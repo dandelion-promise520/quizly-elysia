@@ -4,10 +4,14 @@ export default antfu(
   {
     typescript: true,
     react: true,
+    ignores: [
+      '**/generated/**',
+      '**/prisma/migrations/**',
+    ],
   },
   {
     rules: {
-      'no-console': 'warn',
+      'no-console': 'off',
     },
   },
 )

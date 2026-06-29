@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Question {
+  id     Int      @id
+  type   String   @db.VarChar(20)
+  text   String   @db.Text
+  answer String   @default("") @db.VarChar(50)
+  Option Option[]
+  Blank  Blank[]
+}
+
+model Option {
+  id         Int      @id
+  label      String   @db.VarChar(5)
+  text       String   @db.Text
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Blank {
+  id         Int      @id
+  text       String   @db.Text
+  order      Int      @default(0)
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}

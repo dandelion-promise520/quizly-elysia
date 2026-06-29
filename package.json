@@ -35,6 +35,6 @@
     "pre-commit": "bun run typecheck && npx lint-staged"
   },
   "lint-staged": {
-    "*": "eslint --fix"
+    "*": "eslint --fix --no-warn-ignored"
   }
 }
