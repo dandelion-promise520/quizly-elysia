@@ -8,6 +8,27 @@
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Inter Variable', sans-serif;
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94a3b8;
+    --color-accent: #0d9488;
+    --color-accent-light: #f0fdfa;
+    --color-accent-border: #99f6e4;
+    --color-accent-dark: #0f766e;
+    --color-success: #16a34a;
+    --color-success-light: #f0fdf4;
+    --color-success-border: #86efac;
+    --color-error: #dc2626;
+    --color-error-light: #fef2f2;
+    --color-error-border: #fca5a5;
+    --color-warn-light: #fffbeb;
+    --color-warn-border: #fde68a;
+    --color-border: #e2e8f0;
+    --radius-default: 10px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -127,4 +148,12 @@
   html {
     @apply font-sans;
     }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.7;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
 }
