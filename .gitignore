@@ -13,3 +13,6 @@ build/
 *.tar.gz
 *.tgz
 package-lock.json
+.turbo/
+*.tsbuildinfo
+
