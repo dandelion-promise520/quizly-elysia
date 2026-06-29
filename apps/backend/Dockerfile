@@ -13,9 +13,9 @@ RUN bun install --frozen-lockfile --ignore-scripts
 # 复制整个项目以用于生成和构建
 COPY . .
 
-# 进入后端目录，生成 Prisma 客户端
+# 进入后端目录，生成 Prisma 客户端（注入临时的 DATABASE_URL 以绕过构建期的配置验证）
 WORKDIR /app/apps/backend
-RUN bun prisma generate
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" bun prisma generate
 
 # 暴露 Elysia 端口
 EXPOSE 3000
