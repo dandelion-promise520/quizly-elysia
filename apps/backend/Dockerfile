@@ -7,8 +7,8 @@ COPY package.json bun.lock ./
 COPY apps/backend/package.json ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
 
-# 安装依赖
-RUN bun install --frozen-lockfile
+# 安装依赖（忽略开发相关的 postinstall 脚本，如 simple-git-hooks 等）
+RUN bun install --frozen-lockfile --ignore-scripts
 
 # 复制整个项目以用于生成和构建
 COPY . .
