@@ -1,0 +1,25 @@
+FROM oven/bun:1.3-alpine AS builder
+
+WORKDIR /app
+
+# 复制 root 依赖定义及 backend 的 package.json
+COPY package.json bun.lock ./
+COPY apps/backend/package.json ./apps/backend/
+
+# 安装依赖
+RUN bun install --frozen-lockfile
+
+# 复制整个项目以用于生成和构建
+COPY . .
+
+# 进入后端目录，生成 Prisma 客户端
+WORKDIR /app/apps/backend
+RUN bun prisma generate
+
+# 暴露 Elysia 端口
+EXPOSE 3000
+
+ENV NODE_ENV=production
+
+# 运行数据库迁移并启动服务
+CMD ["sh", "-c", "bun prisma migrate deploy && bun run src/index.ts"]
