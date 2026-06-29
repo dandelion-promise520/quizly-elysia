@@ -2,9 +2,10 @@ FROM oven/bun:1.3-alpine AS builder
 
 WORKDIR /app
 
-# 复制 root 依赖定义及 backend 的 package.json
+# 复制 root 依赖定义及所有 workspace 子包的 package.json
 COPY package.json bun.lock ./
 COPY apps/backend/package.json ./apps/backend/
+COPY apps/frontend/package.json ./apps/frontend/
 
 # 安装依赖
 RUN bun install --frozen-lockfile
