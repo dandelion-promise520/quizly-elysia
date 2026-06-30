@@ -8,12 +8,13 @@ datasource db {
 }
 
 model Question {
-  id     Int      @id @default(autoincrement())
-  type   String   @db.VarChar(20)
-  text   String   @db.Text
-  answer String   @default("") @db.VarChar(50)
-  Option Option[]
-  Blank  Blank[]
+  id       Int      @id @default(autoincrement())
+  type     String   @db.VarChar(20)
+  text     String   @db.Text
+  answer   String   @default("") @db.VarChar(50)
+  category String   @default("基础题") @db.VarChar(50)
+  Option   Option[]
+  Blank    Blank[]
 }
 
 model Option {

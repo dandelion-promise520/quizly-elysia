@@ -84,11 +84,13 @@ export function TabsTrigger({
   children,
   className,
   indicatorClassName,
+  wrapperClassName,
 }: {
   value: string
   children: ReactNode
   className?: string
   indicatorClassName?: string
+  wrapperClassName?: string
 }) {
   const { value: current, setValue, layoutId, variant } = useTabs()
   const active = current === value
@@ -125,7 +127,7 @@ export function TabsTrigger({
   const radius = variant === 'pill' ? 'rounded-full' : 'rounded-md'
 
   return (
-    <div className="relative cursor-pointer">
+    <div className={cn('relative cursor-pointer', wrapperClassName)}>
       {active
         ? (
             <motion.span

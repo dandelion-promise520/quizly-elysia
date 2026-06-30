@@ -1,4 +1,5 @@
 import type { Question } from '@quizly/types'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff, Lock } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -15,9 +16,8 @@ export default function AdminDashboard() {
   const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
 
+  const queryClient = useQueryClient()
   const [questions, setQuestions] = useState<Question[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(0)
@@ -43,59 +43,58 @@ export default function AdminDashboard() {
       })
   }
 
-  const loadData = () => {
-    setLoading(true)
-    setError(null)
-    getQuestions()
-      .then((data) => {
-        setQuestions(data)
-        setLoading(false)
-        if (data.length > 0) {
-          setSelectedIndex(0)
-        }
-        else {
-          setSelectedIndex(null)
-        }
-      })
-      .catch((err) => {
-        console.error('加载管理后台数据出错:', err)
-        setError('数据加载失败，请确认后端服务是否启动')
-        setLoading(false)
-      })
-  }
+  const { data: fetchedQuestions, isLoading: queryLoading, error: queryError, refetch } = useQuery<Question[]>({
+    queryKey: ['questions'],
+    queryFn: getQuestions,
+    enabled: isAuthenticated,
+  })
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadData()
+    if (fetchedQuestions) {
+      setQuestions(fetchedQuestions)
+      if (fetchedQuestions.length > 0) {
+        setSelectedIndex(prev => (prev === null ? 0 : Math.min(prev, fetchedQuestions.length - 1)))
+      }
+      else {
+        setSelectedIndex(null)
+      }
     }
-  }, [isAuthenticated])
+  }, [fetchedQuestions])
 
-  const saveToDisk = async (newQuestions: Question[]) => {
+  const saveToDisk = useCallback(async (newQuestions: Question[]) => {
     try {
       const data = await saveQuestions(newQuestions)
       if (data.success && data.questions) {
         setQuestions(data.questions)
+        void queryClient.invalidateQueries({ queryKey: ['questions'] })
       }
-      else if (!data.success) {
-        console.error('Failed to save to database:', data.error)
+      else {
+        throw new Error(data.error || 'Failed to save to database')
       }
     }
     catch (err) {
-      console.error('Network error when saving to database:', err)
+      console.error('保存数据库出错:', err)
+      throw err
     }
-  }
+  }, [queryClient])
 
   const handleSave = useCallback(
-    (q: Question) => {
+    async (q: Question) => {
       const next = [...questions]
       if (selectedIndex !== null) {
         next[selectedIndex] = q
       }
       setQuestions(next)
       setIsNew(false)
-      void saveToDisk(next)
+      try {
+        await saveToDisk(next)
+      }
+      catch (err) {
+        void refetch()
+        throw err
+      }
     },
-    [questions, selectedIndex],
+    [questions, selectedIndex, saveToDisk, refetch],
   )
 
   const handleDelete = useCallback(
@@ -113,7 +112,7 @@ export default function AdminDashboard() {
       setIsNew(false)
       void saveToDisk(next)
     },
-    [questions, selectedIndex],
+    [questions, selectedIndex, saveToDisk],
   )
 
   const handleNew = () => {
@@ -234,7 +233,7 @@ export default function AdminDashboard() {
     )
   }
 
-  if (loading) {
+  if (queryLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -244,13 +243,15 @@ export default function AdminDashboard() {
     )
   }
 
-  if (error) {
+  if (queryError) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200 max-w-md">
           <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
-          <div className="text-slate-600 text-sm mb-6">{error}</div>
-          <Button variant="primary" onClick={loadData} className="px-6 py-2">
+          <div className="text-slate-600 text-sm mb-6">
+            {queryError instanceof Error ? queryError.message : '数据加载失败，请确认后端服务是否启动'}
+          </div>
+          <Button variant="primary" onClick={() => { void refetch() }} className="px-6 py-2">
             重新加载
           </Button>
         </div>

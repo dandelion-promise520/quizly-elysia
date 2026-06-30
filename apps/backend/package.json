@@ -14,6 +14,7 @@
     "@quizly/types": "workspace:*",
     "dotenv": "^17.4.2",
     "elysia": "latest",
+    "ioredis": "^5.11.1",
     "pg": "^8.22.0",
     "prismabox": "^1.1.26"
   },

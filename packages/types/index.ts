@@ -11,6 +11,7 @@ export interface ChoiceQuestion {
   answer: string // original label, e.g. "B"
   shuffledOptions?: Option[]
   correctShuffledIdx?: number
+  category?: string
 }
 
 export interface MultiChoiceQuestion {
@@ -21,6 +22,7 @@ export interface MultiChoiceQuestion {
   answer: string // comma-separated original labels, e.g. "A,C"
   shuffledOptions?: Option[]
   correctShuffledIndices?: number[]
+  category?: string
 }
 
 export interface FillQuestion {
@@ -29,6 +31,7 @@ export interface FillQuestion {
   text: string
   blanks: string[] // correct answers per blank
   answer: string[]
+  category?: string
 }
 
 export type Question = ChoiceQuestion | MultiChoiceQuestion | FillQuestion

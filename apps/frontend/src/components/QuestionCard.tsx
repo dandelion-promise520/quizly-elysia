@@ -1,4 +1,5 @@
 import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question } from '@quizly/types'
+import { checkAnswerCorrect, normalizeSql } from '@/hooks/useQuizState'
 import ChoiceCard from './ChoiceCard'
 import FeedbackBanner from './FeedbackBanner'
 import FillCard from './FillCard'
@@ -7,6 +8,7 @@ import MultiChoiceCard from './MultiChoiceCard'
 interface QuestionCardProps {
   question: Question
   index: number
+  displayIndex?: number
   done: boolean
   selectedIdx?: number
   selectedIndices?: number[]
@@ -19,6 +21,7 @@ interface QuestionCardProps {
 export default function QuestionCard({
   question,
   index,
+  displayIndex,
   done,
   selectedIdx,
   selectedIndices,
@@ -28,15 +31,10 @@ export default function QuestionCard({
   onSubmitFill,
 }: QuestionCardProps) {
   const isCorrect = question.type === '填空题'
-    ? userAnswers?.every((a, i) => a === (question as FillQuestion).answer[i])
+    ? userAnswers && checkAnswerCorrect(question, userAnswers)
     : question.type === '多选题'
-      ? (
-          selectedIndices
-          && (question as MultiChoiceQuestion).correctShuffledIndices
-          && selectedIndices.length === (question as MultiChoiceQuestion).correctShuffledIndices!.length
-          && selectedIndices.every(val => (question as MultiChoiceQuestion).correctShuffledIndices!.includes(val))
-        )
-      : selectedIdx === (question as ChoiceQuestion).correctShuffledIdx
+      ? selectedIndices && checkAnswerCorrect(question, selectedIndices)
+      : selectedIdx !== undefined && checkAnswerCorrect(question, selectedIdx)
 
   let feedbackType: 'correct' | 'wrong' | 'unanswered' = 'wrong'
   let feedbackMsg = ''
@@ -46,7 +44,10 @@ export default function QuestionCard({
       const fillQ = question as FillQuestion
       let blankCorrect = 0
       for (let b = 0; b < fillQ.answer.length; b++) {
-        if (userAnswers[b] === fillQ.answer[b])
+        const isBlankCorrect = question.category === 'SQL填空题'
+          ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
+          : userAnswers[b] === fillQ.answer[b]
+        if (isBlankCorrect)
           blankCorrect++
       }
       if (blankCorrect === fillQ.answer.length) {
@@ -57,7 +58,10 @@ export default function QuestionCard({
         feedbackType = 'wrong'
         const parts: string[] = []
         for (let b = 0; b < fillQ.answer.length; b++) {
-          const status = userAnswers[b] === fillQ.answer[b] ? '✓' : '✗'
+          const isBlankCorrect = question.category === 'SQL填空题'
+            ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
+            : userAnswers[b] === fillQ.answer[b]
+          const status = isBlankCorrect ? '✓' : '✗'
           parts.push(`${status} 第${b + 1}空：你填"${userAnswers[b] || ''}"，正确答案"${fillQ.answer[b]}"`)
         }
         const statusText = blankCorrect === 0 ? '回答错误。' : '部分正确。'
@@ -116,7 +120,7 @@ export default function QuestionCard({
       {/* Question header */}
       <div className="flex items-start gap-2.5 mb-4.5">
         <span className="text-sm font-semibold text-white bg-teal-600 px-3 py-0.5 rounded-full flex-shrink-0 mt-0.5">
-          {index + 1}
+          {displayIndex ?? (index + 1)}
         </span>
         <span className="text-[11px] font-semibold text-teal-600 bg-teal-50 px-2.5 py-0.75 rounded-full flex-shrink-0 mt-0.5 border border-teal-200">
           {question.type}

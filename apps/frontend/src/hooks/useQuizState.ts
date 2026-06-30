@@ -105,17 +105,47 @@ export interface QuizHookReturn {
   pickAnswer: (qi: number, oi: number) => void
   submitMulti: (qi: number, selectedIndices: number[]) => void
   submitFill: (qi: number, userAnswers: string[]) => void
-  submitAll: () => void
+  submitAll: (category?: 'SQL填空题' | '基础题') => void
   resetAll: () => void
   hydrated: boolean
 }
 
-function checkAnswerCorrect(q: Question, savedAns: any): boolean {
+export function normalizeSql(sql: string | undefined | null): string {
+  if (!sql)
+    return ''
+  return sql
+    .toLowerCase()
+    .replace(/[\r\n\t]+/g, ' ') // replace newlines/tabs with space
+    .replace(/\s+/g, ' ') // collapse multiple spaces
+    .trim()
+    .replace(/;\s*$/, '') // remove trailing semicolon
+    .replace(/\s*,\s*/g, ',') // remove spaces around commas
+    .replace(/\s*=\s*/g, '=') // remove spaces around equals
+    .replace(/\s*<>\s*/g, '<>') // remove spaces around not equals
+    .replace(/\s*!=\s*/g, '!=') // remove spaces around not equals
+    .replace(/\s*>\s*/g, '>') // remove spaces around greater than
+    .replace(/\s*<\s*/g, '<') // remove spaces around less than
+    .replace(/\s*>=\s*/g, '>=') // remove spaces around >=
+    .replace(/\s*<=\s*/g, '<=') // remove spaces around <=
+    .replace(/\s*\(\s*/g, '(') // remove spaces around parentheses
+    .replace(/\s*\)\s*/g, ')')
+    .replace(/['"`]/g, '\'') // normalize quotes to single quotes
+    .trim()
+}
+
+export function checkAnswerCorrect(q: Question, savedAns: any): boolean {
   if (q.type === '填空题') {
     const fillQ = q as FillQuestion
     if (!Array.isArray(savedAns))
       return false
-    return fillQ.answer.every((ans, idx) => savedAns[idx] === ans)
+    return fillQ.answer.every((ans, idx) => {
+      const userVal = savedAns[idx] || ''
+      const correctVal = ans || ''
+      if (q.category === 'SQL填空题') {
+        return normalizeSql(userVal) === normalizeSql(correctVal)
+      }
+      return userVal === correctVal
+    })
   }
   else if (q.type === '多选题') {
     const multiQ = q as MultiChoiceQuestion
@@ -335,7 +365,7 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
     })
   }, [])
 
-  const submitAll = useCallback(() => {
+  const submitAll = useCallback((category?: 'SQL填空题' | '基础题') => {
     setState((prev) => {
       const newDf = { ...prev.doneFlags }
       const newAnswers = { ...prev.answers }
@@ -344,6 +374,15 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
       prev.questions.forEach((q, i) => {
         if (newDf[i])
           return
+
+        if (category) {
+          const isSql = q.category === 'SQL填空题'
+          if (category === 'SQL填空题' && !isSql)
+            return
+          if (category === '基础题' && isSql)
+            return
+        }
+
         newDf[i] = true
         newAnswered++
         if (q.type === '填空题') {

@@ -2,6 +2,7 @@ import process from 'node:process'
 import { cors } from '@elysiajs/cors'
 import { Elysia } from 'elysia'
 import { getQuestions, saveQuestionsToDatabase } from './lib/db'
+import { delCache, getCache, setCache } from './lib/redis'
 
 const app = new Elysia()
   .use(cors({
@@ -28,7 +29,12 @@ const app = new Elysia()
   })
   .get('/api/questions', async () => {
     try {
+      const cached = await getCache('quizly:questions')
+      if (cached) {
+        return JSON.parse(cached)
+      }
       const questions = await getQuestions()
+      await setCache('quizly:questions', JSON.stringify(questions), 3600)
       return questions
     }
     catch (error) {
@@ -41,6 +47,7 @@ const app = new Elysia()
     try {
       const questions = body as any[]
       const updated = await saveQuestionsToDatabase(questions)
+      await delCache('quizly:questions')
       return { success: true, questions: updated }
     }
     catch (error) {

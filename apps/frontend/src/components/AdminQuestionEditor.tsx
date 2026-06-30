@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
 interface AdminQuestionEditorProps {
   question: Question
   index: number
-  onSave: (q: Question) => void
+  onSave: (q: Question) => Promise<void> | void
   isNew: boolean
 }
 
@@ -23,6 +23,7 @@ interface Draft {
   options?: Option[]
   answer: string | string[]
   blanks?: string[]
+  category?: string
 }
 
 function emptyDraft(type: Draft['type']): Draft {
@@ -107,6 +108,7 @@ export default function AdminQuestionEditor({
     d.answer = question.answer
     if ('blanks' in question)
       d.blanks = (question as FillQuestion).blanks
+    d.category = question.category
     return d
   })
   const [saveState, setSaveState] = useState<
@@ -121,32 +123,32 @@ export default function AdminQuestionEditor({
     d.answer = question.answer
     if ('blanks' in question)
       d.blanks = (question as FillQuestion).blanks
+    d.category = question.category
     setDraft(d)
   }, [question])
 
-  const push = () => {
+  const push = async () => {
     console.log('push function called inside AdminQuestionEditor!')
     setSaveState('loading')
-    setTimeout(() => {
-      try {
-        const q: Question = {
-          type: draft.type,
-          text: draft.text,
-          answer: draft.answer,
-          ...(draft.options ? { options: draft.options } : {}),
-          ...(draft.blanks ? { blanks: draft.blanks } : {}),
-        } as Question
-        console.log('pushing question data to onSave:', q)
-        onSave(q)
-        setSaveState('success')
-        setTimeout(() => setSaveState('idle'), 1500)
-      }
-      catch (err) {
-        console.error('error inside push function:', err)
-        setSaveState('error')
-        setTimeout(() => setSaveState('idle'), 1500)
-      }
-    }, 600)
+    try {
+      const q: Question = {
+        type: draft.type,
+        text: draft.text,
+        answer: draft.answer,
+        category: draft.category || '基础题',
+        ...(draft.options ? { options: draft.options } : {}),
+        ...(draft.blanks ? { blanks: draft.blanks } : {}),
+      } as Question
+      console.log('pushing question data to onSave:', q)
+      await onSave(q)
+      setSaveState('success')
+      setTimeout(() => setSaveState('idle'), 1500)
+    }
+    catch (err) {
+      console.error('error inside push function:', err)
+      setSaveState('error')
+      setTimeout(() => setSaveState('idle'), 1500)
+    }
   }
 
   const setText = (v: string) => setDraft(d => ({ ...d, text: v }))
@@ -275,6 +277,20 @@ export default function AdminQuestionEditor({
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* Category input */}
+        <div className="max-w-lg">
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            分类
+          </label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-teal-500 text-sm"
+            value={draft.category || ''}
+            onChange={e => setDraft(d => ({ ...d, category: e.target.value }))}
+            placeholder="请输入分类，如：基础题、SQL填空题"
+          />
+        </div>
 
         {/* Question text */}
         <div>

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   createRootRoute,
   createRoute,
@@ -7,6 +8,15 @@ import {
 } from '@tanstack/react-router'
 import AdminDashboard from '@/components/AdminDashboard'
 import QuizPage from '@/components/QuizPage'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -35,5 +45,9 @@ declare module '@tanstack/react-router' {
 }
 
 export function App() {
-  return <RouterProvider router={router} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  )
 }
