@@ -1,4 +1,5 @@
 import type { Question } from '@quizly/types'
+import { Link } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
@@ -222,12 +223,12 @@ export default function AdminDashboard() {
 
           <div className="flex-1" />
 
-          <a
-            href="#/"
+          <Link
+            to="/"
             className="text-sm text-teal-600 hover:text-teal-700 font-semibold"
           >
             ← 返回答题页面
-          </a>
+          </Link>
         </div>
 
         {/* Editor */}

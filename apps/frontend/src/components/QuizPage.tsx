@@ -1,4 +1,5 @@
 import type { Question } from '@quizly/types'
+import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useQuizState } from '@/hooks/useQuizState'
 import { getQuestions } from '@/lib/api'
@@ -85,9 +86,9 @@ export default function QuizPage() {
       <ProgressBar answered={answered} total={total} />
 
       <div className="max-w-[720px] mx-auto px-5 pt-4 text-right">
-        <a href="#/admin" className="text-sm font-semibold text-teal-600 hover:text-teal-700">
+        <Link to="/admin" className="text-sm font-semibold text-teal-600 hover:text-teal-700">
           进入管理后台 →
-        </a>
+        </Link>
       </div>
 
       <main className="max-w-[720px] mx-auto px-5 py-8 pb-20">
