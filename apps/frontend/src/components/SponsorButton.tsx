@@ -37,7 +37,7 @@ export default function SponsorButton() {
             </span>
             <div className="relative w-32 h-32 bg-slate-50 border border-slate-100 rounded-lg overflow-hidden flex items-center justify-center p-1">
               <img
-                src="/sponsor-qr.jpg"
+                src="/sponsor-qr.png"
                 alt="微信打赏码"
                 className="w-full h-full object-contain"
               />
