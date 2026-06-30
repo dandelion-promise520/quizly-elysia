@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Question {
-  id     Int      @id
+  id     Int      @id @default(autoincrement())
   type   String   @db.VarChar(20)
   text   String   @db.Text
   answer String   @default("") @db.VarChar(50)
@@ -17,7 +17,7 @@ model Question {
 }
 
 model Option {
-  id         Int      @id
+  id         Int      @id @default(autoincrement())
   label      String   @db.VarChar(5)
   text       String   @db.Text
   questionId Int
@@ -25,7 +25,7 @@ model Option {
 }
 
 model Blank {
-  id         Int      @id
+  id         Int      @id @default(autoincrement())
   text       String   @db.Text
   order      Int      @default(0)
   questionId Int

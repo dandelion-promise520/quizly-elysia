@@ -55,7 +55,7 @@ export default function ChoiceCard({
 
           return (
             <div
-              key={oi}
+              key={opt.label}
               className={optCls}
               onMouseEnter={() => !done && setHoveredIdx(oi)}
               onClick={() => !done && onPick(index, oi)}

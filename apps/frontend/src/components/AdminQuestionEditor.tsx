@@ -307,7 +307,7 @@ export default function AdminQuestionEditor({
             </div>
 
             {(draft.options ?? []).map((opt: Option, i: number) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={opt.label} className="flex items-center gap-2">
                 <input
                   value={opt.label}
                   onChange={e => updateOption(i, 'label', e.target.value)}
@@ -428,7 +428,7 @@ export default function AdminQuestionEditor({
             </div>
 
             {(draft.blanks ?? []).map((_: string, i: number) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={`blank-${i}`} className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 w-6 text-center">
                   {i + 1}
                   .

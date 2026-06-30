@@ -146,6 +146,7 @@ export default function AdminSidebar({
               </span>
 
               <button
+                type="button"
                 className={[
                   'relative z-10 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs transition',
                   needConfirm

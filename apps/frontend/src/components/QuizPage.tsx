@@ -67,6 +67,7 @@ export default function QuizPage() {
           <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
           <div className="text-slate-600 text-sm mb-6">{error}</div>
           <button
+            type="button"
             onClick={loadData}
             className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold transition cursor-pointer"
           >
@@ -119,7 +120,7 @@ export default function QuizPage() {
 
           return (
             <QuestionCard
-              key={i}
+              key={q.id ?? `q-${i}`}
               question={q}
               index={i}
               done={done}

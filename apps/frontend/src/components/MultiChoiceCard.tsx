@@ -81,7 +81,7 @@ export default function MultiChoiceCard({
 
           return (
             <div
-              key={oi}
+              key={opt.label}
               className={optCls}
               onMouseEnter={() => !done && setHoveredIdx(oi)}
               onClick={() => toggleOption(oi)}

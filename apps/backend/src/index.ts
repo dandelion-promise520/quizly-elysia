@@ -1,19 +1,13 @@
+import { cors } from '@elysiajs/cors'
 import { Elysia } from 'elysia'
 import { getQuestions, saveQuestionsToDatabase } from './lib/db'
 
 const app = new Elysia()
-  // 手写简易 CORS 中间件，避免依赖外部包
-  .onRequest(({ set }) => {
-    set.headers['Access-Control-Allow-Origin'] = '*'
-    set.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    set.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-  })
-  .onBeforeHandle(({ request, set }) => {
-    if (request.method === 'OPTIONS') {
-      set.status = 204
-      return ''
-    }
-  })
+  .use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }))
   .get('/', () => ({ status: 'ok', service: 'quizly-backend' }))
   .get('/api/questions', async () => {
     try {
