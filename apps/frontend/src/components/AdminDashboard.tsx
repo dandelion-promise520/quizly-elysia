@@ -1,12 +1,20 @@
 import type { Question } from '@quizly/types'
 import { Link } from '@tanstack/react-router'
+import { Eye, EyeOff, Lock } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
 import { Button } from '@/components/motion/button'
-import { getQuestions, saveQuestions } from '@/lib/api'
+import { getQuestions, saveQuestions, verifyAdminPassword } from '@/lib/api'
 
 export default function AdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return sessionStorage.getItem('quizly_admin_authenticated') === 'true'
+  })
+  const [passwordInput, setPasswordInput] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
+
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -15,6 +23,25 @@ export default function AdminDashboard() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(0)
   const [isNew, setIsNew] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    verifyAdminPassword(passwordInput)
+      .then((data) => {
+        if (data.success) {
+          sessionStorage.setItem('quizly_admin_authenticated', 'true')
+          setIsAuthenticated(true)
+          setAuthError(null)
+        }
+        else {
+          setAuthError(data.error || '密码错误，请重新输入')
+        }
+      })
+      .catch((err) => {
+        console.error('密码验证出错:', err)
+        setAuthError('网络错误或后端服务未启动')
+      })
+  }
 
   const loadData = () => {
     setLoading(true)
@@ -38,8 +65,10 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    loadData()
-  }, [])
+    if (isAuthenticated) {
+      loadData()
+    }
+  }, [isAuthenticated])
 
   const saveToDisk = async (newQuestions: Question[]) => {
     try {
@@ -139,6 +168,70 @@ export default function AdminDashboard() {
     reader.readAsText(file)
     if (fileInputRef.current)
       fileInputRef.current.value = ''
+  }
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden font-sans">
+        {/* 背景动态渐变球 */}
+        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-teal-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+
+        <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
+          <div className="w-16 h-16 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center mb-6">
+            <Lock className="w-8 h-8 text-teal-400" />
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mb-2">管理后台认证</h2>
+          <p className="text-slate-400 text-sm mb-8 text-center">请输入管理员密码以访问控制台</p>
+
+          <form onSubmit={handleAuthSubmit} className="w-full space-y-5">
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="请输入密码..."
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value)
+                  if (authError)
+                    setAuthError(null)
+                }}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm pr-10"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+
+            {authError && (
+              <p className="text-red-400 text-xs mt-1 text-center font-medium animate-pulse">
+                ⚠️
+                {' '}
+                {authError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-teal-600/20 cursor-pointer"
+            >
+              验证密码
+            </button>
+          </form>
+
+          <Link
+            to="/"
+            className="text-xs text-slate-500 hover:text-teal-400 transition-colors mt-8 font-medium"
+          >
+            ← 返回答题页面
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

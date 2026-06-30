@@ -21,3 +21,16 @@ export async function saveQuestions(questions: Question[]): Promise<{ success: b
     throw new Error('Failed to save questions')
   return res.json()
 }
+
+export async function verifyAdminPassword(password: string): Promise<{ success: boolean, error?: string }> {
+  const res = await fetch(`${API_BASE}/admin/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ password }),
+  })
+  if (!res.ok)
+    throw new Error('Failed to verify admin password')
+  return res.json()
+}
