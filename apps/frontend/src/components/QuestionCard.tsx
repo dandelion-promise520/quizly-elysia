@@ -115,7 +115,7 @@ export default function QuestionCard({
 
   return (
     <div
-      className={`bg-white border border-slate-200 rounded-xl p-6 mb-4 shadow-sm transition-all duration-300 ${cardBorder}`}
+      className={`bg-white border border-slate-200 rounded-xl p-6 mb-3 shadow-sm transition-all duration-300 ${cardBorder}`}
     >
       {/* Question header */}
       <div className="flex items-start gap-2.5 mb-4.5">

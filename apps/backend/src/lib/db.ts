@@ -85,40 +85,38 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
 
       // 2. Insert or Update questions
       for (const q of questions) {
-        if (typeof q.id === 'number') {
-          const dbQ = existing.find(x => x.id === q.id)
+        const dbQ = typeof q.id === 'number' ? existing.find(x => x.id === q.id) : undefined
+        if (dbQ) {
           let needsUpdate = true
-          if (dbQ) {
-            if (q.type === '填空题') {
-              const dbBlanks = [...dbQ.Blank].sort((a, b) => a.order - b.order).map(b => b.text)
-              const hasBlanksChanged = dbBlanks.length !== q.blanks.length || dbBlanks.some((b, idx) => b !== q.blanks[idx])
+          if (q.type === '填空题') {
+            const dbBlanks = [...dbQ.Blank].sort((a, b) => a.order - b.order).map(b => b.text)
+            const hasBlanksChanged = dbBlanks.length !== q.blanks.length || dbBlanks.some((b, idx) => b !== q.blanks[idx])
 
-              if (
-                dbQ.type === q.type
-                && dbQ.text === q.text
-                && dbQ.categoryId === (q.categoryId ?? null)
-                && dbQ.courseId === (q.courseId ?? null)
-                && !hasBlanksChanged
-              ) {
-                needsUpdate = false
-              }
+            if (
+              dbQ.type === q.type
+              && dbQ.text === q.text
+              && dbQ.categoryId === (q.categoryId ?? null)
+              && dbQ.courseId === (q.courseId ?? null)
+              && !hasBlanksChanged
+            ) {
+              needsUpdate = false
             }
-            else {
-              const hasOptionsChanged = dbQ.Option.length !== q.options.length || q.options.some((opt) => {
-                const dbOpt = dbQ.Option.find(o => o.label === opt.label)
-                return !dbOpt || dbOpt.text !== opt.text
-              })
+          }
+          else {
+            const hasOptionsChanged = dbQ.Option.length !== q.options.length || q.options.some((opt) => {
+              const dbOpt = dbQ.Option.find(o => o.label === opt.label)
+              return !dbOpt || dbOpt.text !== opt.text
+            })
 
-              if (
-                dbQ.type === q.type
-                && dbQ.text === q.text
-                && dbQ.answer === q.answer
-                && dbQ.categoryId === (q.categoryId ?? null)
-                && dbQ.courseId === (q.courseId ?? null)
-                && !hasOptionsChanged
-              ) {
-                needsUpdate = false
-              }
+            if (
+              dbQ.type === q.type
+              && dbQ.text === q.text
+              && dbQ.answer === q.answer
+              && dbQ.categoryId === (q.categoryId ?? null)
+              && dbQ.courseId === (q.courseId ?? null)
+              && !hasOptionsChanged
+            ) {
+              needsUpdate = false
             }
           }
 

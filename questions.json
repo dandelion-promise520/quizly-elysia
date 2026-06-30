@@ -2670,5 +2670,263 @@
       "courseId": 2
     },
     "courseId": 2
+  },
+  {
+    "id": 201,
+    "type": "单选题",
+    "text": "在数据结构中，数据相关的概念存在着层层包含关系。以下关于数据概念的层次关系，正确的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "数据 -> 数据对象 -> 数据元素 -> 数据项"
+      },
+      {
+        "label": "B",
+        "text": "数据 -> 数据元素 -> 数据对象 -> 数据项"
+      },
+      {
+        "label": "C",
+        "text": "数据 -> 数据对象 -> 数据项 -> 数据元素"
+      },
+      {
+        "label": "D",
+        "text": "数据 -> 数据项 -> 数据元素 -> 数据对象"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 202,
+    "type": "单选题",
+    "text": "以下关于数据逻辑结构与存储结构的叙述中，正确的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "同一种逻辑结构只能采用一种特定的存储结构"
+      },
+      {
+        "label": "B",
+        "text": "逻辑结构独立于计算机，而存储结构依赖于计算机"
+      },
+      {
+        "label": "C",
+        "text": "链式存储结构支持随机存取（Random Access）"
+      },
+      {
+        "label": "D",
+        "text": "数据的逻辑结构与具体的物理实现和计算机硬件有关"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 203,
+    "type": "单选题",
+    "text": "关于算法的特性和评判标准，以下说法正确的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "一个算法可以没有输入，也可以没有输出"
+      },
+      {
+        "label": "B",
+        "text": "操作系统是一个典型的有穷算法"
+      },
+      {
+        "label": "C",
+        "text": "算法必须在执行有穷步之后结束，且每一步都可在有穷时间内完成"
+      },
+      {
+        "label": "D",
+        "text": "算法与程序在概念上是完全等价的"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 204,
+    "type": "单选题",
+    "text": "常见时间渐进复杂度按效率由高到低（即增长速度由慢到快）的顺序排列，正确的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "O(1) < O(n) < O(log2 n) < O(n^2)"
+      },
+      {
+        "label": "B",
+        "text": "O(1) < O(log2 n) < O(n) < O(n log2 n) < O(n^2)"
+      },
+      {
+        "label": "C",
+        "text": "O(log2 n) < O(1) < O(n) < O(n^2) < O(2^n)"
+      },
+      {
+        "label": "D",
+        "text": "O(1) < O(n) < O(n log2 n) < O(log2 n) < O(n^2)"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 10,
+    "category": {
+      "id": 10,
+      "name": "算法分析题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 205,
+    "type": "单选题",
+    "text": "分析以下代码段的时间复杂度（ ）\n\nint i = 1;\nwhile (i < n) {\n    i = i * 2;\n}",
+    "options": [
+      {
+        "label": "A",
+        "text": "O(1)"
+      },
+      {
+        "label": "B",
+        "text": "O(n)"
+      },
+      {
+        "label": "C",
+        "text": "O(log2 n)"
+      },
+      {
+        "label": "D",
+        "text": "O(n^2)"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 10,
+    "category": {
+      "id": 10,
+      "name": "算法分析题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 206,
+    "type": "单选题",
+    "text": "分析以下双重嵌套循环代码段的时间复杂度（ ）\n\nint count = 0;\nfor (int i = 0; i < n; i++) {\n    for (int j = 0; j < i; j++) {\n        count++;\n    }\n}",
+    "options": [
+      {
+        "label": "A",
+        "text": "O(n)"
+      },
+      {
+        "label": "B",
+        "text": "O(n log2 n)"
+      },
+      {
+        "label": "C",
+        "text": "O(n^2)"
+      },
+      {
+        "label": "D",
+        "text": "O(n^3)"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 10,
+    "category": {
+      "id": 10,
+      "name": "算法分析题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 207,
+    "type": "填空题",
+    "text": "数据的基本单位是____，而数据的不可分割的最小单位是数据项。",
+    "blanks": [
+      "数据元素"
+    ],
+    "answer": [
+      "数据元素"
+    ],
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 208,
+    "type": "填空题",
+    "text": "在数据的存储结构中，顺序存储支持____存取，而链式存储仅支持顺序存取。",
+    "blanks": [
+      "随机"
+    ],
+    "answer": [
+      "随机"
+    ],
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 209,
+    "type": "填空题",
+    "text": "若算法在运行过程中临时占用的辅助空间大小为常数（即不随输入规模 n 的改变而改变），则该算法的空间复杂度为 O(1)，这被称为____。",
+    "blanks": [
+      "原地工作"
+    ],
+    "answer": [
+      "原地工作"
+    ],
+    "categoryId": 9,
+    "category": {
+      "id": 9,
+      "name": "基础题",
+      "courseId": 3
+    },
+    "courseId": 3
+  },
+  {
+    "id": 210,
+    "type": "填空题",
+    "text": "若单路递归计算阶乘的递归深度为 n，且系统为每层递归分配固定大小的栈空间，则该递归算法的空间复杂度为____。",
+    "blanks": [
+      "O(n)"
+    ],
+    "answer": [
+      "O(n)"
+    ],
+    "categoryId": 10,
+    "category": {
+      "id": 10,
+      "name": "算法分析题",
+      "courseId": 3
+    },
+    "courseId": 3
   }
 ]

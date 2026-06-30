@@ -1,4 +1,5 @@
 import type { Course, Question } from '@quizly/types'
+import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff, Lock } from 'lucide-react'
@@ -34,6 +35,10 @@ export default function AdminDashboard() {
 
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
   const [tempCourses, setTempCourses] = useState<Course[]>([])
+
+  const [isImportConfirmOpen, setIsImportConfirmOpen] = useState(false)
+  const [importData, setImportData] = useState<Question[] | null>(null)
+  const [isImporting, setIsImporting] = useState(false)
 
   const [isBatchMode, setIsBatchMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
@@ -269,11 +274,12 @@ export default function AdminDashboard() {
       try {
         const data = JSON.parse(reader.result as string)
         if (Array.isArray(data)) {
-          setQuestions(data)
-          saveToDisk(data)
-          setSelectedIndex(0)
-          setIsNew(false)
+          setImportData(data)
+          setIsImportConfirmOpen(true)
           setPageError(null)
+        }
+        else {
+          setPageError('导入失败：JSON 文件不是一个题目数组。')
         }
       }
       catch {
@@ -283,6 +289,25 @@ export default function AdminDashboard() {
     reader.readAsText(file)
     if (fileInputRef.current)
       fileInputRef.current.value = ''
+  }
+
+  const executeImport = async () => {
+    if (!importData)
+      return
+    setIsImporting(true)
+    try {
+      await saveToDisk(importData)
+      setIsImportConfirmOpen(false)
+      setImportData(null)
+      setSelectedIndex(0)
+      setIsNew(false)
+    }
+    catch (err: any) {
+      setPageError(`导入失败：${err.message || err}`)
+    }
+    finally {
+      setIsImporting(false)
+    }
   }
   if (!isAuthenticated) {
     return (
@@ -796,6 +821,53 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* 确认导入弹窗 */}
+      <AlertDialog.Root open={isImportConfirmOpen} onOpenChange={setIsImportConfirmOpen}>
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+          <AlertDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex w-[400px] max-w-[calc(100vw-3rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl transition-[scale,opacity] duration-150 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+            <div className="flex flex-col gap-2">
+              <AlertDialog.Title className="text-lg font-bold text-slate-900">确认导入题目</AlertDialog.Title>
+              <AlertDialog.Description className="text-sm text-slate-500 leading-relaxed">
+                你确定要导入所选的 JSON 文件吗？此操作将**覆盖当前数据库中的所有题目**，且无法撤销。
+                {importData && (
+                  <span className="block mt-2 font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded-lg p-2 text-xs">
+                    本次即将导入
+                    {' '}
+                    {importData.length}
+                    {' '}
+                    道题目。
+                  </span>
+                )}
+              </AlertDialog.Description>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-2">
+              <AlertDialog.Close className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer select-none">
+                取消
+              </AlertDialog.Close>
+              <button
+                type="button"
+                disabled={isImporting}
+                onClick={executeImport}
+                className="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer select-none flex items-center justify-center gap-1.5"
+              >
+                {isImporting
+                  ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        导入中...
+                      </>
+                    )
+                  : (
+                      '确认导入'
+                    )}
+              </button>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   )
 }

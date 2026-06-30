@@ -158,11 +158,11 @@ export default function QuizPage() {
         </Link>
       </div>
 
-      <main className="max-w-[720px] mx-auto px-5 py-8 pb-20">
+      <main className="max-w-[720px] mx-auto px-5 py-6 pb-20">
         {courses.length > 0 && (
           <>
             {categoryList.length > 0 && (
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-4">
                 <Tabs
                   value={currentCategoryIdStr}
                   onValueChange={setActiveCategoryId}
@@ -194,7 +194,7 @@ export default function QuizPage() {
 
             {categoryList.length > 0 && (
               <>
-                <div className="text-sm font-semibold text-slate-900 mt-6 mb-5 pb-2.5 border-b-2 border-teal-600 inline-block">
+                <div className="text-sm font-semibold text-slate-900 mt-4 mb-4 pb-2.5 border-b-2 border-teal-600 inline-block">
                   题目列表
                 </div>
 
