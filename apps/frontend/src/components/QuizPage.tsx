@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { checkAnswerCorrect, useQuizState } from '@/hooks/useQuizState'
 
 import { getCourses, getQuestions } from '@/lib/api'
+import DbSchemaHelper from './DbSchemaHelper'
 import Header from './Header'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './motion/select'
 import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
@@ -54,6 +55,13 @@ export default function QuizPage() {
 
   const currentCategoryIdStr = activeCategoryId || (categoryList[0] ? String(categoryList[0].id) : '')
   const currentCategoryIdNum = currentCategoryIdStr ? Number(currentCategoryIdStr) : undefined
+
+  const isDbOrSqlActive = useMemo(() => {
+    const courseName = activeCourse?.name.toLowerCase() || ''
+    const currentCategory = categoryList.find(cat => String(cat.id) === currentCategoryIdStr)
+    const categoryName = currentCategory?.name.toLowerCase() || ''
+    return courseName.includes('数据库') || courseName.includes('sql') || categoryName.includes('sql') || categoryName.includes('数据库')
+  }, [activeCourse, categoryList, currentCategoryIdStr])
 
   // 当切换课程或课程分类列表变化时，自动将选中的 Tab 归到第一个分类的 ID
   useEffect(() => {
@@ -264,6 +272,7 @@ export default function QuizPage() {
           </div>
         )}
       </main>
+      {isDbOrSqlActive && <DbSchemaHelper />}
     </div>
   )
 }
