@@ -132,6 +132,7 @@ export default function AdminQuestionEditor({
     setSaveState('loading')
     try {
       const q: Question = {
+        id: question.id,
         type: draft.type,
         text: draft.text,
         answer: draft.answer,
