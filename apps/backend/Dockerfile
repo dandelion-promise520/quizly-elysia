@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 COPY apps/backend/package.json ./apps/backend/
 COPY apps/frontend/package.json ./apps/frontend/
+COPY packages/types/package.json ./packages/types/
 
 # 安装依赖（忽略开发相关的 postinstall 脚本，如 simple-git-hooks 等）
 RUN bun install --frozen-lockfile --ignore-scripts
