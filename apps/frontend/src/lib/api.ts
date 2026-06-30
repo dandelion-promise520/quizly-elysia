@@ -54,3 +54,20 @@ export async function saveCourses(courses: Course[]): Promise<{ success: boolean
     throw new Error('Failed to save courses')
   return res.json()
 }
+
+export async function batchBindQuestions(payload: {
+  questionIds: number[]
+  courseId: number | null
+  categoryId: number | null
+}): Promise<{ success: boolean, error?: string }> {
+  const res = await fetch(`${API_BASE}/questions/batch-bind`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok)
+    throw new Error('Failed to batch bind questions')
+  return res.json()
+}

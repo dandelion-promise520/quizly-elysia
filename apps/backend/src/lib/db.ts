@@ -311,3 +311,39 @@ export async function saveCoursesToDatabase(courses: { id?: number, name: string
 
   return await getCourses()
 }
+
+export async function batchBindQuestions(
+  questionIds: number[],
+  courseId: number | null,
+  categoryId: number | null,
+) {
+  const finalCourseId = courseId
+  let finalCategoryId = categoryId
+
+  if (finalCourseId === null) {
+    finalCategoryId = null
+  }
+  else if (finalCategoryId !== null) {
+    const cat = await prisma.category.findUnique({
+      where: { id: finalCategoryId },
+    })
+    if (!cat) {
+      throw new Error('所选分类不存在')
+    }
+    if (cat.courseId !== finalCourseId) {
+      throw new Error('所选分类不属于该课程')
+    }
+  }
+
+  await prisma.question.updateMany({
+    where: {
+      id: {
+        in: questionIds,
+      },
+    },
+    data: {
+      courseId: finalCourseId,
+      categoryId: finalCategoryId,
+    },
+  })
+}

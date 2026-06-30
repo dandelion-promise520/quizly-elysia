@@ -6,7 +6,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
 import { Button } from '@/components/motion/button'
-import { getCourses, getQuestions, saveCourses, saveQuestions, verifyAdminPassword } from '@/lib/api'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/motion/select'
+import { batchBindQuestions, getCourses, getQuestions, saveCourses, saveQuestions, verifyAdminPassword } from '@/lib/api'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -27,6 +34,12 @@ export default function AdminDashboard() {
 
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
   const [tempCourses, setTempCourses] = useState<Course[]>([])
+
+  const [isBatchMode, setIsBatchMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false)
+  const [batchCourseId, setBatchCourseId] = useState<number | null>(null)
+  const [batchCategoryId, setBatchCategoryId] = useState<number | null>(null)
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,6 +94,74 @@ export default function AdminDashboard() {
     catch (err) {
       console.error('保存课程失败:', err)
       setPageError('保存课程失败')
+    }
+  }
+
+  const handleToggleBatchMode = useCallback(() => {
+    setIsBatchMode((prev) => {
+      const next = !prev
+      if (!next) {
+        setSelectedIds(new Set())
+      }
+      return next
+    })
+  }, [])
+
+  const handleToggleSelect = useCallback((id: number, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (checked) {
+        next.add(id)
+      }
+      else {
+        next.delete(id)
+      }
+      return next
+    })
+  }, [])
+
+  const handleSelectAll = useCallback((ids: number[], checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (checked) {
+        ids.forEach(id => next.add(id))
+      }
+      else {
+        ids.forEach(id => next.delete(id))
+      }
+      return next
+    })
+  }, [])
+
+  const handleOpenBatchModal = useCallback(() => {
+    setBatchCourseId(null)
+    setBatchCategoryId(null)
+    setIsBatchModalOpen(true)
+  }, [])
+
+  const handleBatchBind = async () => {
+    if (selectedIds.size === 0)
+      return
+    try {
+      const res = await batchBindQuestions({
+        questionIds: Array.from(selectedIds),
+        courseId: batchCourseId,
+        categoryId: batchCategoryId,
+      })
+      if (res.success) {
+        void queryClient.invalidateQueries({ queryKey: ['questions'] })
+        setIsBatchModalOpen(false)
+        setIsBatchMode(false)
+        setSelectedIds(new Set())
+        setPageError(null)
+      }
+      else {
+        setPageError(res.error || '批量修改失败')
+      }
+    }
+    catch (err) {
+      console.error('批量修改失败:', err)
+      setPageError('网络错误，批量修改失败')
     }
   }
 
@@ -405,6 +486,12 @@ export default function AdminDashboard() {
           setIsNew(false)
         }}
         onDelete={handleDelete}
+        isBatchMode={isBatchMode}
+        onToggleBatchMode={handleToggleBatchMode}
+        selectedIds={selectedIds}
+        onToggleSelect={handleToggleSelect}
+        onSelectAll={handleSelectAll}
+        onOpenBatchModal={handleOpenBatchModal}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -470,22 +557,57 @@ export default function AdminDashboard() {
         )}
 
         {/* Editor */}
-        {displayQuestion
+        {isBatchMode
           ? (
-              <AdminQuestionEditor
-                key={isNew ? 'new' : String(selectedIndex)}
-                question={displayQuestion}
-                index={selectedIndex!}
-                onSave={handleSave}
-                isNew={isNew}
-                courses={courses}
-              />
-            )
-          : (
-              <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
-                请选择或新增一道题目
+              <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 p-8 text-center">
+                <div className="w-16 h-16 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-teal-600 mb-4 animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-slate-800 mb-2">批量操作模式已启用</h3>
+                <p className="text-slate-500 text-sm max-w-md mb-6">
+                  在左侧侧边栏中勾选您需要修改的题目。
+                  {selectedIds.size > 0
+                    ? `已选中 ${selectedIds.size} 道题目，点击侧边栏下方的“修改所属课程与分类”即可进行批量修改。`
+                    : '当前尚未选择任何题目。'}
+                </p>
+                {selectedIds.size > 0 && (
+                  <div className="w-full max-w-md bg-white border border-slate-200/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
+                    <div className="text-xs font-bold text-slate-400 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
+                    <div className="space-y-1.5">
+                      {questions
+                        .filter(q => q.id !== undefined && selectedIds.has(q.id))
+                        .map((q, i) => (
+                          <div key={q.id} className="flex items-center gap-2 text-xs text-slate-600">
+                            <span className="w-5 h-5 bg-teal-50 text-teal-600 font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
+                              {i + 1}
+                            </span>
+                            <span className="truncate flex-1 font-medium">{q.text}</span>
+                            <span className="text-[10px] text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            )
+          : displayQuestion
+            ? (
+                <AdminQuestionEditor
+                  key={isNew ? 'new' : String(selectedIndex)}
+                  question={displayQuestion}
+                  index={selectedIndex!}
+                  onSave={handleSave}
+                  isNew={isNew}
+                  courses={courses}
+                />
+              )
+            : (
+                <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+                  请选择或新增一道题目
+                </div>
+              )}
       </div>
 
       {/* Course Management Modal */}
@@ -541,6 +663,135 @@ export default function AdminDashboard() {
                   保存并应用
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Batch Update Modal */}
+      {isBatchModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
+          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">批量修改所属课程与分类</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  将选中的
+                  {selectedIds.size}
+                  {' '}
+                  道题目关联到指定的课程和分类
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBatchModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  所属课程
+                </label>
+                <Select
+                  value={batchCourseId ? String(batchCourseId) : 'none'}
+                  onValueChange={(val) => {
+                    const nextCourseId = val === 'none' ? null : Number(val)
+                    const nextCourse = courses.find(c => c.id === nextCourseId)
+                    const nextCategories = nextCourse?.categories || []
+                    setBatchCourseId(nextCourseId)
+                    setBatchCategoryId(nextCategories[0]?.id || null)
+                  }}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="选择所属课程" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">未分配课程 (清除)</SelectItem>
+                    {courses.map(c => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  分类
+                </label>
+                {batchCourseId
+                  ? (
+                      (() => {
+                        const selectedCourse = courses.find(c => c.id === batchCourseId)
+                        const categoryOptions = selectedCourse?.categories || []
+                        if (categoryOptions.length > 0) {
+                          return (
+                            <Select
+                              value={batchCategoryId ? String(batchCategoryId) : 'none'}
+                              onValueChange={(val) => {
+                                setBatchCategoryId(val === 'none' ? null : Number(val))
+                              }}
+                            >
+                              <SelectTrigger className="w-full bg-white">
+                                <SelectValue placeholder="选择所属分类" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">未分配分类 (清除)</SelectItem>
+                                {categoryOptions.map(cat => (
+                                  <SelectItem key={cat.id} value={String(cat.id)}>
+                                    {cat.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )
+                        }
+                        return (
+                          <div className="text-xs text-amber-600 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200">
+                            ⚠️ 当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
+                          </div>
+                        )
+                      })()
+                    )
+                  : (
+                      <Select disabled value="disabled">
+                        <SelectTrigger className="w-full bg-slate-50 text-slate-400 cursor-not-allowed">
+                          <SelectValue placeholder="请先选择所属课程" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="disabled">请先选择所属课程</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex gap-2 justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsBatchModalOpen(false)}
+                className="px-4 py-2 text-slate-600 hover:text-slate-700"
+              >
+                取消
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleBatchBind}
+                disabled={batchCourseId !== null && (courses.find(c => c.id === batchCourseId)?.categories || []).length === 0}
+                className="px-5 py-2"
+              >
+                确认修改
+              </Button>
             </div>
           </div>
         </div>

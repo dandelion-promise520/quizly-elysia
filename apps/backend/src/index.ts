@@ -1,7 +1,7 @@
 import process from 'node:process'
 import { cors } from '@elysiajs/cors'
 import { Elysia } from 'elysia'
-import { getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase } from './lib/db'
+import { batchBindQuestions, getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase } from './lib/db'
 import { delCache, getCache, setCache } from './lib/redis'
 
 const app = new Elysia()
@@ -54,6 +54,29 @@ const app = new Elysia()
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to save to database',
+      }
+    }
+  })
+  .post('/api/questions/batch-bind', async ({ body }) => {
+    try {
+      const { questionIds, courseId, categoryId } = body as {
+        questionIds: number[]
+        courseId: number | null
+        categoryId: number | null
+      }
+
+      if (!Array.isArray(questionIds) || questionIds.length === 0) {
+        return { success: false, error: '请选择要修改的题目' }
+      }
+
+      await batchBindQuestions(questionIds, courseId, categoryId)
+      await delCache('quizly:questions')
+      return { success: true }
+    }
+    catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '批量修改失败',
       }
     }
   })
