@@ -1,4 +1,4 @@
-import type { Question } from '../types'
+import type { Question } from '@quizly/types'
 import { prisma } from './prisma'
 
 let saveQueue: Promise<unknown> = Promise.resolve()

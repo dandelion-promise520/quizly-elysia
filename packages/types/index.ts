@@ -43,10 +43,10 @@ export interface SavedAnswer {
 export interface QuizState {
   score: number
   answered: number
-  questions: Omit<Question, 'shuffledOptions' | 'correctShuffledIdx' | 'correctShuffledIndices'> & {
+  questions: (Omit<Question, 'shuffledOptions' | 'correctShuffledIdx' | 'correctShuffledIndices'> & {
     shuffledOptions?: Option[]
     correctShuffledIdx?: number
     correctShuffledIndices?: number[]
-  }[]
+  })[]
   answers: SavedAnswer
 }

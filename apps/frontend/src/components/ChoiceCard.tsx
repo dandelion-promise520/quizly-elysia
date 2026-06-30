@@ -1,4 +1,4 @@
-import type { ChoiceQuestion } from '@/lib/types'
+import type { ChoiceQuestion } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { RadioGroup, RadioGroupItem } from './motion/radio'

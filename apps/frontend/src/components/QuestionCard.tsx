@@ -1,4 +1,4 @@
-import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question } from '@/lib/types'
+import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question } from '@quizly/types'
 import ChoiceCard from './ChoiceCard'
 import FeedbackBanner from './FeedbackBanner'
 import FillCard from './FillCard'

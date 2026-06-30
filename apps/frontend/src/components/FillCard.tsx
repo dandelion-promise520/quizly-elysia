@@ -1,4 +1,4 @@
-import type { FillQuestion } from '@/lib/types'
+import type { FillQuestion } from '@quizly/types'
 import { useState } from 'react'
 import { Button } from './motion/button'
 

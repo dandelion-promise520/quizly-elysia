@@ -1,4 +1,4 @@
-import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question, SavedAnswer } from '@/lib/types'
+import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question, SavedAnswer } from '@quizly/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const STORAGE_KEY = 'db_quiz_progress'

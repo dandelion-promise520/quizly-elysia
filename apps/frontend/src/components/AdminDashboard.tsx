@@ -1,4 +1,4 @@
-import type { Question } from '@/lib/types'
+import type { Question } from '@quizly/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'

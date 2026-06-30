@@ -1,4 +1,4 @@
-import type { Question } from '@/lib/types'
+import type { Question } from '@quizly/types'
 import { useEffect, useState } from 'react'
 import { useQuizState } from '@/hooks/useQuizState'
 import { getQuestions } from '@/lib/api'

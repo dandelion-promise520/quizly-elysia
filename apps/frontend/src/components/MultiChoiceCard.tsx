@@ -1,4 +1,4 @@
-import type { MultiChoiceQuestion } from '@/lib/types'
+import type { MultiChoiceQuestion } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Button } from './motion/button'

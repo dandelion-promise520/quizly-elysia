@@ -1,4 +1,4 @@
-import type { Question } from './types'
+import type { Question } from '@quizly/types'
 
 const API_BASE = '/api'
 

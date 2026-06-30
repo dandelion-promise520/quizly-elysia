@@ -1,4 +1,4 @@
-import type { Option, Question } from '@/lib/types'
+import type { Option, Question } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
