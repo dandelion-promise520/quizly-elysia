@@ -1,0 +1,2674 @@
+[
+  {
+    "id": 45,
+    "type": "单选题",
+    "text": "数据库体系结构是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "两级模式结构和一级映像"
+      },
+      {
+        "label": "B",
+        "text": "三级模式结构和一级映像"
+      },
+      {
+        "label": "C",
+        "text": "三级模式结构和两级映像"
+      },
+      {
+        "label": "D",
+        "text": "三级模式结构和三级映像"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 46,
+    "type": "单选题",
+    "text": "数据库的三级模式结构是指（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "外模式、模式、子模式"
+      },
+      {
+        "label": "B",
+        "text": "子模式、模式、概念模式"
+      },
+      {
+        "label": "C",
+        "text": "模式、内模式、存储模式"
+      },
+      {
+        "label": "D",
+        "text": "外模式、模式、内模式"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 47,
+    "type": "单选题",
+    "text": "数据库领域中主要的逻辑数据模型不包含下列哪种模型（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "层次模型"
+      },
+      {
+        "label": "B",
+        "text": "网状模型"
+      },
+      {
+        "label": "C",
+        "text": "线性模型"
+      },
+      {
+        "label": "D",
+        "text": "关系模型"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 48,
+    "type": "单选题",
+    "text": "数据库中，数据的物理独立性是指（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "数据库与数据库管理系统的相互独立"
+      },
+      {
+        "label": "B",
+        "text": "用户程序与DBMS的相互独立"
+      },
+      {
+        "label": "C",
+        "text": "用户的应用程序与存储在磁盘上数据库中的数据是相互独立的"
+      },
+      {
+        "label": "D",
+        "text": "用户程序与数据库中数据的逻辑结构相互独立"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 49,
+    "type": "单选题",
+    "text": "数据库管理系统能实现对数据库中数据的查询、插入、修改和删除等操作，这种功能称为（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "数据定义功能"
+      },
+      {
+        "label": "B",
+        "text": "数据管理功能"
+      },
+      {
+        "label": "C",
+        "text": "数据操纵功能"
+      },
+      {
+        "label": "D",
+        "text": "数据控制功能"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 50,
+    "type": "单选题",
+    "text": "将数据库的结构划分成三级模式，是为了提高数据库的（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "数据完整性"
+      },
+      {
+        "label": "B",
+        "text": "数据独立性"
+      },
+      {
+        "label": "C",
+        "text": "管理规范性"
+      },
+      {
+        "label": "D",
+        "text": "数据的共享"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 51,
+    "type": "单选题",
+    "text": "数据的逻辑独立性是通过（ ）得到保证。",
+    "options": [
+      {
+        "label": "A",
+        "text": "模式/内模式映像"
+      },
+      {
+        "label": "B",
+        "text": "外模式/模式映像"
+      },
+      {
+        "label": "C",
+        "text": "模式"
+      },
+      {
+        "label": "D",
+        "text": "外模式"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 52,
+    "type": "单选题",
+    "text": "下面哪个不是数据库管理员（DBA）的职责（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "决定数据库中的信息内容和结构"
+      },
+      {
+        "label": "B",
+        "text": "设计和编写应用程序"
+      },
+      {
+        "label": "C",
+        "text": "定义数据的安全性要求和完整性约束条件"
+      },
+      {
+        "label": "D",
+        "text": "数据库的改进和重组、重构"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 53,
+    "type": "单选题",
+    "text": "一个关系中的各元组（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "前后顺序不能任意颠倒，一定要按照输入的顺序排列"
+      },
+      {
+        "label": "B",
+        "text": "前后顺序可以任意颠倒，不影响关系"
+      },
+      {
+        "label": "C",
+        "text": "前后顺序可以任意颠倒，但排列顺序不同，统计处理的结果可能不同"
+      },
+      {
+        "label": "D",
+        "text": "前后顺序不能任意颠倒，一定要按照码的属性列顺序排列"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 54,
+    "type": "单选题",
+    "text": "在关系代数运算中，专门的关系运算包括以下（ ）4种。",
+    "options": [
+      {
+        "label": "A",
+        "text": "并、选择、投影、连接"
+      },
+      {
+        "label": "B",
+        "text": "并、差、交、选择"
+      },
+      {
+        "label": "C",
+        "text": "选择、投影、连接、除"
+      },
+      {
+        "label": "D",
+        "text": "并、差、交、连接"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 55,
+    "type": "单选题",
+    "text": "取出关系中的某些列，并消去重复元组的关系代数运算称为（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "除运算"
+      },
+      {
+        "label": "B",
+        "text": "投影运算"
+      },
+      {
+        "label": "C",
+        "text": "连接运算"
+      },
+      {
+        "label": "D",
+        "text": "选择运算"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 56,
+    "type": "单选题",
+    "text": "设有关系：班级（班号，专业，班长）；学生（学号，姓名，性别，班号）。学生关系中每个元组的班号属性值只能取空值或者是班级关系中的某一个班号。这个要求属于关系的（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "参照完整性"
+      },
+      {
+        "label": "B",
+        "text": "实体完整性"
+      },
+      {
+        "label": "C",
+        "text": "用户自定义完整性"
+      },
+      {
+        "label": "D",
+        "text": "以上都不是"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 57,
+    "type": "单选题",
+    "text": "设关系R和S的元组个数分别是3和4，关系T是R与S的笛卡尔积，即T=R×S，则关系T的元组个数是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "7"
+      },
+      {
+        "label": "B",
+        "text": "9"
+      },
+      {
+        "label": "C",
+        "text": "12"
+      },
+      {
+        "label": "D",
+        "text": "16"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 58,
+    "type": "单选题",
+    "text": "设关系 R 和 S 具有相同的度，且对应的属性取自相同的域。集合 { t | t∈R ∧ t∈S } 表示的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "R∩S"
+      },
+      {
+        "label": "B",
+        "text": "R－S"
+      },
+      {
+        "label": "C",
+        "text": "R×S"
+      },
+      {
+        "label": "D",
+        "text": "R∪S"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 59,
+    "type": "单选题",
+    "text": "设关系 R 和 S 具有相同的度，且对应的属性取自相同的域。集合 { t | t∈R ∨ t∈S } 表示的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "R∪S"
+      },
+      {
+        "label": "B",
+        "text": "R－S"
+      },
+      {
+        "label": "C",
+        "text": "R×S"
+      },
+      {
+        "label": "D",
+        "text": "R∩S"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 60,
+    "type": "单选题",
+    "text": "数据库的（ ）是指数据的正确性和相容性。",
+    "options": [
+      {
+        "label": "A",
+        "text": "安全性"
+      },
+      {
+        "label": "B",
+        "text": "完整性"
+      },
+      {
+        "label": "C",
+        "text": "并发控制"
+      },
+      {
+        "label": "D",
+        "text": "恢复"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 61,
+    "type": "单选题",
+    "text": "在关系代数的专门关系运算中，从表中选出满足某种条件的元组的操作称为（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "扫描"
+      },
+      {
+        "label": "B",
+        "text": "投影"
+      },
+      {
+        "label": "C",
+        "text": "连接"
+      },
+      {
+        "label": "D",
+        "text": "选择"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 62,
+    "type": "单选题",
+    "text": "关系查询操作中的五种基本运算是指（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "交、并、差、笛卡尔积、投影"
+      },
+      {
+        "label": "B",
+        "text": "并、差、笛卡尔积、选择、投影"
+      },
+      {
+        "label": "C",
+        "text": "并、差、笛卡尔积、选择、连接"
+      },
+      {
+        "label": "D",
+        "text": "选择、投影、连接、除、笛卡尔积"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 63,
+    "type": "单选题",
+    "text": "在数据库系统中，保证数据及语义正确和有效的功能是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "并发控制"
+      },
+      {
+        "label": "B",
+        "text": "存取控制"
+      },
+      {
+        "label": "C",
+        "text": "安全控制"
+      },
+      {
+        "label": "D",
+        "text": "完整性控制"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 64,
+    "type": "单选题",
+    "text": "如果对选课表中学生的选课成绩限定在0~100这个输入范围，应使用（ ）约束。",
+    "options": [
+      {
+        "label": "A",
+        "text": "Primary Key"
+      },
+      {
+        "label": "B",
+        "text": "Foreign Key"
+      },
+      {
+        "label": "C",
+        "text": "Unique"
+      },
+      {
+        "label": "D",
+        "text": "Check"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 65,
+    "type": "单选题",
+    "text": "关于主键约束以下说法错误的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "一个表中只能设置一个主键约束"
+      },
+      {
+        "label": "B",
+        "text": "允许空值的字段上可以定义主键约束"
+      },
+      {
+        "label": "C",
+        "text": "可以将包含多个字段的字段组合设置为主键"
+      },
+      {
+        "label": "D",
+        "text": "允许空值的字段上不能定义主键约束"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 66,
+    "type": "单选题",
+    "text": "如果在学生表中要求学生的姓名不能重名，应使用（ ）约束。",
+    "options": [
+      {
+        "label": "A",
+        "text": "Primary Key"
+      },
+      {
+        "label": "B",
+        "text": "Foreign Key"
+      },
+      {
+        "label": "C",
+        "text": "Unique"
+      },
+      {
+        "label": "D",
+        "text": "Check"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 67,
+    "type": "单选题",
+    "text": "在一个已经存在的表中要为表添加约束，可以使用（ ）命令。",
+    "options": [
+      {
+        "label": "A",
+        "text": "Create table"
+      },
+      {
+        "label": "B",
+        "text": "Alter table"
+      },
+      {
+        "label": "C",
+        "text": "Drop table"
+      },
+      {
+        "label": "D",
+        "text": "Add"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 69,
+    "type": "单选题",
+    "text": "若有两张表：学生（学号，姓名，性别，年龄），选课（学号，课程号，成绩），要使选课表中学号的取值参照学生表中的主键学号的值，可以为选课表中的学号添加（ ）约束。",
+    "options": [
+      {
+        "label": "A",
+        "text": "Primary Key"
+      },
+      {
+        "label": "B",
+        "text": "Foreign Key"
+      },
+      {
+        "label": "C",
+        "text": "Unique"
+      },
+      {
+        "label": "D",
+        "text": "Check"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 70,
+    "type": "单选题",
+    "text": "强制存取控制策略是TCSEC/TDI哪一级安全级别的特色（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "C1"
+      },
+      {
+        "label": "B",
+        "text": "C2"
+      },
+      {
+        "label": "C",
+        "text": "B1"
+      },
+      {
+        "label": "D",
+        "text": "B2"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 71,
+    "type": "单选题",
+    "text": "SQL的Grant和Revoke语句可以用来实现（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "自主存取控制"
+      },
+      {
+        "label": "B",
+        "text": "强制存取控制"
+      },
+      {
+        "label": "C",
+        "text": "数据库角色创建"
+      },
+      {
+        "label": "D",
+        "text": "数据库审计"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 72,
+    "type": "单选题",
+    "text": "在强制存取控制机制中，当主体的许可证级别等于客体的密级时，主体可以对客体进行如下操作（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "读取"
+      },
+      {
+        "label": "B",
+        "text": "写入"
+      },
+      {
+        "label": "C",
+        "text": "不可操作"
+      },
+      {
+        "label": "D",
+        "text": "读取、写入"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 73,
+    "type": "单选题",
+    "text": "在数据加密技术中，原始数据通过某种加密算法变换为不可直接识别的格式，称为（ ）。",
+    "options": [
+      {
+        "label": "A",
+        "text": "主码"
+      },
+      {
+        "label": "B",
+        "text": "密文"
+      },
+      {
+        "label": "C",
+        "text": "审计"
+      },
+      {
+        "label": "D",
+        "text": "写入"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 74,
+    "type": "单选题",
+    "text": "数据库角色实际上是一组与数据库操作相关的各种（ ）。",
+    "options": [
+      {
+        "label": "A",
+        "text": "设置"
+      },
+      {
+        "label": "B",
+        "text": "读取"
+      },
+      {
+        "label": "C",
+        "text": "权限"
+      },
+      {
+        "label": "D",
+        "text": "加密"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 75,
+    "type": "判断题",
+    "text": "在数据库系统中只有一个模式，这个模式只对应一个内模式。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 76,
+    "type": "判断题",
+    "text": "数据库管理系统的模式/内模式映像保证了数据与程序的逻辑独立性。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 77,
+    "type": "判断题",
+    "text": "一个数据库系统可以有多个外模式。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 78,
+    "type": "判断题",
+    "text": "假设有关系R和S，关系代数表达式R-(R-S)表示的是R∩S。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 80,
+    "type": "填空题",
+    "text": "在对用户授予列 Insert 权限时，一定要包含对______的 Insert 权限，否则用户的插入会因为空值被拒绝。除了授权的列，其他列的值或者取______，或者为默认值。",
+    "blanks": [
+      "主键",
+      "空值"
+    ],
+    "answer": [
+      "主键",
+      "空值"
+    ],
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 81,
+    "type": "判断题",
+    "text": "自然连接是构成新关系的有效方法。一般情况下，当对关系R和S使用自然连接时，要求R和S含有一个或多个共有的元组。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 82,
+    "type": "判断题",
+    "text": "对数据库中的表进行插入操作时，有可能违背参照完整性约束。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 83,
+    "type": "判断题",
+    "text": "对数据库中的表进行删除操作时，有可能违背用户定义的完整性。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 84,
+    "type": "判断题",
+    "text": "任何情况下，某个外键的取值除了可以取它所参照的主键表中的某个主键值外，都可以取空值。（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "正确"
+      },
+      {
+        "label": "B",
+        "text": "错误"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 85,
+    "type": "单选题",
+    "text": "关系规范化中的删除异常是指（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "应该删除的数据未被删除"
+      },
+      {
+        "label": "B",
+        "text": "应该插入的数据未被插入"
+      },
+      {
+        "label": "C",
+        "text": "不该插入的数据被插入"
+      },
+      {
+        "label": "D",
+        "text": "不该删除的数据被删除"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 86,
+    "type": "单选题",
+    "text": "规范化过程主要为克服数据库逻辑结构中的插入异常，删除异常，修改异常以及（ ）的缺陷。",
+    "options": [
+      {
+        "label": "A",
+        "text": "数据的不一致性"
+      },
+      {
+        "label": "B",
+        "text": "结构不合理"
+      },
+      {
+        "label": "C",
+        "text": "数据丢失"
+      },
+      {
+        "label": "D",
+        "text": "冗余度大"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 87,
+    "type": "单选题",
+    "text": "满足1NF关系模式的最基本的条件是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "每一个分量都是不可再分的数据项"
+      },
+      {
+        "label": "B",
+        "text": "分量是可以再分的数据项"
+      },
+      {
+        "label": "C",
+        "text": "该关系模式中的命名可以不唯一"
+      },
+      {
+        "label": "D",
+        "text": "以上都不是"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 88,
+    "type": "单选题",
+    "text": "已知关系模式R（A，B，C，D，E）及其函数依赖集合 F = {A→D, B→C, E→A}，该关系模式的候选码是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "CD"
+      },
+      {
+        "label": "B",
+        "text": "AB"
+      },
+      {
+        "label": "C",
+        "text": "DE"
+      },
+      {
+        "label": "D",
+        "text": "BE"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 89,
+    "type": "单选题",
+    "text": "X→Y，当下列哪一条成立时，称为平凡的函数依赖（ ）。",
+    "options": [
+      {
+        "label": "A",
+        "text": "X∈Y"
+      },
+      {
+        "label": "B",
+        "text": "Y∈X"
+      },
+      {
+        "label": "C",
+        "text": "X∩Y = φ"
+      },
+      {
+        "label": "D",
+        "text": "X∩Y ≠ φ"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 90,
+    "type": "单选题",
+    "text": "设有关系模式R（A，B，C，D），其数据依赖集：F = {(A,B)→C, C→D}，则关系模式的规范化程度最高达到（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "BCNF"
+      },
+      {
+        "label": "B",
+        "text": "1NF"
+      },
+      {
+        "label": "C",
+        "text": "2NF"
+      },
+      {
+        "label": "D",
+        "text": "3NF"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 92,
+    "type": "单选题",
+    "text": "消除了非主属性对码的传递函数依赖的关系模式达到了（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "1NF"
+      },
+      {
+        "label": "B",
+        "text": "2NF"
+      },
+      {
+        "label": "C",
+        "text": "3NF"
+      },
+      {
+        "label": "D",
+        "text": "BCNF"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 93,
+    "type": "单选题",
+    "text": "在关系数据库设计中，设计关系模式是（ ）的任务。",
+    "options": [
+      {
+        "label": "A",
+        "text": "逻辑设计阶段"
+      },
+      {
+        "label": "B",
+        "text": "概念设计阶段"
+      },
+      {
+        "label": "C",
+        "text": "需求分析阶段"
+      },
+      {
+        "label": "D",
+        "text": "物理设计阶段"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 94,
+    "type": "单选题",
+    "text": "储蓄所有多个储户，储户能够在多个储蓄所存取款，储蓄所与储户之间是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "一对一的联系"
+      },
+      {
+        "label": "B",
+        "text": "一对多的联系"
+      },
+      {
+        "label": "C",
+        "text": "多对一的联系"
+      },
+      {
+        "label": "D",
+        "text": "多对多的联系"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 95,
+    "type": "单选题",
+    "text": "从E-R图中导出关系模型时，如果实体间的联系是 n:m 的，下列说法中正确的是（ ）。",
+    "options": [
+      {
+        "label": "A",
+        "text": "将n方主键和联系的属性纳入m方的属性中"
+      },
+      {
+        "label": "B",
+        "text": "将m方主键和联系的属性纳入n方的属性中"
+      },
+      {
+        "label": "C",
+        "text": "增加一个关系表示联系，其中纳入m方和n方的主键和联系的属性"
+      },
+      {
+        "label": "D",
+        "text": "在m方属性和n方属性中均增加一个表示级别的属性"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 96,
+    "type": "单选题",
+    "text": "公司有多个部门和多名职员，每个职员只能属于一个部门，一个部门有多名职员，职员与部门的联系类型是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "一对一的联系"
+      },
+      {
+        "label": "B",
+        "text": "一对多的联系"
+      },
+      {
+        "label": "C",
+        "text": "多对一的联系"
+      },
+      {
+        "label": "D",
+        "text": "多对多的联系"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 97,
+    "type": "单选题",
+    "text": "表示数据库的概念模型一般使用（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "E-R图"
+      },
+      {
+        "label": "B",
+        "text": "数据流图"
+      },
+      {
+        "label": "C",
+        "text": "用户活动图"
+      },
+      {
+        "label": "D",
+        "text": "流程图"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 98,
+    "type": "单选题",
+    "text": "在数据库设计中，用E-R图来描述结构是数据库设计的（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "需求分析阶段"
+      },
+      {
+        "label": "B",
+        "text": "概念设计阶段"
+      },
+      {
+        "label": "C",
+        "text": "逻辑设计阶段"
+      },
+      {
+        "label": "D",
+        "text": "物理设计阶段"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 99,
+    "type": "单选题",
+    "text": "以下描述不正确的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "属性是不能具有再分的数理项"
+      },
+      {
+        "label": "B",
+        "text": "一个关系模式可以具有多个候选码"
+      },
+      {
+        "label": "C",
+        "text": "实体和属性之间可以存在联系"
+      },
+      {
+        "label": "D",
+        "text": "联系可以具有属性"
+      }
+    ],
+    "answer": "C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 100,
+    "type": "单选题",
+    "text": "数据库设计中，确定数据库存储结构，即确定关系、索引、聚簇、日志、备份等数据的存储安排和存储结构，这是数据库设计的（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "物理设计阶段"
+      },
+      {
+        "label": "B",
+        "text": "概念设计阶段"
+      },
+      {
+        "label": "C",
+        "text": "逻辑设计阶段"
+      },
+      {
+        "label": "D",
+        "text": "需求分析阶段"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 101,
+    "type": "单选题",
+    "text": "建立数据字典的时机是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "需求分析阶段"
+      },
+      {
+        "label": "B",
+        "text": "数据库物理设计阶段"
+      },
+      {
+        "label": "C",
+        "text": "数据库实施阶段"
+      },
+      {
+        "label": "D",
+        "text": "概念结构设计阶段"
+      }
+    ],
+    "answer": "A",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 108,
+    "type": "多选题",
+    "text": "给定关系模式R(A，B，C，D)，如果存在依赖：A→B，BC→D，DE→A，则该关系模式的码为（ ）（多选）",
+    "options": [
+      {
+        "label": "A",
+        "text": "ACE"
+      },
+      {
+        "label": "B",
+        "text": "BCE"
+      },
+      {
+        "label": "C",
+        "text": "ABC"
+      },
+      {
+        "label": "D",
+        "text": "CDE"
+      }
+    ],
+    "answer": "A,B,D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 110,
+    "type": "多选题",
+    "text": "在概念结构设计阶段，把一个系统中各子系统的分E-R图集成时，要做以下什么事情（ ）（多选）",
+    "options": [
+      {
+        "label": "A",
+        "text": "消除各种冲突"
+      },
+      {
+        "label": "B",
+        "text": "消除冗余的数据"
+      },
+      {
+        "label": "C",
+        "text": "消除冗余的联系"
+      },
+      {
+        "label": "D",
+        "text": "把E-R图转换成关系模型"
+      }
+    ],
+    "answer": "A,B,C",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 112,
+    "type": "多选题",
+    "text": "关于用户外模式的说法正确的是（ ）（多选）",
+    "options": [
+      {
+        "label": "A",
+        "text": "可以使用更符合用户习惯的别名"
+      },
+      {
+        "label": "B",
+        "text": "可以针对不同级别的用户定义不同的视图"
+      },
+      {
+        "label": "C",
+        "text": "可以保证数据的完整性"
+      },
+      {
+        "label": "D",
+        "text": "可以将复杂的查询定义为视图，简化用户对系统的使用"
+      }
+    ],
+    "answer": "A,B,D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 113,
+    "type": "单选题",
+    "text": "若一个表中的某个约束只涉及到一个列时，可以使用（ ）定义该约束。",
+    "options": [
+      {
+        "label": "B",
+        "text": "表级约束"
+      },
+      {
+        "label": "A",
+        "text": "列级约束"
+      },
+      {
+        "label": "C",
+        "text": "元组级约束"
+      },
+      {
+        "label": "D",
+        "text": "列级约束和表级约束都可以"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 114,
+    "type": "单选题",
+    "text": "当关系模式R属于3NF，下列说法中（ ）是正确的。",
+    "options": [
+      {
+        "label": "A",
+        "text": "它一定消除了非主属性对码的部分函数依赖"
+      },
+      {
+        "label": "B",
+        "text": "每个函数依赖的左部都含有候选码"
+      },
+      {
+        "label": "C",
+        "text": "它一定消除了非主属性对码的传递函数依赖"
+      },
+      {
+        "label": "D",
+        "text": "它一定消除了非主属性对码的部分函数依赖并且它一定消除了非主属性对码的传递函数依赖"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 117,
+    "type": "单选题",
+    "text": "以下表示数据库管理系统的是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "DBA"
+      },
+      {
+        "label": "B",
+        "text": "DBMS"
+      },
+      {
+        "label": "C",
+        "text": "DB"
+      },
+      {
+        "label": "D",
+        "text": "DATA"
+      }
+    ],
+    "answer": "B",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 118,
+    "type": "填空题",
+    "text": "数据库安全技术包括用户______、______、______、______和______等。",
+    "blanks": [
+      "身份鉴别",
+      "存取控制",
+      "视图机制",
+      "审计",
+      "数据加密"
+    ],
+    "answer": [
+      "身份鉴别",
+      "存取控制",
+      "视图机制",
+      "审计",
+      "数据加密"
+    ],
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 119,
+    "type": "填空题",
+    "text": "查询xscj数据库的xs表中各个同学的姓名、专业名和总学分。",
+    "blanks": [
+      "SELECT 姓名, 专业名, 总学分 FROM xs"
+    ],
+    "answer": [
+      "SELECT 姓名, 专业名, 总学分 FROM xs"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 121,
+    "type": "填空题",
+    "text": "查询xs表中计算机专业各同学的学号、姓名和总学分，对总学分按如下规则进行替换：\n若总学分为空值，替换为\"尚未选课\"；\n若总学分小于50，替换为\"不及格\"；\n若总学分在50～52之间，替换为\"合格\"；\n若总学分大于52，替换为\"优秀\"。\n总学分列的标题更改为\"等级\"。",
+    "blanks": [
+      "SELECT 学号, 姓名, CASE WHEN 总学分 IS NULL THEN '尚未选课' WHEN 总学分 < 50 THEN '不及格' WHEN 总学分 BETWEEN 50 AND 52 THEN '合格' ELSE '优秀' END AS 等级 FROM xs WHERE 专业名 = '计算机'"
+    ],
+    "answer": [
+      "SELECT 学号, 姓名, CASE WHEN 总学分 IS NULL THEN '尚未选课' WHEN 总学分 < 50 THEN '不及格' WHEN 总学分 BETWEEN 50 AND 52 THEN '合格' ELSE '优秀' END AS 等级 FROM xs WHERE 专业名 = '计算机'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 122,
+    "type": "填空题",
+    "text": "按120分制重新计算成绩，显示xs_kc表中学号为081101的学生成绩信息。",
+    "blanks": [
+      "SELECT 学号, 课程号, 成绩 * 1.2 AS 成绩, 学分 FROM xs_kc WHERE 学号 = '081101'"
+    ],
+    "answer": [
+      "SELECT 学号, 课程号, 成绩 * 1.2 AS 成绩, 学分 FROM xs_kc WHERE 学号 = '081101'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 123,
+    "type": "填空题",
+    "text": "对xscj数据库的xs表只选择专业名和总学分，消除结果集中的重复行。",
+    "blanks": [
+      "SELECT DISTINCT 专业名, 总学分 FROM xs"
+    ],
+    "answer": [
+      "SELECT DISTINCT 专业名, 总学分 FROM xs"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 124,
+    "type": "填空题",
+    "text": "求学生的总人数。",
+    "blanks": [
+      "SELECT COUNT(*) FROM xs"
+    ],
+    "answer": [
+      "SELECT COUNT(*) FROM xs"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 125,
+    "type": "填空题",
+    "text": "统计备注不为空的学生数目。",
+    "blanks": [
+      "SELECT COUNT(备注) FROM xs"
+    ],
+    "answer": [
+      "SELECT COUNT(备注) FROM xs"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 126,
+    "type": "填空题",
+    "text": "统计总学分在50分以上的人数。",
+    "blanks": [
+      "SELECT COUNT(*) FROM xs WHERE 总学分 > 50"
+    ],
+    "answer": [
+      "SELECT COUNT(*) FROM xs WHERE 总学分 > 50"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 127,
+    "type": "填空题",
+    "text": "求选修101课程的学生的最高分 and 最低分。",
+    "blanks": [
+      "SELECT MAX(成绩), MIN(成绩) FROM xs_kc WHERE 课程号 = '101'"
+    ],
+    "answer": [
+      "SELECT MAX(成绩), MIN(成绩) FROM xs_kc WHERE 课程号 = '101'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 128,
+    "type": "填空题",
+    "text": "求学号081101的学生所学课程的总成绩。",
+    "blanks": [
+      "SELECT SUM(成绩) FROM xs_kc WHERE 学号 = '081101'"
+    ],
+    "answer": [
+      "SELECT SUM(成绩) FROM xs_kc WHERE 学号 = '081101'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 129,
+    "type": "填空题",
+    "text": "求选修101课程的学生的平均成绩。",
+    "blanks": [
+      "SELECT AVG(成绩) FROM xs_kc WHERE 课程号 = '101'"
+    ],
+    "answer": [
+      "SELECT AVG(成绩) FROM xs_kc WHERE 课程号 = '101'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 130,
+    "type": "填空题",
+    "text": "查询xscj数据库xs表中学号为081101的学生情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 学号 = '081101'"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 学号 = '081101'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 131,
+    "type": "填空题",
+    "text": "查询xs表中总学分大于50的学生的情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 总学分 > 50"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 总学分 > 50"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 132,
+    "type": "填空题",
+    "text": "查询xs表中备注为空的同学的情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 备注 IS NULL"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 备注 IS NULL"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 133,
+    "type": "填空题",
+    "text": "查询xs表中专业为计算机，性别为女（0）的同学的情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 专业名 = '计算机' AND 性别 = 0"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 专业名 = '计算机' AND 性别 = 0"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 134,
+    "type": "填空题",
+    "text": "查询xs_kc表中102 and 206课程中大于80分的同学的记录。",
+    "blanks": [
+      "SELECT * FROM xs_kc WHERE 课程号 IN ('102', '206') AND 成绩 > 80"
+    ],
+    "answer": [
+      "SELECT * FROM xs_kc WHERE 课程号 IN ('102', '206') AND 成绩 > 80"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 135,
+    "type": "填空题",
+    "text": "查询xscj数据库xs表中姓王的学生学号、姓名及性别。",
+    "blanks": [
+      "SELECT 学号, 姓名, 性别 FROM xs WHERE 姓名 LIKE '王%'"
+    ],
+    "answer": [
+      "SELECT 学号, 姓名, 性别 FROM xs WHERE 姓名 LIKE '王%'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 136,
+    "type": "填空题",
+    "text": "查询xscj数据库xs表中学号倒数第二个数字为0的学生学号、姓名及专业名。",
+    "blanks": [
+      "SELECT 学号, 姓名, 专业名 FROM xs WHERE 学号 LIKE '%0_'",
+      "SELECT 学号, 姓名, 专业名 FROM xs WHERE 学号 LIKE '%0_'"
+    ],
+    "answer": [
+      "SELECT 学号, 姓名, 专业名 FROM xs WHERE 学号 LIKE '%0_'",
+      "SELECT 学号, 姓名, 专业名 FROM xs WHERE 学号 LIKE '%0_'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 137,
+    "type": "填空题",
+    "text": "查询xs表中名字中包含下画线的学生学号和姓名。",
+    "blanks": [
+      "SELECT 学号, 姓名 FROM xs WHERE 姓名 LIKE '%\\_%' ESCAPE '\\'"
+    ],
+    "answer": [
+      "SELECT 学号, 姓名 FROM xs WHERE 姓名 LIKE '%\\_%' ESCAPE '\\'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 138,
+    "type": "填空题",
+    "text": "查询xs表中不在1989年出生的学生情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 出生时间 NOT BETWEEN '1989-01-01' AND '1989-12-31'"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 出生时间 NOT BETWEEN '1989-01-01' AND '1989-12-31'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 139,
+    "type": "填空题",
+    "text": "查询xs表中专业名为\"计算机\"、\"通信工程\"或\"无线电\"的学生的情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 专业名 IN ('计算机', '通信工程', '无线电')"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 专业名 IN ('计算机', '通信工程', '无线电')"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 140,
+    "type": "填空题",
+    "text": "查询xscj数据库中总学分尚不定的学生情况。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 总学分 IS NULL"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 总学分 IS NULL"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 141,
+    "type": "填空题",
+    "text": "查询xscj数据库中所有学生选过的课程名和课程号。",
+    "blanks": [
+      "SELECT DISTINCT 课程名, kc.课程号 FROM kc JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "answer": [
+      "SELECT DISTINCT 课程名, kc.课程号 FROM kc JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 142,
+    "type": "填空题",
+    "text": "查找选修了206课程且成绩在80分以上的学生姓名及成绩。",
+    "blanks": [
+      "SELECT 姓名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206' AND 成绩 > 80"
+    ],
+    "answer": [
+      "SELECT 姓名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206' AND 成绩 > 80"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 143,
+    "type": "填空题",
+    "text": "查找选修了\"计算机基础\"课程且成绩在80分以上的学生学号、姓名、课程名及成绩。",
+    "blanks": [
+      "SELECT xs.学号, 姓名, 课程名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 JOIN kc ON kc.课程号 = xs_kc.课程号 WHERE 课程名 = '计算机基础' AND 成绩 > 80"
+    ],
+    "answer": [
+      "SELECT xs.学号, 姓名, 课程名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 JOIN kc ON kc.课程号 = xs_kc.课程号 WHERE 课程名 = '计算机基础' AND 成绩 > 80"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 144,
+    "type": "填空题",
+    "text": "查找xscj数据库中课程不同、成绩相同的学生的学号、课程号和成绩。",
+    "blanks": [
+      "SELECT a.学号, a.课程号, a.成绩 FROM xs_kc a JOIN xs_kc b ON a.成绩 = b.成绩 AND a.课程号 <> b.课程号"
+    ],
+    "answer": [
+      "SELECT a.学号, a.课程号, a.成绩 FROM xs_kc a JOIN xs_kc b ON a.成绩 = b.成绩 AND a.课程号 <> b.课程号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 145,
+    "type": "填空题",
+    "text": "查找kc表中所有学生选过的课程名。",
+    "blanks": [
+      "SELECT DISTINCT 课程名 FROM kc JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "answer": [
+      "SELECT DISTINCT 课程名 FROM kc JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 146,
+    "type": "填空题",
+    "text": "查找所有学生情况及他们选修的课程号，若学生未选修任何课，也要包括其情况。",
+    "blanks": [
+      "SELECT xs.*, 课程号 FROM xs LEFT JOIN xs_kc ON xs.学号 = xs_kc.学号"
+    ],
+    "answer": [
+      "SELECT xs.*, 课程号 FROM xs LEFT JOIN xs_kc ON xs.学号 = xs_kc.学号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 147,
+    "type": "填空题",
+    "text": "查找被选修了的课程的选修情况和所有开设的课程名。",
+    "blanks": [
+      "SELECT 课程名, xs_kc.* FROM kc LEFT JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "answer": [
+      "SELECT 课程名, xs_kc.* FROM kc LEFT JOIN xs_kc ON kc.课程号 = xs_kc.课程号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 148,
+    "type": "填空题",
+    "text": "查找在xscj数据库中选修了课程号为206的课程的学生的姓名、学号。",
+    "blanks": [
+      "SELECT 姓名, xs.学号 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206'"
+    ],
+    "answer": [
+      "SELECT 姓名, xs.学号 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 149,
+    "type": "填空题",
+    "text": "查找未选修离散数学的学生的姓名、学号、专业名。",
+    "blanks": [
+      "SELECT 姓名, 学号, 专业名 FROM xs WHERE 学号 NOT IN (SELECT 学号 FROM xs_kc JOIN kc ON xs_kc.课程号 = kc.课程号 WHERE 课程名 = '离散数学')"
+    ],
+    "answer": [
+      "SELECT 姓名, 学号, 专业名 FROM xs WHERE 学号 NOT IN (SELECT 学号 FROM xs_kc JOIN kc ON xs_kc.课程号 = kc.课程号 WHERE 课程名 = '离散数学')"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 150,
+    "type": "填空题",
+    "text": "查找选修了离散数学的学生学号。",
+    "blanks": [
+      "SELECT 学号 FROM xs_kc JOIN kc ON xs_kc.课程号 = kc.课程号 WHERE 课程名 = '离散数学'"
+    ],
+    "answer": [
+      "SELECT 学号 FROM xs_kc JOIN kc ON xs_kc.课程号 = kc.课程号 WHERE 课程名 = '离散数学'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 151,
+    "type": "填空题",
+    "text": "查找xs表中比所有计算机系的学生年龄都大的学生学号、姓名、专业名、出生日期。",
+    "blanks": [
+      "SELECT 学号, 姓名, 专业名, 出生时间 FROM xs WHERE 出生时间 < ALL (SELECT 出生时间 FROM xs WHERE 专业名 = '计算机')"
+    ],
+    "answer": [
+      "SELECT 学号, 姓名, 专业名, 出生时间 FROM xs WHERE 出生时间 < ALL (SELECT 出生时间 FROM xs WHERE 专业名 = '计算机')"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 152,
+    "type": "填空题",
+    "text": "查找xs_kc表中课程号206的成绩不低于课程号101的最低成绩的学生的学号。",
+    "blanks": [
+      "SELECT 学号 FROM xs_kc WHERE 课程号 = '206' AND 成绩 >= (SELECT MIN(成绩) FROM xs_kc WHERE 课程号 = '101')"
+    ],
+    "answer": [
+      "SELECT 学号 FROM xs_kc WHERE 课程号 = '206' AND 成绩 >= (SELECT MIN(成绩) FROM xs_kc WHERE 课程号 = '101')"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 153,
+    "type": "填空题",
+    "text": "查找选修206号课程的学生姓名。",
+    "blanks": [
+      "SELECT 姓名 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206'"
+    ],
+    "answer": [
+      "SELECT 姓名 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 课程号 = '206'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 154,
+    "type": "填空题",
+    "text": "将xs中各专业名输出。",
+    "blanks": [
+      "SELECT DISTINCT 专业名 FROM xs"
+    ],
+    "answer": [
+      "SELECT DISTINCT 专业名 FROM xs"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 155,
+    "type": "填空题",
+    "text": "查询xs表中各专业的学生数。",
+    "blanks": [
+      "SELECT 专业名, COUNT(*) FROM xs GROUP BY 专业名"
+    ],
+    "answer": [
+      "SELECT 专业名, COUNT(*) FROM xs GROUP BY 专业名"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 156,
+    "type": "填空题",
+    "text": "求被选修的各门课程的平均成绩和选修该课程的人数。",
+    "blanks": [
+      "SELECT 课程号, AVG(成绩), COUNT(*) FROM xs_kc GROUP BY 课程号"
+    ],
+    "answer": [
+      "SELECT 课程号, AVG(成绩), COUNT(*) FROM xs_kc GROUP BY 课程号"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 157,
+    "type": "填空题",
+    "text": "查询每个专业的男生人数、女生人数、总人数，以及学生总人数。",
+    "blanks": [
+      "SELECT 专业名, 性别, COUNT(*) FROM xs GROUP BY ROLLUP(专业名, 性别)"
+    ],
+    "answer": [
+      "SELECT 专业名, 性别, COUNT(*) FROM xs GROUP BY ROLLUP(专业名, 性别)"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 158,
+    "type": "填空题",
+    "text": "查找平均成绩在75分以上的学生的学号和平均成绩。",
+    "blanks": [
+      "SELECT 学号, AVG(成绩) FROM xs_kc GROUP BY 学号 HAVING AVG(成绩) > 75"
+    ],
+    "answer": [
+      "SELECT 学号, AVG(成绩) FROM xs_kc GROUP BY 学号 HAVING AVG(成绩) > 75"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 159,
+    "type": "填空题",
+    "text": "查找选修课程超过2门且成绩都在70分以上的学生的学号。",
+    "blanks": [
+      "SELECT 学号 FROM xs_kc WHERE 成绩 > 70 GROUP BY 学号 HAVING COUNT(*) > 2"
+    ],
+    "answer": [
+      "SELECT 学号 FROM xs_kc WHERE 成绩 > 70 GROUP BY 学号 HAVING COUNT(*) > 2"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 160,
+    "type": "填空题",
+    "text": "将通信工程专业的学生按出生日期先后排序。",
+    "blanks": [
+      "SELECT * FROM xs WHERE 专业名 = '通信工程' ORDER BY 出生时间 ASC"
+    ],
+    "answer": [
+      "SELECT * FROM xs WHERE 专业名 = '通信工程' ORDER BY 出生时间 ASC"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 161,
+    "type": "填空题",
+    "text": "将计算机专业学生的\"计算机基础\"课程成绩按降序排列。",
+    "blanks": [
+      "SELECT 姓名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 JOIN kc ON kc.课程号 = xs_kc.课程号 WHERE 专业名 = '计算机' AND 课程名 = '计算机基础' ORDER BY 成绩 DESC"
+    ],
+    "answer": [
+      "SELECT 姓名, 成绩 FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 JOIN kc ON kc.课程号 = xs_kc.课程号 WHERE 专业名 = '计算机' AND 课程名 = '计算机基础' ORDER BY 成绩 DESC"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 162,
+    "type": "填空题",
+    "text": "将计算机专业学生按其平均成绩排列。",
+    "blanks": [
+      "SELECT xs.学号, 姓名, AVG(成绩) FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 专业名 = '计算机' GROUP BY xs.学号, 姓名 ORDER BY AVG(成绩) DESC"
+    ],
+    "answer": [
+      "SELECT xs.学号, 姓名, AVG(成绩) FROM xs JOIN xs_kc ON xs.学号 = xs_kc.学号 WHERE 专业名 = '计算机' GROUP BY xs.学号, 姓名 ORDER BY AVG(成绩) DESC"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 163,
+    "type": "填空题",
+    "text": "查找xs表中学号最靠前的5位学生的信息。",
+    "blanks": [
+      "SELECT * FROM xs ORDER BY 学号 LIMIT 5"
+    ],
+    "answer": [
+      "SELECT * FROM xs ORDER BY 学号 LIMIT 5"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 164,
+    "type": "填空题",
+    "text": "查找xs表中从第4位同学开始的5位学生的信息。",
+    "blanks": [
+      "SELECT * FROM xs ORDER BY 学号 LIMIT 5 OFFSET 3"
+    ],
+    "answer": [
+      "SELECT * FROM xs ORDER BY 学号 LIMIT 5 OFFSET 3"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 169,
+    "type": "单选题",
+    "text": "目前应用最广泛的数据库模型是（ ）",
+    "options": [
+      {
+        "label": "A",
+        "text": "层次模型"
+      },
+      {
+        "label": "B",
+        "text": "网状模型"
+      },
+      {
+        "label": "C",
+        "text": "混合模型"
+      },
+      {
+        "label": "D",
+        "text": "关系模型"
+      }
+    ],
+    "answer": "D",
+    "categoryId": 7,
+    "category": {
+      "id": 7,
+      "name": "基础题",
+      "courseId": 2
+    },
+    "courseId": 2
+  },
+  {
+    "id": 170,
+    "type": "填空题",
+    "text": "查询xs表中计算机专业同学的学号、姓名和总学分，结果中各列的标题分别指定为number、name和mark。",
+    "blanks": [
+      "SELECT 学号 AS number, 姓名 AS name, 总学分 AS mark FROM xs WHERE 专业名 = '计算机'"
+    ],
+    "answer": [
+      "SELECT 学号 AS number, 姓名 AS name, 总学分 AS mark FROM xs WHERE 专业名 = '计算机'"
+    ],
+    "categoryId": 8,
+    "category": {
+      "id": 8,
+      "name": "代码题",
+      "courseId": 2
+    },
+    "courseId": 2
+  }
+]

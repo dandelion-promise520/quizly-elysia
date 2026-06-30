@@ -167,14 +167,13 @@ export default function QuizPage() {
                   value={currentCategoryIdStr}
                   onValueChange={setActiveCategoryId}
                   variant="segment"
-                  className="w-full max-w-lg"
                 >
-                  <TabsList className="w-full flex flex-wrap gap-1">
+                  <TabsList className="flex flex-wrap gap-1">
                     {categoryList.map(cat => (
                       <TabsTrigger
                         key={cat.id}
                         value={String(cat.id)}
-                        className="text-sm py-2 px-4 flex-1 text-center"
+                        className="text-sm py-2 px-4 text-center"
                         wrapperClassName="flex justify-center"
                       >
                         {cat.name}
