@@ -27,6 +27,8 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+        env:
+          SKIP_INSTALL_SIMPLE_GIT_HOOKS: 1
 
       - name: Build frontend
         run: bun run build --filter=frontend
