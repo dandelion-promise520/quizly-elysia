@@ -1,4 +1,4 @@
-import type { Question } from '@quizly/types'
+import type { Course, Question } from '@quizly/types'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff, Lock } from 'lucide-react'
@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
 import { Button } from '@/components/motion/button'
-import { getQuestions, saveQuestions, verifyAdminPassword } from '@/lib/api'
+import { getCourses, getQuestions, saveCourses, saveQuestions, verifyAdminPassword } from '@/lib/api'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [passwordInput, setPasswordInput] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [pageError, setPageError] = useState<string | null>(null)
 
   const queryClient = useQueryClient()
   const [questions, setQuestions] = useState<Question[]>([])
@@ -23,6 +24,9 @@ export default function AdminDashboard() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(0)
   const [isNew, setIsNew] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
+  const [tempCourses, setTempCourses] = useState<Course[]>([])
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,6 +52,37 @@ export default function AdminDashboard() {
     queryFn: getQuestions,
     enabled: isAuthenticated,
   })
+
+  const { data: courses = [] } = useQuery<Course[]>({
+    queryKey: ['courses'],
+    queryFn: getCourses,
+    enabled: isAuthenticated,
+  })
+
+  const handleOpenCourseModal = () => {
+    setTempCourses(courses)
+    setPageError(null)
+    setIsCourseModalOpen(true)
+  }
+
+  const handleSaveCourses = async () => {
+    try {
+      const data = await saveCourses(tempCourses)
+      if (data.success && data.courses) {
+        void queryClient.invalidateQueries({ queryKey: ['courses'] })
+        void queryClient.invalidateQueries({ queryKey: ['questions'] })
+        setPageError(null)
+        setIsCourseModalOpen(false)
+      }
+      else {
+        setPageError(data.error || '保存课程失败')
+      }
+    }
+    catch (err) {
+      console.error('保存课程失败:', err)
+      setPageError('保存课程失败')
+    }
+  }
 
   useEffect(() => {
     if (fetchedQuestions) {
@@ -157,11 +192,11 @@ export default function AdminDashboard() {
           saveToDisk(data)
           setSelectedIndex(0)
           setIsNew(false)
+          setPageError(null)
         }
       }
       catch {
-        // eslint-disable-next-line no-alert
-        alert('JSON 文件格式有误，请检查后重试。')
+        setPageError('JSON 文件格式有误，请检查后重试。')
       }
     }
     reader.readAsText(file)
@@ -262,6 +297,100 @@ export default function AdminDashboard() {
   const displayQuestion
     = selectedIndex !== null ? questions[selectedIndex] : null
 
+  const renderCourseItems = () => {
+    if (tempCourses.length === 0) {
+      return (
+        <div className="text-center py-8 text-slate-400 text-sm">
+          目前暂无课程，请点击下方按钮新增。
+        </div>
+      )
+    }
+
+    return tempCourses.map((course, idx) => (
+      <div key={course.id ?? `temp-${idx}`} className="flex flex-col gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100/80 shadow-sm relative">
+        <div className="flex items-center gap-3">
+          <div className="text-xs font-bold text-teal-600 bg-teal-50 px-2.5 py-1 rounded-md">课程</div>
+          <input
+            type="text"
+            value={course.name}
+            onChange={(e) => {
+              const next = [...tempCourses]
+              next[idx] = { ...next[idx], name: e.target.value }
+              setTempCourses(next)
+            }}
+            placeholder="请输入课程名称"
+            className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg outline-none bg-white focus:border-teal-500 text-sm font-semibold focus:ring-1 focus:ring-teal-500 transition"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const next = tempCourses.filter((_, i) => i !== idx)
+              setTempCourses(next)
+            }}
+            className="w-8 h-8 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 flex items-center justify-center text-sm font-bold transition cursor-pointer"
+            title="删除课程"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="pl-6 border-l-2 border-slate-200/60 space-y-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-bold text-slate-500">内部 Tab 分类:</span>
+            <button
+              type="button"
+              onClick={() => {
+                const next = [...tempCourses]
+                const cats = [...(next[idx].categories || [])]
+                cats.push({ id: undefined as any, name: '新分类', courseId: course.id })
+                next[idx] = { ...next[idx], categories: cats }
+                setTempCourses(next)
+              }}
+              className="text-[10px] font-bold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded transition cursor-pointer"
+            >
+              + 添加分类
+            </button>
+          </div>
+
+          {(course.categories || []).length === 0
+            ? (
+                <div className="text-[10px] text-slate-400 italic">暂无分类，请添加</div>
+              )
+            : (course.categories || []).map((cat, catIdx) => (
+                <div key={cat.id ?? `cat-${catIdx}`} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={cat.name}
+                    onChange={(e) => {
+                      const next = [...tempCourses]
+                      const cats = [...(next[idx].categories || [])]
+                      cats[catIdx] = { ...cats[catIdx], name: e.target.value }
+                      next[idx] = { ...next[idx], categories: cats }
+                      setTempCourses(next)
+                    }}
+                    placeholder="分类名称"
+                    className="flex-1 px-2.5 py-1 border border-slate-200 rounded-md outline-none bg-white focus:border-teal-500 text-xs focus:ring-1 focus:ring-teal-500 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = [...tempCourses]
+                      const cats = (next[idx].categories || []).filter((_, i) => i !== catIdx)
+                      next[idx] = { ...next[idx], categories: cats }
+                      setTempCourses(next)
+                    }}
+                    className="w-6 h-6 rounded border border-red-50 text-red-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-xs font-semibold transition cursor-pointer"
+                    title="删除分类"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+        </div>
+      </div>
+    ))
+  }
+
   return (
     <div className="flex h-screen bg-slate-50">
       <AdminSidebar
@@ -288,6 +417,15 @@ export default function AdminDashboard() {
             className="px-5 py-2"
           >
             + 新增题目
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleOpenCourseModal}
+            className="px-5 py-2"
+          >
+            课程管理
           </Button>
 
           <Button
@@ -325,6 +463,12 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
+        {pageError && (
+          <div className="mx-6 mt-4 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {pageError}
+          </div>
+        )}
+
         {/* Editor */}
         {displayQuestion
           ? (
@@ -334,6 +478,7 @@ export default function AdminDashboard() {
                 index={selectedIndex!}
                 onSave={handleSave}
                 isNew={isNew}
+                courses={courses}
               />
             )
           : (
@@ -342,6 +487,64 @@ export default function AdminDashboard() {
               </div>
             )}
       </div>
+
+      {/* Course Management Modal */}
+      {isCourseModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
+          <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">课程管理</h3>
+                <p className="text-xs text-slate-500 mt-0.5">添加、修改或删除课程，删除课程将解除所有关联题目</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCourseModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 max-h-[60vh]">
+              {renderCourseItems()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setTempCourses(prev => [...prev, { id: undefined as any, name: '新课程', categories: [{ id: undefined as any, name: '基础题', courseId: undefined as any }] }])}
+                className="px-4 py-2"
+              >
+                + 新增课程
+              </Button>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCourseModalOpen(false)}
+                  className="px-4 py-2 text-slate-600 hover:text-slate-700"
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleSaveCourses}
+                  className="px-5 py-2"
+                >
+                  保存并应用
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

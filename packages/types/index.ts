@@ -3,6 +3,18 @@ export interface Option {
   text: string
 }
 
+export interface Category {
+  id: number
+  name: string
+  courseId: number
+}
+
+export interface Course {
+  id: number
+  name: string
+  categories?: Category[]
+}
+
 export interface ChoiceQuestion {
   id?: number
   type: '单选题' | '判断题'
@@ -11,7 +23,10 @@ export interface ChoiceQuestion {
   answer: string // original label, e.g. "B"
   shuffledOptions?: Option[]
   correctShuffledIdx?: number
-  category?: string
+  categoryId?: number | null
+  category?: Category | null
+  courseId?: number | null
+  course?: Course | null
 }
 
 export interface MultiChoiceQuestion {
@@ -22,7 +37,10 @@ export interface MultiChoiceQuestion {
   answer: string // comma-separated original labels, e.g. "A,C"
   shuffledOptions?: Option[]
   correctShuffledIndices?: number[]
-  category?: string
+  categoryId?: number | null
+  category?: Category | null
+  courseId?: number | null
+  course?: Course | null
 }
 
 export interface FillQuestion {
@@ -31,7 +49,10 @@ export interface FillQuestion {
   text: string
   blanks: string[] // correct answers per blank
   answer: string[]
-  category?: string
+  categoryId?: number | null
+  category?: Category | null
+  courseId?: number | null
+  course?: Course | null
 }
 
 export type Question = ChoiceQuestion | MultiChoiceQuestion | FillQuestion

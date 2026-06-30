@@ -1,4 +1,4 @@
-import type { FillQuestion, Option, Question } from '@quizly/types'
+import type { Course, FillQuestion, Option, Question } from '@quizly/types'
 import { useEffect, useState } from 'react'
 import { Button, StatefulButton } from './motion/button'
 import {
@@ -15,6 +15,7 @@ interface AdminQuestionEditorProps {
   index: number
   onSave: (q: Question) => Promise<void> | void
   isNew: boolean
+  courses: Course[]
 }
 
 interface Draft {
@@ -23,12 +24,13 @@ interface Draft {
   options?: Option[]
   answer: string | string[]
   blanks?: string[]
-  category?: string
+  categoryId?: number | null
+  courseId?: number | null
 }
 
 function emptyDraft(type: Draft['type']): Draft {
   if (type === '填空题')
-    return { type, text: '', answer: ['答案 1'], blanks: ['答案 1'] }
+    return { type, text: '', answer: ['答案 1'], blanks: ['答案 1'], courseId: null, categoryId: null }
   const labels = type === '判断题' ? ['A', 'B'] : ['A', 'B', 'C', 'D']
   const texts
     = type === '判断题'
@@ -39,6 +41,8 @@ function emptyDraft(type: Draft['type']): Draft {
     text: '',
     options: labels.map((l, i) => ({ label: l, text: texts[i] })),
     answer: labels[0],
+    courseId: null,
+    categoryId: null,
   }
 }
 
@@ -61,6 +65,8 @@ function createDraftForTypeChange(prev: Draft, nextType: Draft['type']): Draft {
         { label: 'B', text: '错误' },
       ],
       answer,
+      courseId: prev.courseId,
+      categoryId: prev.categoryId,
     }
   }
 
@@ -91,6 +97,8 @@ function createDraftForTypeChange(prev: Draft, nextType: Draft['type']): Draft {
     text: prev.text,
     options,
     answer,
+    courseId: prev.courseId,
+    categoryId: prev.categoryId,
   }
 }
 
@@ -99,6 +107,7 @@ export default function AdminQuestionEditor({
   index,
   onSave,
   isNew,
+  courses,
 }: AdminQuestionEditorProps) {
   const [draft, setDraft] = useState<Draft>(() => {
     const d = emptyDraft(question.type)
@@ -108,7 +117,8 @@ export default function AdminQuestionEditor({
     d.answer = question.answer
     if ('blanks' in question)
       d.blanks = (question as FillQuestion).blanks
-    d.category = question.category
+    d.categoryId = question.categoryId
+    d.courseId = question.courseId
     return d
   })
   const [saveState, setSaveState] = useState<
@@ -123,7 +133,8 @@ export default function AdminQuestionEditor({
     d.answer = question.answer
     if ('blanks' in question)
       d.blanks = (question as FillQuestion).blanks
-    d.category = question.category
+    d.categoryId = question.categoryId
+    d.courseId = question.courseId
     setDraft(d)
   }, [question])
 
@@ -136,7 +147,8 @@ export default function AdminQuestionEditor({
         type: draft.type,
         text: draft.text,
         answer: draft.answer,
-        category: draft.category || '基础题',
+        categoryId: draft.categoryId || null,
+        courseId: draft.courseId || null,
         ...(draft.options ? { options: draft.options } : {}),
         ...(draft.blanks ? { blanks: draft.blanks } : {}),
       } as Question
@@ -222,6 +234,9 @@ export default function AdminQuestionEditor({
     })
   }
 
+  const selectedCourse = courses.find(c => c.id === draft.courseId)
+  const categoryOptions = selectedCourse?.categories || []
+
   return (
     <div className="flex-1 overflow-y-auto p-6">
       <div className="w-full max-w-3xl mx-auto space-y-5">
@@ -279,18 +294,68 @@ export default function AdminQuestionEditor({
           </TabsList>
         </Tabs>
 
-        {/* Category input */}
+        {/* Course selector */}
+        <div className="max-w-lg">
+          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            所属课程
+          </label>
+          <Select
+            value={draft.courseId ? String(draft.courseId) : 'none'}
+            onValueChange={(val) => {
+              const nextCourseId = val === 'none' ? null : Number(val)
+              const nextCourse = courses.find(c => c.id === nextCourseId)
+              const nextCategories = nextCourse?.categories || []
+              setDraft(d => ({
+                ...d,
+                courseId: nextCourseId,
+                categoryId: nextCategories[0]?.id || null, // 切换课程时自动将其分类归到该课程的第一个分类下
+              }))
+            }}
+          >
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="选择所属课程" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">未分配课程</SelectItem>
+              {courses.map(c => (
+                <SelectItem key={c.id} value={String(c.id)}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Category selector */}
         <div className="max-w-lg">
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">
             分类
           </label>
-          <input
-            type="text"
-            className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-teal-500 text-sm"
-            value={draft.category || ''}
-            onChange={e => setDraft(d => ({ ...d, category: e.target.value }))}
-            placeholder="请输入分类，如：基础题、SQL填空题"
-          />
+          {categoryOptions.length > 0
+            ? (
+                <Select
+                  value={draft.categoryId ? String(draft.categoryId) : ''}
+                  onValueChange={(val) => {
+                    setDraft(d => ({ ...d, categoryId: val ? Number(val) : null }))
+                  }}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="选择所属分类" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categoryOptions.map(cat => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )
+            : (
+                <div className="text-xs text-amber-600 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200 inline-block w-full">
+                  ⚠️ 当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
+                </div>
+              )}
         </div>
 
         {/* Question text */}

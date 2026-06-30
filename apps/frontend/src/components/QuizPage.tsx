@@ -1,11 +1,12 @@
-import type { Question } from '@quizly/types'
+import type { Course, Question } from '@quizly/types'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { checkAnswerCorrect, useQuizState } from '@/hooks/useQuizState'
 
-import { getQuestions } from '@/lib/api'
+import { getCourses, getQuestions } from '@/lib/api'
 import Header from './Header'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './motion/select'
 import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
 import ProgressBar from './ProgressBar'
 import QuestionCard from './QuestionCard'
@@ -14,11 +15,18 @@ import ResultBanner from './ResultBanner'
 import Scoreboard from './Scoreboard'
 
 export default function QuizPage() {
-  const { data: initialQuestions = [], isLoading, error, refetch } = useQuery<Question[]>({
+  const { data: initialQuestions = [], isLoading: isQuestionsLoading, error: questionsError, refetch: refetchQuestions } = useQuery<Question[]>({
     queryKey: ['questions'],
     queryFn: getQuestions,
   })
-  const [activeTab, setActiveTab] = useState<'basic' | 'sql'>('basic')
+
+  const { data: courses = [], isLoading: isCoursesLoading, error: coursesError, refetch: refetchCourses } = useQuery<Course[]>({
+    queryKey: ['courses'],
+    queryFn: getCourses,
+  })
+
+  const [activeCourseTab, setActiveCourseTab] = useState<string>('')
+  const [activeCategoryId, setActiveCategoryId] = useState<string>('')
 
   const {
     questions,
@@ -32,13 +40,33 @@ export default function QuizPage() {
     hydrated,
   } = useQuizState(initialQuestions)
 
-  const activeCategory = activeTab === 'sql' ? 'SQL填空题' : '基础题'
+  const activeCourseIdStr = activeCourseTab || (courses[0] ? String(courses[0].id) : '')
+  const activeCourseIdNum = activeCourseIdStr ? Number(activeCourseIdStr) : undefined
+  const activeCourse = useMemo(
+    () => courses.find(c => String(c.id) === activeCourseIdStr),
+    [courses, activeCourseIdStr],
+  )
+
+  const categoryList = useMemo(
+    () => activeCourse?.categories || [],
+    [activeCourse],
+  )
+
+  const currentCategoryIdStr = activeCategoryId || (categoryList[0] ? String(categoryList[0].id) : '')
+  const currentCategoryIdNum = currentCategoryIdStr ? Number(currentCategoryIdStr) : undefined
+
+  // 当切换课程或课程分类列表变化时，自动将选中的 Tab 归到第一个分类的 ID
+  useEffect(() => {
+    const hasCurrent = categoryList.some(cat => String(cat.id) === activeCategoryId)
+    if (categoryList.length > 0 && !hasCurrent) {
+      setActiveCategoryId(String(categoryList[0].id))
+    }
+  }, [activeCourseIdStr, categoryList, activeCategoryId])
 
   const filteredItems = questions
     .map((q, i) => ({ q, originalIndex: i }))
     .filter((item) => {
-      const isSql = item.q.category === 'SQL填空题'
-      return activeTab === 'sql' ? isSql : !isSql
+      return item.q.courseId === activeCourseIdNum && item.q.categoryId === currentCategoryIdNum
     })
 
   const tabTotal = filteredItems.length
@@ -57,6 +85,13 @@ export default function QuizPage() {
   }, 0)
 
   const tabAllDone = tabTotal > 0 && tabAnswered >= tabTotal
+
+  const isLoading = isQuestionsLoading || isCoursesLoading
+  const error = questionsError || coursesError
+  const refetch = () => {
+    void refetchQuestions()
+    void refetchCourses()
+  }
 
   if (isLoading || !hydrated) {
     return (
@@ -78,7 +113,7 @@ export default function QuizPage() {
           </div>
           <button
             type="button"
-            onClick={() => { void refetch() }}
+            onClick={refetch}
             className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold transition cursor-pointer"
           >
             重新加载
@@ -94,90 +129,141 @@ export default function QuizPage() {
       <Scoreboard score={tabScore} answered={tabAnswered} total={tabTotal} />
       <ProgressBar answered={tabAnswered} total={tabTotal} />
 
-      <div className="max-w-[720px] mx-auto px-5 pt-4 text-right">
+      <div className="max-w-[720px] mx-auto px-5 pt-4 flex justify-between items-center">
+        {/* 课程切换下拉菜单 */}
+        {courses.length > 0
+          ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-500">切换课程:</span>
+                <Select value={activeCourseIdStr} onValueChange={setActiveCourseTab}>
+                  <SelectTrigger className="w-[180px] h-8 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-medium focus:ring-1 focus:ring-teal-500 outline-none">
+                    <SelectValue placeholder="切换课程" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map(c => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )
+          : (
+              <div />
+            )}
+
         <Link to="/admin" className="text-sm font-semibold text-teal-600 hover:text-teal-700">
           进入管理后台 →
         </Link>
       </div>
 
       <main className="max-w-[720px] mx-auto px-5 py-8 pb-20">
-        <div className="flex justify-center mb-6">
-          <Tabs
-            value={activeTab}
-            onValueChange={v => setActiveTab(v as 'basic' | 'sql')}
-            variant="segment"
-            className="w-full max-w-xs"
-          >
-            <TabsList className="w-full grid grid-cols-2">
-              <TabsTrigger
-                value="basic"
-                className="text-sm py-2 w-full text-center"
-                wrapperClassName="w-full flex justify-center"
-              >
-                基础理论题
-              </TabsTrigger>
-              <TabsTrigger
-                value="sql"
-                className="text-sm py-2 w-full text-center"
-                wrapperClassName="w-full flex justify-center"
-              >
-                SQL操作题
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        {courses.length > 0 && (
+          <>
+            {categoryList.length > 0 && (
+              <div className="flex justify-center mb-6">
+                <Tabs
+                  value={currentCategoryIdStr}
+                  onValueChange={setActiveCategoryId}
+                  variant="segment"
+                  className="w-full max-w-lg"
+                >
+                  <TabsList className="w-full flex flex-wrap gap-1">
+                    {categoryList.map(cat => (
+                      <TabsTrigger
+                        key={cat.id}
+                        value={String(cat.id)}
+                        className="text-sm py-2 px-4 flex-1 text-center"
+                        wrapperClassName="flex justify-center"
+                      >
+                        {cat.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              </div>
+            )}
 
-        {tabAllDone && <ResultBanner score={tabScore} total={tabTotal * 5} />}
+            {categoryList.length === 0 && (
+              <div className="text-center py-8 text-slate-400 text-sm">
+                当前课程未配置分类，请到后台为该课程添加分类。
+              </div>
+            )}
 
-        <div className="text-sm font-semibold text-slate-900 mt-6 mb-5 pb-2.5 border-b-2 border-teal-600 inline-block">
-          题目列表
-        </div>
+            {tabAllDone && <ResultBanner score={tabScore} total={tabTotal * 5} />}
 
-        {filteredItems.map((item, idx) => {
-          const q = item.q
-          const i = item.originalIndex
-          const done = !!doneFlags[i]
-          const saved = answers[String(i)]
-          let selectedIdx: number | undefined
-          let selectedIndices: number[] | undefined
-          let userAnswers: string[] | undefined
+            {categoryList.length > 0 && (
+              <>
+                <div className="text-sm font-semibold text-slate-900 mt-6 mb-5 pb-2.5 border-b-2 border-teal-600 inline-block">
+                  题目列表
+                </div>
 
-          if (saved !== undefined) {
-            if (typeof saved === 'number') {
-              selectedIdx = saved
-            }
-            else if (Array.isArray(saved)) {
-              if (q.type === '多选题') {
-                selectedIndices = saved as number[]
-              }
-              else {
-                userAnswers = saved as string[]
-              }
-            }
-          }
+                {filteredItems.length > 0 && (
+                  filteredItems.map((item, idx) => {
+                    const q = item.q
+                    const i = item.originalIndex
+                    const done = !!doneFlags[i]
+                    const saved = answers[String(i)]
+                    let selectedIdx: number | undefined
+                    let selectedIndices: number[] | undefined
+                    let userAnswers: string[] | undefined
 
-          return (
-            <QuestionCard
-              key={q.id ?? `q-${i}`}
-              question={q}
-              index={i}
-              displayIndex={idx + 1}
-              done={done}
-              selectedIdx={selectedIdx}
-              selectedIndices={selectedIndices}
-              userAnswers={userAnswers}
-              onPick={pickAnswer}
-              onSubmitMulti={submitMulti}
-              onSubmitFill={submitFill}
-            />
-          )
-        })}
+                    if (saved !== undefined) {
+                      if (typeof saved === 'number') {
+                        selectedIdx = saved
+                      }
+                      else if (Array.isArray(saved)) {
+                        if (q.type === '多选题') {
+                          selectedIndices = saved as number[]
+                        }
+                        else {
+                          userAnswers = saved as string[]
+                        }
+                      }
+                    }
 
-        <QuizFooter
-          allDone={tabAllDone}
-          onSubmitAll={() => submitAll(activeCategory as 'SQL填空题' | '基础题')}
-          onReset={resetAll}
-        />
+                    return (
+                      <QuestionCard
+                        key={q.id ?? `q-${i}`}
+                        question={q}
+                        index={i}
+                        displayIndex={idx + 1}
+                        done={done}
+                        selectedIdx={selectedIdx}
+                        selectedIndices={selectedIndices}
+                        userAnswers={userAnswers}
+                        onPick={pickAnswer}
+                        onSubmitMulti={submitMulti}
+                        onSubmitFill={submitFill}
+                      />
+                    )
+                  })
+                )}
+
+                {filteredItems.length === 0 && (
+                  <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-white text-sm">
+                    当前分类下暂无题目。
+                  </div>
+                )}
+
+                {filteredItems.length > 0 && (
+                  <QuizFooter
+                    allDone={tabAllDone}
+                    onSubmitAll={() => submitAll(activeCourseIdNum, currentCategoryIdNum)}
+                    onReset={resetAll}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
+
+        {courses.length === 0 && (
+          <div className="text-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-white text-sm">
+            暂无已发布课程，请到后台管理添加课程并关联题目。
+          </div>
+        )}
       </main>
     </div>
   )

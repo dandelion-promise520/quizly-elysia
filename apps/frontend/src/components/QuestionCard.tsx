@@ -44,7 +44,7 @@ export default function QuestionCard({
       const fillQ = question as FillQuestion
       let blankCorrect = 0
       for (let b = 0; b < fillQ.answer.length; b++) {
-        const isBlankCorrect = question.category === 'SQL填空题'
+        const isBlankCorrect = question.category?.name === 'SQL填空题'
           ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
           : userAnswers[b] === fillQ.answer[b]
         if (isBlankCorrect)
@@ -58,7 +58,7 @@ export default function QuestionCard({
         feedbackType = 'wrong'
         const parts: string[] = []
         for (let b = 0; b < fillQ.answer.length; b++) {
-          const isBlankCorrect = question.category === 'SQL填空题'
+          const isBlankCorrect = question.category?.name === 'SQL填空题'
             ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
             : userAnswers[b] === fillQ.answer[b]
           const status = isBlankCorrect ? '✓' : '✗'

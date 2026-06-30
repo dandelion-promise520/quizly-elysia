@@ -31,7 +31,7 @@ export default function FillCard({
   return (
     <div className="flex flex-col gap-2.5 mt-1">
       {Array.from({ length: blankCount }).map((_, b) => {
-        const isBlankCorrect = question.category === 'SQL填空题'
+        const isBlankCorrect = question.category?.name === 'SQL填空题'
           ? normalizeSql(inputs[b]) === normalizeSql(question.answer[b])
           : inputs[b] === question.answer[b]
 

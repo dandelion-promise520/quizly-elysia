@@ -105,7 +105,7 @@ export interface QuizHookReturn {
   pickAnswer: (qi: number, oi: number) => void
   submitMulti: (qi: number, selectedIndices: number[]) => void
   submitFill: (qi: number, userAnswers: string[]) => void
-  submitAll: (category?: 'SQL填空题' | '基础题') => void
+  submitAll: (courseId?: number, categoryId?: number) => void
   resetAll: () => void
   hydrated: boolean
 }
@@ -141,7 +141,7 @@ export function checkAnswerCorrect(q: Question, savedAns: any): boolean {
     return fillQ.answer.every((ans, idx) => {
       const userVal = savedAns[idx] || ''
       const correctVal = ans || ''
-      if (q.category === 'SQL填空题') {
+      if (q.category?.name === 'SQL填空题') {
         return normalizeSql(userVal) === normalizeSql(correctVal)
       }
       return userVal === correctVal
@@ -365,7 +365,7 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
     })
   }, [])
 
-  const submitAll = useCallback((category?: 'SQL填空题' | '基础题') => {
+  const submitAll = useCallback((courseId?: number, categoryId?: number) => {
     setState((prev) => {
       const newDf = { ...prev.doneFlags }
       const newAnswers = { ...prev.answers }
@@ -375,11 +375,12 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
         if (newDf[i])
           return
 
-        if (category) {
-          const isSql = q.category === 'SQL填空题'
-          if (category === 'SQL填空题' && !isSql)
+        if (courseId !== undefined) {
+          if (q.courseId !== courseId)
             return
-          if (category === '基础题' && isSql)
+        }
+        if (categoryId !== undefined) {
+          if (q.categoryId !== categoryId)
             return
         }
 

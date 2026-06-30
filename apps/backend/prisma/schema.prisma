@@ -1,3 +1,7 @@
+generator client_js {
+  provider = "prisma-client-js"
+}
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -7,14 +11,34 @@ datasource db {
   provider = "postgresql"
 }
 
+model Course {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique @db.VarChar(100)
+  questions Question[]
+  Category  Category[]
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @db.VarChar(100)
+  courseId  Int
+  course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@unique([name, courseId])
+}
+
 model Question {
-  id       Int      @id @default(autoincrement())
-  type     String   @db.VarChar(20)
-  text     String   @db.Text
-  answer   String   @default("") @db.VarChar(50)
-  category String   @default("基础题") @db.VarChar(50)
-  Option   Option[]
-  Blank    Blank[]
+  id         Int       @id @default(autoincrement())
+  type       String    @db.VarChar(20)
+  text       String    @db.Text
+  answer     String    @default("") @db.VarChar(50)
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  courseId   Int?
+  course     Course?   @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  Option     Option[]
+  Blank      Blank[]
 }
 
 model Option {

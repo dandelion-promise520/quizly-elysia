@@ -6,6 +6,7 @@ export async function getQuestions(): Promise<Question[]> {
     include: {
       Option: true,
       Blank: true,
+      category: true,
     },
     orderBy: {
       id: 'asc',
@@ -17,6 +18,8 @@ export async function getQuestions(): Promise<Question[]> {
     const type = q.type
     const text = q.text
     const category = q.category
+    const categoryId = q.categoryId
+    const courseId = q.courseId
 
     if (type === '填空题') {
       const sortedBlanks = [...q.Blank].sort((a, b) => a.order - b.order)
@@ -27,7 +30,9 @@ export async function getQuestions(): Promise<Question[]> {
         text,
         blanks: textArr,
         answer: textArr,
+        categoryId,
         category,
+        courseId,
       }
     }
     else {
@@ -41,7 +46,9 @@ export async function getQuestions(): Promise<Question[]> {
         text,
         options: optionsArr,
         answer: q.answer,
+        categoryId,
         category,
+        courseId,
       }
     }
   })
@@ -89,7 +96,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
               if (
                 dbQ.type === q.type
                 && dbQ.text === q.text
-                && dbQ.category === (q.category || '基础题')
+                && dbQ.categoryId === (q.categoryId ?? null)
+                && dbQ.courseId === (q.courseId ?? null)
                 && !hasBlanksChanged
               ) {
                 needsUpdate = false
@@ -105,7 +113,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
                 dbQ.type === q.type
                 && dbQ.text === q.text
                 && dbQ.answer === q.answer
-                && dbQ.category === (q.category || '基础题')
+                && dbQ.categoryId === (q.categoryId ?? null)
+                && dbQ.courseId === (q.courseId ?? null)
                 && !hasOptionsChanged
               ) {
                 needsUpdate = false
@@ -124,7 +133,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
                 type: q.type,
                 text: q.text,
                 answer: '',
-                category: q.category || '基础题',
+                categoryId: q.categoryId ?? null,
+                courseId: q.courseId ?? null,
                 Option: { deleteMany: {} },
                 Blank: {
                   deleteMany: {},
@@ -143,7 +153,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
                 type: q.type,
                 text: q.text,
                 answer: q.answer,
-                category: q.category || '基础题',
+                categoryId: q.categoryId ?? null,
+                courseId: q.courseId ?? null,
                 Blank: { deleteMany: {} },
                 Option: {
                   deleteMany: {},
@@ -163,7 +174,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
                 type: q.type,
                 text: q.text,
                 answer: '',
-                category: q.category || '基础题',
+                categoryId: q.categoryId ?? null,
+                courseId: q.courseId ?? null,
                 Blank: {
                   create: q.blanks.map((b, index) => ({
                     text: b,
@@ -179,7 +191,8 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
                 type: q.type,
                 text: q.text,
                 answer: q.answer,
-                category: q.category || '基础题',
+                categoryId: q.categoryId ?? null,
+                courseId: q.courseId ?? null,
                 Option: {
                   create: q.options.map(o => ({
                     label: o.label,
@@ -199,4 +212,102 @@ export async function saveQuestionsToDatabase(questions: Question[]): Promise<Qu
   )
 
   return await getQuestions()
+}
+
+export async function getCourses() {
+  const courses = await prisma.course.findMany({
+    include: {
+      Category: true,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  })
+  return courses.map(c => ({
+    id: c.id,
+    name: c.name,
+    categories: c.Category,
+  }))
+}
+
+export async function saveCoursesToDatabase(courses: { id?: number, name: string, categories?: { id?: number, name: string }[] }[]) {
+  const inputIds = courses
+    .map(c => c.id)
+    .filter((id): id is number => typeof id === 'number')
+
+  await prisma.$transaction(
+    async (tx) => {
+      // 1. Delete removed courses
+      await tx.course.deleteMany({
+        where: {
+          id: {
+            notIn: inputIds,
+          },
+        },
+      })
+
+      // 2. Insert or Update courses
+      for (const c of courses) {
+        let courseId = c.id
+        if (typeof courseId === 'number') {
+          await tx.course.update({
+            where: { id: courseId },
+            data: {
+              name: c.name,
+            },
+          })
+        }
+        else {
+          const created = await tx.course.create({
+            data: {
+              name: c.name,
+            },
+          })
+          courseId = created.id
+        }
+
+        // 同步分类数据
+        const inputCategories = c.categories || []
+        const inputCatIds = inputCategories
+          .map(cat => cat.id)
+          .filter((id): id is number => typeof id === 'number')
+
+        // 2.1 删除被移除的分类
+        await tx.category.deleteMany({
+          where: {
+            courseId,
+            id: {
+              notIn: inputCatIds,
+            },
+          },
+        })
+
+        // 2.2 更新或新增分类
+        for (const cat of inputCategories) {
+          if (typeof cat.id === 'number') {
+            await tx.category.update({
+              where: { id: cat.id },
+              data: {
+                name: cat.name,
+              },
+            })
+          }
+          else {
+            await tx.category.create({
+              data: {
+                name: cat.name,
+                courseId,
+              },
+            })
+          }
+        }
+      }
+    },
+    {
+      timeout: 60_000,
+      maxWait: 10_000,
+    },
+  )
+
+  return await getCourses()
 }

@@ -1,7 +1,7 @@
 import process from 'node:process'
 import { cors } from '@elysiajs/cors'
 import { Elysia } from 'elysia'
-import { getQuestions, saveQuestionsToDatabase } from './lib/db'
+import { getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase } from './lib/db'
 import { delCache, getCache, setCache } from './lib/redis'
 
 const app = new Elysia()
@@ -49,6 +49,37 @@ const app = new Elysia()
       const updated = await saveQuestionsToDatabase(questions)
       await delCache('quizly:questions')
       return { success: true, questions: updated }
+    }
+    catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to save to database',
+      }
+    }
+  })
+  .get('/api/courses', async () => {
+    try {
+      const cached = await getCache('quizly:courses')
+      if (cached) {
+        return JSON.parse(cached)
+      }
+      const courses = await getCourses()
+      await setCache('quizly:courses', JSON.stringify(courses), 3600)
+      return courses
+    }
+    catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Unknown database error',
+      }
+    }
+  })
+  .post('/api/courses', async ({ body }) => {
+    try {
+      const courses = body as any[]
+      const updated = await saveCoursesToDatabase(courses)
+      await delCache('quizly:courses')
+      await delCache('quizly:questions')
+      return { success: true, courses: updated }
     }
     catch (error) {
       return {

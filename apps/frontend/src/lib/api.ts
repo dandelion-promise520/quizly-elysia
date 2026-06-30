@@ -1,4 +1,4 @@
-import type { Question } from '@quizly/types'
+import type { Course, Question } from '@quizly/types'
 
 const API_BASE = '/api'
 
@@ -32,5 +32,25 @@ export async function verifyAdminPassword(password: string): Promise<{ success: 
   })
   if (!res.ok)
     throw new Error('Failed to verify admin password')
+  return res.json()
+}
+
+export async function getCourses(): Promise<Course[]> {
+  const res = await fetch(`${API_BASE}/courses`)
+  if (!res.ok)
+    throw new Error('Failed to fetch courses')
+  return res.json()
+}
+
+export async function saveCourses(courses: Course[]): Promise<{ success: boolean, courses?: Course[], error?: string }> {
+  const res = await fetch(`${API_BASE}/courses`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(courses),
+  })
+  if (!res.ok)
+    throw new Error('Failed to save courses')
   return res.json()
 }
