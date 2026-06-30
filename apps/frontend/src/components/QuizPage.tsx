@@ -12,8 +12,11 @@ import Scoreboard from './Scoreboard'
 export default function QuizPage() {
   const [initialQuestions, setInitialQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadData = () => {
+    setLoading(true)
+    setError(null)
     getQuestions()
       .then((data) => {
         setInitialQuestions(data)
@@ -21,8 +24,13 @@ export default function QuizPage() {
       })
       .catch((err) => {
         console.error('加载题目出错:', err)
+        setError('数据加载失败，请确认后端服务是否启动')
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   const {
@@ -47,6 +55,23 @@ export default function QuizPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-xl font-semibold text-slate-400">加载中...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200 max-w-md w-full">
+          <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
+          <div className="text-slate-600 text-sm mb-6">{error}</div>
+          <button
+            onClick={loadData}
+            className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold transition cursor-pointer"
+          >
+            重新加载
+          </button>
         </div>
       </div>
     )

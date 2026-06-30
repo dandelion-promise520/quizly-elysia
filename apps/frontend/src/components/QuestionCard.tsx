@@ -60,7 +60,8 @@ export default function QuestionCard({
           const status = userAnswers[b] === fillQ.answer[b] ? '✓' : '✗'
           parts.push(`${status} 第${b + 1}空：你填"${userAnswers[b] || ''}"，正确答案"${fillQ.answer[b]}"`)
         }
-        feedbackMsg = `<strong>部分正确。</strong><br>${parts.join('<br>')}`
+        const statusText = blankCorrect === 0 ? '回答错误。' : '部分正确。'
+        feedbackMsg = `<strong>${statusText}</strong><br>${parts.join('<br>')}`
       }
     }
   }

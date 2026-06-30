@@ -8,13 +8,16 @@ import { getQuestions, saveQuestions } from '@/lib/api'
 export default function AdminDashboard() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [selectedIndex, setSelectedIndex] = useState<number | null>(0)
   const [isNew, setIsNew] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
+  const loadData = () => {
+    setLoading(true)
+    setError(null)
     getQuestions()
       .then((data) => {
         setQuestions(data)
@@ -28,8 +31,13 @@ export default function AdminDashboard() {
       })
       .catch((err) => {
         console.error('加载管理后台数据出错:', err)
+        setError('数据加载失败，请确认后端服务是否启动')
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   const saveToDisk = async (newQuestions: Question[]) => {
@@ -50,19 +58,14 @@ export default function AdminDashboard() {
   const handleSave = useCallback(
     (q: Question) => {
       const next = [...questions]
-      if (selectedIndex !== null && !isNew) {
+      if (selectedIndex !== null) {
         next[selectedIndex] = q
       }
-      else {
-        next.push(q)
-        setSelectedIndex(next.length - 1)
-      }
-
       setQuestions(next)
       setIsNew(false)
       void saveToDisk(next)
     },
-    [questions, selectedIndex, isNew],
+    [questions, selectedIndex],
   )
 
   const handleDelete = useCallback(
@@ -95,8 +98,9 @@ export default function AdminDashboard() {
       ],
       answer: 'A',
     }
-    setQuestions(prev => [...prev, emptyQ])
-    setSelectedIndex(questions.length)
+    const next = [...questions, emptyQ]
+    setQuestions(next)
+    setSelectedIndex(next.length - 1)
     setIsNew(true)
   }
 
@@ -141,6 +145,20 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-xl font-semibold text-slate-400">加载中...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200 max-w-md">
+          <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
+          <div className="text-slate-600 text-sm mb-6">{error}</div>
+          <Button variant="primary" onClick={loadData} className="px-6 py-2">
+            重新加载
+          </Button>
         </div>
       </div>
     )
