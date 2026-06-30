@@ -428,6 +428,7 @@ export default function AdminQuestionEditor({
             </div>
 
             {(draft.blanks ?? []).map((_: string, i: number) => (
+              // eslint-disable-next-line react/no-array-index-key
               <div key={`blank-${i}`} className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 w-6 text-center">
                   {i + 1}

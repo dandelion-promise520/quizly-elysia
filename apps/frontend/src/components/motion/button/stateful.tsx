@@ -97,7 +97,7 @@ function TextSlot({
     if (!nextWidth)
       return
     setWidth(current => (current === nextWidth ? current : nextWidth))
-  })
+  }, [children])
 
   return (
     <motion.span
@@ -129,6 +129,7 @@ function TextSlot({
                 >
                   {label.split('').map((char, index) => (
                     <motion.span
+                      // eslint-disable-next-line react/no-array-index-key
                       key={index}
                       custom={index * CASCADE_STAGGER}
                       variants={CASCADE_LETTER_VARIANTS}

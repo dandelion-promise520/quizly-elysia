@@ -389,7 +389,7 @@ export function SelectItem({
   useLayoutEffect(() => {
     ctx.register(value, label)
     return () => ctx.unregister(value)
-  }, [ctx.register, ctx.unregister, value, label])
+  }, [ctx, value, label])
 
   return (
     <motion.li variants={ctx.reduce ? undefined : ITEM_VARIANTS}>

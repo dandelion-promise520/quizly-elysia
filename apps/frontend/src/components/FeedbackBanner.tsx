@@ -17,6 +17,7 @@ export default function FeedbackBanner({ show, type, message }: FeedbackBannerPr
 
   return (
     <div className={`mt-3.5 rounded-xl text-sm leading-relaxed p-3.5 border ${cls}`}>
+      {/* eslint-disable-next-line react-dom/no-dangerously-set-innerhtml */}
       <div dangerouslySetInnerHTML={{ __html: message }} />
     </div>
   )

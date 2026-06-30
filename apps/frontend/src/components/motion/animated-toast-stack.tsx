@@ -139,6 +139,7 @@ function createToast(input: ToastInput, defaultDuration: number): AnimatedToast 
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAnimatedToastStack({
   initialToasts = [],
   defaultDuration = 4200,
@@ -219,6 +220,7 @@ export function useAnimatedToastStack({
 
       const elapsed = Date.now() - createdAt
       const remaining = Math.max(duration - elapsed, 0)
+      // eslint-disable-next-line react-web-api/no-leaked-timeout
       const timer = window.setTimeout(() => {
         toastTimers.current.delete(toast.id)
         dismissToast(toast.id)
