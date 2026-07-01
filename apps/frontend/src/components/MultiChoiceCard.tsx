@@ -1,6 +1,7 @@
 import type { MultiChoiceQuestion } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { Button } from './motion/button'
 import { Checkbox } from './motion/checkbox'
 
@@ -12,7 +13,7 @@ interface MultiChoiceCardProps {
   onSubmit: (qi: number, indices: number[]) => void
 }
 
-export default function MultiChoiceCard({
+function MultiChoiceCard({
   question,
   index,
   done,
@@ -55,29 +56,17 @@ export default function MultiChoiceCard({
     >
       <div className="flex flex-col gap-1.5 pl-0">
         {opts.map((opt: { label: string, text: string }, oi: number) => {
-          let optCls
-            = 'relative isolate flex items-center gap-3 p-3 my-[2px] border rounded-xl cursor-pointer select-none bg-white transition-all duration-200'
-
           const isSelected = selected.includes(oi)
           const isCorrect = correctIndices.includes(oi)
+          const isWrong = done && isSelected && !isCorrect
 
-          if (done) {
-            optCls += ' cursor-default pointer-events-none border-slate-200'
-            if (isCorrect) {
-              optCls += ' border-green-300 bg-green-50 ring-1 ring-green-300'
-            }
-            else if (isSelected && !isCorrect) {
-              optCls += ' border-red-300 bg-red-50 ring-1 ring-red-300'
-            }
-          }
-          else {
-            if (isSelected) {
-              optCls += ' border-teal-600 ring-1 ring-teal-600'
-            }
-            else {
-              optCls += ' border-slate-200 hover:border-slate-300'
-            }
-          }
+          const optCls = cn(
+            'relative isolate flex items-center gap-3 p-3 my-[2px] border rounded-xl cursor-pointer select-none bg-card transition-all duration-200',
+            done ? 'cursor-default pointer-events-none border-border' : 'border-border hover:border-slate-300',
+            isSelected && !done && 'border-accent ring-1 ring-accent',
+            done && isCorrect && 'border-green-500/30 bg-green-500/10 dark:border-emerald-500/40 dark:bg-emerald-500/15 ring-1 ring-green-500/30 dark:ring-emerald-500/40',
+            isWrong && 'border-destructive/30 bg-destructive/10 dark:border-destructive/40 dark:bg-destructive/20 ring-1 ring-destructive/30 dark:ring-destructive/40',
+          )
 
           return (
             <div
@@ -90,7 +79,7 @@ export default function MultiChoiceCard({
               {oi === hoveredIdx && !isSelected && !done && (
                 <motion.span
                   layoutId={`choice-hover-${index}`}
-                  className="absolute inset-0 z-[-1] rounded-xl bg-slate-100/70"
+                  className="absolute inset-0 z-[-1] rounded-xl bg-slate-100/70 dark:bg-white/5"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -107,7 +96,7 @@ export default function MultiChoiceCard({
               {isSelected && !done && (
                 <motion.span
                   layoutId={`choice-selected-${index}-${oi}`}
-                  className="absolute inset-0 z-[-1] rounded-xl bg-teal-50/70"
+                  className="absolute inset-0 z-[-1] rounded-xl bg-accent-light/70 dark:bg-accent-light"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -128,7 +117,11 @@ export default function MultiChoiceCard({
                 isWrongSelection={done && isSelected && !isCorrect}
                 className="pointer-events-none relative z-10"
               />
-              <span className="relative z-10 text-[14.5px] text-slate-900 leading-relaxed flex-1 min-w-0 break-words">
+              <span className={cn(
+                'relative z-10 text-[14.5px] leading-relaxed flex-1 min-w-0 break-words',
+                (done && isCorrect) ? 'text-green-700 dark:text-emerald-300' : isWrong ? 'text-destructive dark:text-red-400' : 'text-foreground',
+              )}
+              >
                 <span className="opt-key font-bold mr-1">
                   {opt.label}
                   .
@@ -154,3 +147,5 @@ export default function MultiChoiceCard({
     </div>
   )
 }
+
+export default memo(MultiChoiceCard)

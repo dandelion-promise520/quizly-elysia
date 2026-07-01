@@ -1,5 +1,5 @@
 import type { Course, FillQuestion, Option, Question } from '@quizly/types'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Button, StatefulButton } from './motion/button'
 import {
   Select,
@@ -102,7 +102,7 @@ function createDraftForTypeChange(prev: Draft, nextType: Draft['type']): Draft {
   }
 }
 
-export default function AdminQuestionEditor({
+function AdminQuestionEditor({
   question,
   index,
   onSave,
@@ -239,7 +239,7 @@ export default function AdminQuestionEditor({
 
   return (
     <div className="flex-1 overflow-y-auto p-6">
-      <div className="w-full max-w-3xl mx-auto space-y-5">
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-5">
         {/* Header */}
         <div className="flex items-center gap-3">
           {!isNew && (
@@ -312,7 +312,7 @@ export default function AdminQuestionEditor({
               }))
             }}
           >
-            <SelectTrigger className="w-full bg-white">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="选择所属课程" />
             </SelectTrigger>
             <SelectContent>
@@ -339,7 +339,7 @@ export default function AdminQuestionEditor({
                     setDraft(d => ({ ...d, categoryId: val ? Number(val) : null }))
                   }}
                 >
-                  <SelectTrigger className="w-full bg-white">
+                  <SelectTrigger className="w-full bg-background">
                     <SelectValue placeholder="选择所属分类" />
                   </SelectTrigger>
                   <SelectContent>
@@ -364,7 +364,7 @@ export default function AdminQuestionEditor({
             题干
           </label>
           <textarea
-            className="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-y min-h-[80px] text-sm"
+            className="w-full px-4 py-3 border border-border rounded-lg outline-none bg-background text-foreground focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-y min-h-[80px] text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
             value={draft.text}
             onChange={e => setText(e.target.value)}
             placeholder="输入题干内容…"
@@ -373,7 +373,7 @@ export default function AdminQuestionEditor({
 
         {/* Choice / Judgment editor */}
         {draft.type !== '填空题' && (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-slate-700">
                 选项
@@ -393,19 +393,19 @@ export default function AdminQuestionEditor({
                 <input
                   value={opt.label}
                   onChange={e => updateOption(i, 'label', e.target.value)}
-                  className="w-10 px-2 py-2 text-sm border border-slate-200 rounded text-center font-bold outline-none focus:border-teal-500"
+                  className="w-10 px-2 py-2 text-sm border border-border rounded text-center font-bold outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
                 <input
                   value={opt.text}
                   onChange={e => updateOption(i, 'text', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded outline-none focus:border-teal-500"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder="选项内容"
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeOption(i)}
-                  className="w-8 h-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
+                  className="size-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
                   title="删除选项"
                 >
                   ×
@@ -414,7 +414,7 @@ export default function AdminQuestionEditor({
             ))}
 
             {draft.type !== '多选题' && typeof draft.answer === 'string' && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <label className="block text-sm font-semibold text-slate-700">
                   正确答案
                 </label>
@@ -437,7 +437,7 @@ export default function AdminQuestionEditor({
             )}
 
             {draft.type === '多选题' && typeof draft.answer === 'string' && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <label className="block text-sm font-semibold text-slate-700">
                   正确答案（可多选）
                 </label>
@@ -473,10 +473,10 @@ export default function AdminQuestionEditor({
                             answer: nextLabels.join(','),
                           }))
                         }}
-                        className={`w-10 h-10 rounded-lg border text-sm font-bold transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                        className={`size-10 rounded-lg border text-sm font-bold transition-all duration-200 cursor-pointer flex items-center justify-center ${
                           isCorrect
                             ? 'bg-teal-600 border-teal-600 text-white shadow-sm'
-                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                            : 'bg-background border-border text-foreground hover:bg-muted'
                         }`}
                       >
                         {opt.label}
@@ -491,7 +491,7 @@ export default function AdminQuestionEditor({
 
         {/* Fill editor */}
         {draft.type === '填空题' && (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <label className="text-sm font-semibold text-slate-700">
                 填空答案（
@@ -519,14 +519,14 @@ export default function AdminQuestionEditor({
                 <input
                   value={(draft.answer as string[])[i]}
                   onChange={e => updateBlank(i, e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded outline-none focus:border-teal-500"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder={`第 ${i + 1} 空答案`}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeBlank(i)}
-                  className="w-8 h-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
+                  className="size-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
                   title="删除空位"
                 >
                   ×
@@ -555,3 +555,5 @@ export default function AdminQuestionEditor({
     </div>
   )
 }
+
+export default memo(AdminQuestionEditor)

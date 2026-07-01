@@ -1,10 +1,12 @@
+import { memo } from 'react'
+
 interface ScoreboardProps {
   score: number
   answered: number
   total: number
 }
 
-export default function Scoreboard({ score, answered, total }: ScoreboardProps) {
+function Scoreboard({ score, answered, total }: ScoreboardProps) {
   return (
     <div className="max-w-[720px] -mt-6 mx-auto px-5 relative z-[1]">
       <div className="bg-white border border-slate-200 rounded-xl px-7 py-5.5 flex items-center justify-between gap-5 shadow-md">
@@ -26,3 +28,5 @@ export default function Scoreboard({ score, answered, total }: ScoreboardProps) 
     </div>
   )
 }
+
+export default memo(Scoreboard)

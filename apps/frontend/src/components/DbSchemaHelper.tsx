@@ -1,6 +1,6 @@
 import { Check, Copy, Database, Maximize2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 interface ColumnInfo {
   name: string
@@ -62,7 +62,7 @@ const dbTables: TableInfo[] = [
   },
 ]
 
-export default function DbSchemaHelper() {
+function DbSchemaHelper() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('xs')
   const [copiedField, setCopiedField] = useState<string | null>(null)
@@ -84,9 +84,9 @@ export default function DbSchemaHelper() {
         whileHover={{ scale: 1.08, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-20 z-40 flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-teal-500/20 backdrop-blur-md cursor-pointer group"
+        className="fixed bottom-6 right-20 z-40 flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-teal-500/20 backdrop-blur-md cursor-pointer group db-helper-btn"
       >
-        <Database className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+        <Database data-icon="inline-start" className="group-hover:rotate-12 transition-transform duration-300" />
         <span className="text-sm font-semibold tracking-wide">数据库表结构</span>
         <span className="absolute -top-1 -right-1 flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
@@ -119,7 +119,7 @@ export default function DbSchemaHelper() {
               <div className="p-6 bg-white border-b border-slate-100 flex items-center justify-between shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
-                    <Database className="w-6 h-6" />
+                    <Database className="size-6" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -135,7 +135,7 @@ export default function DbSchemaHelper() {
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="size-5" />
                 </button>
               </div>
 
@@ -164,7 +164,7 @@ export default function DbSchemaHelper() {
               </div>
 
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
                 {/* Table Introduction */}
                 <div className="bg-gradient-to-r from-teal-50/50 to-emerald-50/30 p-4 rounded-xl border border-teal-100/50">
                   <h3 className="text-sm font-bold text-teal-800 flex items-center gap-1.5 mb-1">
@@ -186,7 +186,7 @@ export default function DbSchemaHelper() {
                       onClick={() => setFullscreenImage(activeTable.imageSrc)}
                       className="flex items-center gap-1 text-[11px] font-semibold text-teal-600 hover:text-teal-700 transition cursor-pointer"
                     >
-                      <Maximize2 className="w-3 h-3" />
+                      <Maximize2 className="size-3" />
                       全屏查看
                     </button>
                   </div>
@@ -255,10 +255,10 @@ export default function DbSchemaHelper() {
                         >
                           {copiedField === col.name
                             ? (
-                                <Check className="w-3.5 h-3.5" />
+                                <Check className="size-3.5" />
                               )
                             : (
-                                <Copy className="w-3.5 h-3.5 opacity-0 group-hover/row:opacity-100 transition-opacity" />
+                                <Copy className="size-3.5 opacity-0 group-hover/row:opacity-100 transition-opacity" />
                               )}
                         </button>
                       </div>
@@ -271,10 +271,10 @@ export default function DbSchemaHelper() {
                   <h4 className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1">
                     💡 答题建议
                   </h4>
-                  <ul className="text-xs text-slate-500 space-y-1 list-disc list-inside leading-relaxed pl-1">
+                  <ul className="text-xs text-slate-500 flex flex-col gap-1 list-disc list-inside leading-relaxed pl-1">
                     <li>
                       点击字段名右侧的
-                      <Copy className="w-3 h-3 inline mx-0.5" />
+                      <Copy className="size-3 inline mx-0.5" />
                       {' '}
                       按钮，可直接复制字段名称。
                     </li>
@@ -303,7 +303,7 @@ export default function DbSchemaHelper() {
               onClick={() => setFullscreenImage(null)}
               className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition duration-200 cursor-pointer"
             >
-              <X className="w-6 h-6" />
+              <X className="size-6" />
             </button>
             <motion.div
               initial={{ scale: 0.95 }}
@@ -328,3 +328,5 @@ export default function DbSchemaHelper() {
     </>
   )
 }
+
+export default memo(DbSchemaHelper)

@@ -1,8 +1,10 @@
+import { memo } from 'react'
+
 interface HeaderProps {
   total: number
 }
 
-export default function Header({ total }: HeaderProps) {
+function Header({ total }: HeaderProps) {
   return (
     <header className="bg-white border-b border-slate-200 pt-14 pb-12 text-center">
       <span className="inline-block text-xs font-semibold tracking-wide text-teal-600 bg-teal-50 px-4 py-1.5 rounded-full mb-5 border border-teal-200">
@@ -25,3 +27,5 @@ export default function Header({ total }: HeaderProps) {
     </header>
   )
 }
+
+export default memo(Header)

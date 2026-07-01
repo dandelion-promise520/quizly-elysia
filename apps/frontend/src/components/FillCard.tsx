@@ -1,6 +1,7 @@
 import type { FillQuestion } from '@quizly/types'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { normalizeSql } from '@/hooks/useQuizState'
+import { cn } from '@/lib/utils'
 import { Button } from './motion/button'
 
 interface FillCardProps {
@@ -11,7 +12,7 @@ interface FillCardProps {
   onSubmit: (qi: number, answers: string[]) => void
 }
 
-export default function FillCard({
+function FillCard({
   question,
   index,
   done,
@@ -38,13 +39,17 @@ export default function FillCard({
         return (
           // eslint-disable-next-line react/no-array-index-key
           <div key={`blank-${b}`} className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
+            <span className="text-sm font-semibold text-text-secondary whitespace-nowrap">
               {b + 1}
               .
             </span>
             <input
               type="text"
-              className="flex-1 px-3.5 py-2 border border-slate-200 rounded-lg text-[14.5px] font-sans outline-none transition-colors duration-200 bg-white disabled:cursor-default"
+              className={cn(
+                'flex-1 px-3.5 py-2 border border-border rounded-lg text-[14.5px] font-sans outline-none transition-colors duration-200 bg-background disabled:cursor-default text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500',
+                done && isBlankCorrect && 'border-success-border bg-success-light',
+                done && !isBlankCorrect && 'border-error-border bg-error-light',
+              )}
               placeholder="请输入答案"
               disabled={done}
               value={inputs[b] || ''}
@@ -54,18 +59,6 @@ export default function FillCard({
                   next[b] = e.target.value
                   return next
                 })}
-              style={
-                done
-                  ? {
-                      borderColor: isBlankCorrect
-                        ? 'var(--color-success-border)'
-                        : 'var(--color-error-border)',
-                      backgroundColor: isBlankCorrect
-                        ? 'var(--color-success-light)'
-                        : 'var(--color-error-light)',
-                    }
-                  : undefined
-              }
             />
           </div>
         )
@@ -83,3 +76,5 @@ export default function FillCard({
     </div>
   )
 }
+
+export default memo(FillCard)

@@ -67,7 +67,7 @@ function shuffleQuestions(questions: Question[]): Question[] {
   })
 }
 
-const STORAGE_VERSION = 'v1.0.2'
+const STORAGE_VERSION = 'v1.0.3'
 
 function loadSaved(): { state: { score: number, answered: number }, answers: SavedAnswer, questions: Partial<Question>[], score?: number, answered?: number } | null {
   try {
@@ -93,7 +93,6 @@ function persist(questions: Question[], answers: SavedAnswer, score: number, ans
     questions: questions.map(q => ({
       type: q.type,
       text: q.text,
-      options: q.type === '填空题' ? [] : q.options,
       blanks: 'blanks' in q ? q.blanks : undefined,
       shuffledOptions: 'shuffledOptions' in q ? q.shuffledOptions : undefined,
       correctShuffledIdx: 'correctShuffledIdx' in q ? q.correctShuffledIdx : undefined,

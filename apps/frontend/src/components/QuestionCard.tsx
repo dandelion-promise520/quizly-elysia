@@ -1,4 +1,5 @@
 import type { ChoiceQuestion, FillQuestion, MultiChoiceQuestion, Question } from '@quizly/types'
+import { memo } from 'react'
 import { checkAnswerCorrect, normalizeSql } from '@/hooks/useQuizState'
 import ChoiceCard from './ChoiceCard'
 import FeedbackBanner from './FeedbackBanner'
@@ -19,7 +20,7 @@ interface QuestionCardProps {
   onSubmitFill: (qi: number, answers: string[]) => void
 }
 
-export default function QuestionCard({
+function QuestionCard({
   question,
   index,
   displayIndex,
@@ -103,15 +104,15 @@ export default function QuestionCard({
   const cardBorder = done
     ? question.type === '填空题'
       ? userAnswers && isCorrect
-        ? 'border-green-300 ring-1 ring-green-300'
-        : 'border-red-300 ring-1 ring-red-300'
+        ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+        : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
       : question.type === '多选题'
         ? selectedIndices && isCorrect
-          ? 'border-green-300 ring-1 ring-green-300'
-          : 'border-red-300 ring-1 ring-red-300'
+          ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+          : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
         : selectedIdx !== undefined && isCorrect
-          ? 'border-green-300 ring-1 ring-green-300'
-          : 'border-red-300 ring-1 ring-red-300'
+          ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+          : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
     : ''
 
   return (
@@ -166,3 +167,5 @@ export default function QuestionCard({
     </div>
   )
 }
+
+export default memo(QuestionCard)

@@ -1,6 +1,7 @@
 import type { Option, Question } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
-import { useState } from 'react'
+import { memo, useMemo, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
 
 interface AdminSidebarProps {
@@ -28,7 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
   '填空题': '填空',
 }
 
-export default function AdminSidebar({
+function AdminSidebar({
   questions,
   search,
   onSearchChange,
@@ -48,30 +49,32 @@ export default function AdminSidebar({
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
   const reduce = useReducedMotion()
 
-  const filtered = questions.filter((q) => {
-    if (typeFilter && q.type !== typeFilter)
-      return false
-    if (search) {
-      const options = 'options' in q ? (q.options as Option[]) : []
-      const blanks = 'blanks' in q ? (q.blanks as string[]) : []
-      const haystack = [q.text, ...options.map(o => o.text), ...blanks].join(
-        ' ',
-      )
-      return haystack.toLowerCase().includes(search.toLowerCase())
-    }
-    return true
-  })
+  const filtered = useMemo(() => {
+    return questions.filter((q) => {
+      if (typeFilter && q.type !== typeFilter)
+        return false
+      if (search) {
+        const options = 'options' in q ? (q.options as Option[]) : []
+        const blanks = 'blanks' in q ? (q.blanks as string[]) : []
+        const haystack = [q.text, ...options.map(o => o.text), ...blanks].join(
+          ' ',
+        )
+        return haystack.toLowerCase().includes(search.toLowerCase())
+      }
+      return true
+    })
+  }, [questions, typeFilter, search])
 
   return (
-    <aside className="w-[340px] flex-shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
+    <aside className="w-[340px] flex-shrink-0 bg-sidebar border-r border-border flex flex-col h-screen sticky top-0">
       {/* Toolbar */}
-      <div className="p-4 border-b border-slate-200 space-y-3">
-        <h2 className="text-base font-bold text-slate-900">题目管理</h2>
+      <div className="p-4 border-b border-border flex flex-col gap-3">
+        <h2 className="text-base font-bold text-text-secondary">题目管理</h2>
 
         <input
           type="text"
           placeholder="搜索题干或选项…"
-          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition"
+          className="w-full px-3 py-2 text-sm border border-border rounded-lg outline-none focus:border-accent focus:ring-1 focus:ring-accent transition bg-background text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500"
           value={search}
           onChange={e => onSearchChange(e.target.value)}
         />
@@ -95,7 +98,7 @@ export default function AdminSidebar({
           </TabsList>
         </Tabs>
 
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div>
             共
             {' '}
@@ -110,11 +113,12 @@ export default function AdminSidebar({
           <button
             type="button"
             onClick={onToggleBatchMode}
-            className={`px-2 py-1 rounded border text-xs font-semibold cursor-pointer transition-all duration-200 ${
+            className={cn(
+              'px-2 py-1 rounded border text-xs font-semibold cursor-pointer transition-all duration-200',
               isBatchMode
                 ? 'bg-teal-600 border-teal-600 text-white shadow-sm hover:bg-teal-500'
-                : 'bg-white border-slate-200 text-teal-600 hover:bg-slate-50 hover:border-slate-300'
-            }`}
+                : 'bg-sidebar border-border text-teal-600 dark:text-emerald-400 hover:bg-teal-500/10 dark:hover:bg-emerald-500/15 hover:border-teal-500/20 dark:hover:border-emerald-500/30',
+            )}
           >
             {isBatchMode ? '退出批量' : '批量操作'}
           </button>
@@ -122,7 +126,7 @@ export default function AdminSidebar({
 
         {isBatchMode && (
           <div className="flex justify-between items-center bg-slate-50 border border-slate-100 p-2.5 rounded-lg text-xs transition-all">
-            <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-600">
+            <label className="flex items-center gap-2 cursor-pointer font-semibold text-muted-foreground">
               <input
                 type="checkbox"
                 checked={
@@ -135,14 +139,14 @@ export default function AdminSidebar({
                     .filter((id): id is number => id !== undefined)
                   onSelectAll(filteredIds, e.target.checked)
                 }}
-                className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 cursor-pointer accent-teal-600"
+                className="rounded border-border text-accent focus:ring-accent size-3.5 cursor-pointer accent-accent"
               />
               全选当前筛选 (
               {filtered.length}
               {' '}
               题)
             </label>
-            <div className="text-slate-500 font-bold">
+            <div className="text-muted-foreground font-bold">
               已选
               {' '}
               {selectedIds.size}
@@ -155,7 +159,7 @@ export default function AdminSidebar({
 
       {/* List */}
       <div
-        className="flex-1 overflow-y-auto bg-white relative z-0"
+        className="flex-1 overflow-y-auto bg-sidebar relative z-0"
         onMouseLeave={() => setHoveredIdx(null)}
       >
         {filtered.map((q) => {
@@ -169,11 +173,11 @@ export default function AdminSidebar({
           return (
             <div
               key={q.id ?? `temp-${realIdx}`}
-              className={[
+              className={cn(
                 'relative flex items-start gap-2.5 px-4 py-3 cursor-pointer border-b border-slate-100 transition-colors',
-                isSelected && !isBatchMode ? 'bg-teal-50 border-l-4 border-l-teal-600' : '',
-                isChecked && isBatchMode ? 'bg-teal-50/50' : '',
-              ].join(' ')}
+                isSelected && !isBatchMode && 'bg-teal-500/10 dark:bg-emerald-500/15 border-l-4 border-l-teal-600 dark:border-l-emerald-500',
+                isChecked && isBatchMode && 'bg-teal-500/5 dark:bg-emerald-500/10',
+              )}
               onClick={() => {
                 if (isBatchMode) {
                   if (q.id !== undefined) {
@@ -190,7 +194,7 @@ export default function AdminSidebar({
               {realIdx === hoveredIdx && !isSelected && !isBatchMode && (
                 <motion.span
                   layoutId="admin-sidebar-hover"
-                  className="absolute inset-0 z-[-1] bg-slate-100"
+                  className="absolute inset-0 z-[-1] bg-slate-100 dark:bg-white/5"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -215,31 +219,31 @@ export default function AdminSidebar({
                           onToggleSelect(q.id, e.target.checked)
                         }
                       }}
-                      className="relative z-10 rounded border-slate-300 text-teal-600 focus:ring-teal-500 w-4 h-4 mt-1 cursor-pointer accent-teal-600 flex-shrink-0"
+                      className="relative z-10 rounded border-border text-teal-600 focus:ring-teal-500 size-4 mt-1 cursor-pointer accent-teal-600 flex-shrink-0"
                     />
                   )
                 : (
-                    <span className="relative z-10 text-xs font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+                    <span className="relative z-10 text-xs font-bold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">
                       {realIdx + 1}
                     </span>
                   )}
 
-              <span className="relative z-10 text-[10px] font-semibold text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+              <span className="relative z-10 text-[10px] font-semibold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
                 {q.type}
               </span>
-              <span className="relative z-10 flex-1 text-sm text-slate-700 truncate">
+              <span className="relative z-10 flex-1 text-sm text-foreground truncate">
                 {preview}
               </span>
 
               {!isBatchMode && (
                 <button
                   type="button"
-                  className={[
-                    'relative z-10 flex-shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs transition',
+                  className={cn(
+                    'relative z-10 flex-shrink-0 size-6 rounded flex items-center justify-center text-xs transition',
                     needConfirm
-                      ? 'bg-red-600 text-white'
-                      : 'text-slate-400 hover:text-red-500 hover:bg-red-50',
-                  ].join(' ')}
+                      ? 'bg-error text-white'
+                      : 'text-text-muted hover:text-error hover:bg-error-light',
+                  )}
                   onClick={(e) => {
                     e.stopPropagation()
                     if (needConfirm) {
@@ -261,16 +265,17 @@ export default function AdminSidebar({
       </div>
 
       {isBatchMode && (
-        <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-col gap-2">
+        <div className="p-4 border-t border-border bg-slate-50 flex flex-col gap-2">
           <button
             type="button"
             disabled={selectedIds.size === 0}
             onClick={onOpenBatchModal}
-            className={`w-full py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer text-center ${
+            className={cn(
+              'w-full py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer text-center',
               selectedIds.size === 0
-                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                : 'bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/10'
-            }`}
+                ? 'bg-slate-200 text-text-muted cursor-not-allowed'
+                : 'bg-teal-600 hover:bg-teal-500 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-lg shadow-teal-600/10',
+            )}
           >
             修改所属课程与分类 (
             {selectedIds.size}
@@ -281,3 +286,5 @@ export default function AdminSidebar({
     </aside>
   )
 }
+
+export default memo(AdminSidebar)

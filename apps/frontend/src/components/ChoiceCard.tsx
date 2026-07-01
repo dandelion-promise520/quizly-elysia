@@ -1,6 +1,7 @@
 import type { ChoiceQuestion } from '@quizly/types'
 import { motion, useReducedMotion } from 'motion/react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { RadioGroup, RadioGroupItem } from './motion/radio'
 
 interface ChoiceCardProps {
@@ -11,7 +12,7 @@ interface ChoiceCardProps {
   onPick: (qi: number, oi: number) => void
 }
 
-export default function ChoiceCard({
+function ChoiceCard({
   question,
   index,
   done,
@@ -32,26 +33,17 @@ export default function ChoiceCard({
         className="pl-0 gap-1.5"
       >
         {opts.map((opt: { label: string, text: string }, oi: number) => {
-          let optCls
-            = 'relative isolate flex items-center gap-3 p-3 my-[2px] border rounded-xl cursor-pointer select-none bg-white transition-all duration-200'
+          const isCorrect = done && oi === correctIdx
+          const isWrong = done && oi === selectedIdx && oi !== correctIdx
+          const isSelected = oi === selectedIdx
 
-          if (done) {
-            optCls += ' cursor-default pointer-events-none border-slate-200'
-            if (oi === correctIdx) {
-              optCls += ' border-green-300 bg-green-50 ring-1 ring-green-300'
-            }
-            else if (oi === selectedIdx && oi !== correctIdx) {
-              optCls += ' border-red-300 bg-red-50 ring-1 ring-red-300'
-            }
-          }
-          else {
-            if (oi === selectedIdx) {
-              optCls += ' border-teal-600 ring-1 ring-teal-600'
-            }
-            else {
-              optCls += ' border-slate-200 hover:border-slate-300'
-            }
-          }
+          const optCls = cn(
+            'relative isolate flex items-center gap-3 p-3 my-[2px] border rounded-xl cursor-pointer select-none bg-card transition-all duration-200',
+            done ? 'cursor-default pointer-events-none border-border' : 'border-border hover:border-slate-300',
+            isSelected && !done && 'border-accent ring-1 ring-accent',
+            isCorrect && 'border-green-500/30 bg-green-500/10 dark:border-emerald-500/40 dark:bg-emerald-500/15 ring-1 ring-green-500/30 dark:ring-emerald-500/40',
+            isWrong && 'border-destructive/30 bg-destructive/10 dark:border-destructive/40 dark:bg-destructive/20 ring-1 ring-destructive/30 dark:ring-destructive/40',
+          )
 
           return (
             <div
@@ -64,7 +56,7 @@ export default function ChoiceCard({
               {oi === hoveredIdx && oi !== selectedIdx && !done && (
                 <motion.span
                   layoutId={`choice-hover-${index}`}
-                  className="absolute inset-0 z-[-1] rounded-xl bg-slate-100/70"
+                  className="absolute inset-0 z-[-1] rounded-xl bg-slate-100/70 dark:bg-white/5"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -81,7 +73,7 @@ export default function ChoiceCard({
               {oi === selectedIdx && !done && (
                 <motion.span
                   layoutId={`choice-selected-${index}`}
-                  className="absolute inset-0 z-[-1] rounded-xl bg-teal-50/70"
+                  className="absolute inset-0 z-[-1] rounded-xl bg-accent-light/70 dark:bg-accent-light"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -103,7 +95,11 @@ export default function ChoiceCard({
                 }
                 className="pointer-events-none relative z-10"
               />
-              <span className="relative z-10 text-[14.5px] text-slate-900 leading-relaxed flex-1 min-w-0 break-words">
+              <span className={cn(
+                'relative z-10 text-[14.5px] leading-relaxed flex-1 min-w-0 break-words',
+                isCorrect ? 'text-green-700 dark:text-emerald-300' : isWrong ? 'text-destructive dark:text-red-400' : 'text-foreground',
+              )}
+              >
                 <span className="opt-key font-bold mr-1">
                   {opt.label}
                   .
@@ -117,3 +113,5 @@ export default function ChoiceCard({
     </div>
   )
 }
+
+export default memo(ChoiceCard)

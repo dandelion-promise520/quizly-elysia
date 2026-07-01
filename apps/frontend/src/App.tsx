@@ -10,6 +10,8 @@ import AdminDashboard from '@/components/AdminDashboard'
 import FloatingActions from '@/components/FloatingActions'
 import QuizPage from '@/components/QuizPage'
 
+import { ThemeProvider } from '@/components/theme-provider'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -52,8 +54,10 @@ declare module '@tanstack/react-router' {
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="light" storageKey="quizly-theme">
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }

@@ -236,6 +236,11 @@ export default function AdminDashboard() {
     [questions, selectedIndex, saveToDisk],
   )
 
+  const handleSelect = useCallback((id: number | null) => {
+    setSelectedIndex(id)
+    setIsNew(false)
+  }, [])
+
   const handleNew = () => {
     const emptyQ: Question = {
       type: '单选题',
@@ -313,18 +318,18 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden font-sans">
         {/* 背景动态渐变球 */}
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-teal-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-20%] left-[-10%] size-[500px] rounded-full bg-teal-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-20%] right-[-10%] size-[500px] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
 
-        <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
-          <div className="w-16 h-16 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center mb-6">
-            <Lock className="w-8 h-8 text-teal-400" />
+        <div className="w-full max-w-md bg-[#ffffff]/5 backdrop-blur-xl border border-[#ffffff]/10 p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
+          <div className="size-16 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center mb-6">
+            <Lock className="size-8 text-teal-400" />
           </div>
 
           <h2 className="text-2xl font-bold text-white mb-2">管理后台认证</h2>
           <p className="text-slate-400 text-sm mb-8 text-center">请输入管理员密码以访问控制台</p>
 
-          <form onSubmit={handleAuthSubmit} className="w-full space-y-5">
+          <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-5">
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -335,7 +340,7 @@ export default function AdminDashboard() {
                   if (authError)
                     setAuthError(null)
                 }}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm pr-10"
+                className="w-full px-4 py-3 bg-[#ffffff]/5 border border-[#ffffff]/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm pr-10"
                 autoFocus
               />
               <button
@@ -343,7 +348,7 @@ export default function AdminDashboard() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
 
@@ -415,7 +420,7 @@ export default function AdminDashboard() {
     return tempCourses.map((course, idx) => (
       <div key={course.id ?? `temp-${idx}`} className="flex flex-col gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100/80 shadow-sm relative">
         <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-teal-600 bg-teal-50 px-2.5 py-1 rounded-md">课程</div>
+          <div className="text-xs font-bold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-2.5 py-1 rounded-md">课程</div>
           <input
             type="text"
             value={course.name}
@@ -425,7 +430,7 @@ export default function AdminDashboard() {
               setTempCourses(next)
             }}
             placeholder="请输入课程名称"
-            className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg outline-none bg-white focus:border-teal-500 text-sm font-semibold focus:ring-1 focus:ring-teal-500 transition"
+            className="flex-1 px-3 py-1.5 border border-border rounded-lg outline-none bg-background text-foreground focus:border-teal-500 text-sm font-semibold focus:ring-1 focus:ring-teal-500 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
           <button
             type="button"
@@ -433,14 +438,14 @@ export default function AdminDashboard() {
               const next = tempCourses.filter((_, i) => i !== idx)
               setTempCourses(next)
             }}
-            className="w-8 h-8 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 flex items-center justify-center text-sm font-bold transition cursor-pointer"
+            className="size-8 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 flex items-center justify-center text-sm font-bold transition cursor-pointer"
             title="删除课程"
           >
             ×
           </button>
         </div>
 
-        <div className="pl-6 border-l-2 border-slate-200/60 space-y-2">
+        <div className="pl-6 border-l-2 border-slate-200/60 flex flex-col gap-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-bold text-slate-500">内部 Tab 分类:</span>
             <button
@@ -452,7 +457,7 @@ export default function AdminDashboard() {
                 next[idx] = { ...next[idx], categories: cats }
                 setTempCourses(next)
               }}
-              className="text-[10px] font-bold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded transition cursor-pointer"
+              className="text-[10px] font-bold text-teal-700 bg-teal-500/10 hover:bg-teal-500/20 dark:text-emerald-300 dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 px-2 py-0.5 rounded transition cursor-pointer"
             >
               + 添加分类
             </button>
@@ -475,7 +480,7 @@ export default function AdminDashboard() {
                       setTempCourses(next)
                     }}
                     placeholder="分类名称"
-                    className="flex-1 px-2.5 py-1 border border-slate-200 rounded-md outline-none bg-white focus:border-teal-500 text-xs focus:ring-1 focus:ring-teal-500 transition"
+                    className="flex-1 px-2.5 py-1 border border-border rounded-md outline-none bg-background text-foreground focus:border-teal-500 text-xs focus:ring-1 focus:ring-teal-500 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   <button
                     type="button"
@@ -485,7 +490,7 @@ export default function AdminDashboard() {
                       next[idx] = { ...next[idx], categories: cats }
                       setTempCourses(next)
                     }}
-                    className="w-6 h-6 rounded border border-red-50 text-red-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-xs font-semibold transition cursor-pointer"
+                    className="size-6 rounded border border-red-50 text-red-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-xs font-semibold transition cursor-pointer"
                     title="删除分类"
                   >
                     ×
@@ -506,10 +511,7 @@ export default function AdminDashboard() {
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
         selectedId={selectedIndex}
-        onSelect={(id) => {
-          setSelectedIndex(id)
-          setIsNew(false)
-        }}
+        onSelect={handleSelect}
         onDelete={handleDelete}
         isBatchMode={isBatchMode}
         onToggleBatchMode={handleToggleBatchMode}
@@ -521,7 +523,7 @@ export default function AdminDashboard() {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-slate-200">
+        <div className="flex items-center gap-3 px-6 py-4 bg-card border-b border-border">
           <Button
             variant="primary"
             size="sm"
@@ -585,8 +587,8 @@ export default function AdminDashboard() {
         {isBatchMode
           ? (
               <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 p-8 text-center">
-                <div className="w-16 h-16 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-teal-600 mb-4 animate-pulse">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <div className="size-16 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-teal-600 mb-4 animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                   </svg>
                 </div>
@@ -598,14 +600,14 @@ export default function AdminDashboard() {
                     : '当前尚未选择任何题目。'}
                 </p>
                 {selectedIds.size > 0 && (
-                  <div className="w-full max-w-md bg-white border border-slate-200/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
+                  <div className="w-full max-w-md bg-card border border-border/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
                     <div className="text-xs font-bold text-slate-400 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
-                    <div className="space-y-1.5">
+                    <div className="flex flex-col gap-1.5">
                       {questions
                         .filter(q => q.id !== undefined && selectedIds.has(q.id))
                         .map((q, i) => (
                           <div key={q.id} className="flex items-center gap-2 text-xs text-slate-600">
-                            <span className="w-5 h-5 bg-teal-50 text-teal-600 font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
+                            <span className="size-5 bg-teal-50 text-teal-600 font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
                               {i + 1}
                             </span>
                             <span className="truncate flex-1 font-medium">{q.text}</span>
@@ -638,7 +640,7 @@ export default function AdminDashboard() {
       {/* Course Management Modal */}
       {isCourseModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
-          <div className="w-full max-w-lg bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-lg bg-card rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
             {/* Modal Header */}
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div>
@@ -648,14 +650,14 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setIsCourseModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+                className="size-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
               >
                 ×
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 max-h-[60vh]">
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5 max-h-[60vh]">
               {renderCourseItems()}
             </div>
 
@@ -696,9 +698,9 @@ export default function AdminDashboard() {
       {/* Batch Update Modal */}
       {isBatchModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-100 shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+          <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
               <div>
                 <h3 className="text-lg font-bold text-slate-900">批量修改所属课程与分类</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -711,14 +713,14 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setIsBatchModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+                className="size-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
               >
                 ×
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-4">
+            <div className="p-6 flex flex-col gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   所属课程
@@ -733,7 +735,7 @@ export default function AdminDashboard() {
                     setBatchCategoryId(nextCategories[0]?.id || null)
                   }}
                 >
-                  <SelectTrigger className="w-full bg-white">
+                  <SelectTrigger className="w-full bg-background">
                     <SelectValue placeholder="选择所属课程" />
                   </SelectTrigger>
                   <SelectContent>
@@ -764,7 +766,7 @@ export default function AdminDashboard() {
                                 setBatchCategoryId(val === 'none' ? null : Number(val))
                               }}
                             >
-                              <SelectTrigger className="w-full bg-white">
+                              <SelectTrigger className="w-full bg-background">
                                 <SelectValue placeholder="选择所属分类" />
                               </SelectTrigger>
                               <SelectContent>
@@ -799,7 +801,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex gap-2 justify-end">
+            <div className="px-6 py-4 border-t border-border bg-slate-50/50 flex gap-2 justify-end rounded-b-2xl">
               <Button
                 variant="ghost"
                 size="sm"
@@ -826,7 +828,7 @@ export default function AdminDashboard() {
       <AlertDialog.Root open={isImportConfirmOpen} onOpenChange={setIsImportConfirmOpen}>
         <AlertDialog.Portal>
           <AlertDialog.Backdrop className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-          <AlertDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex w-[400px] max-w-[calc(100vw-3rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl transition-[scale,opacity] duration-150 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+          <AlertDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex w-[400px] max-w-[calc(100vw-3rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-2xl transition-[scale,opacity] duration-150 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
             <div className="flex flex-col gap-2">
               <AlertDialog.Title className="text-lg font-bold text-slate-900">确认导入题目</AlertDialog.Title>
               <AlertDialog.Description className="text-sm text-slate-500 leading-relaxed">
@@ -856,7 +858,7 @@ export default function AdminDashboard() {
                 {isImporting
                   ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         导入中...
                       </>
                     )

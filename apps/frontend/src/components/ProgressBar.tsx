@@ -1,9 +1,11 @@
+import { memo } from 'react'
+
 interface ProgressBarProps {
   answered: number
   total: number
 }
 
-export default function ProgressBar({ answered, total }: ProgressBarProps) {
+function ProgressBar({ answered, total }: ProgressBarProps) {
   const pct = total > 0 ? (answered / total) * 100 : 0
   return (
     <div className="max-w-[720px] mt-4 mx-auto px-5">
@@ -16,3 +18,5 @@ export default function ProgressBar({ answered, total }: ProgressBarProps) {
     </div>
   )
 }
+
+export default memo(ProgressBar)
