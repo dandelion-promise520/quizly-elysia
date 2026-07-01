@@ -4,6 +4,7 @@ import ChoiceCard from './ChoiceCard'
 import FeedbackBanner from './FeedbackBanner'
 import FillCard from './FillCard'
 import MultiChoiceCard from './MultiChoiceCard'
+import RenderText from './RenderText'
 
 interface QuestionCardProps {
   question: Question
@@ -126,7 +127,7 @@ export default function QuestionCard({
           {question.type}
         </span>
         <div className="flex-1 text-[15.5px] font-medium text-slate-900 leading-relaxed">
-          {question.text}
+          <RenderText text={question.text} />
         </div>
       </div>
 
