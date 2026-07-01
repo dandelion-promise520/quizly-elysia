@@ -128,7 +128,7 @@ export default function MultiChoiceCard({
                 isWrongSelection={done && isSelected && !isCorrect}
                 className="pointer-events-none relative z-10"
               />
-              <span className="relative z-10 text-[14.5px] text-slate-900 leading-relaxed">
+              <span className="relative z-10 text-[14.5px] text-slate-900 leading-relaxed flex-1 min-w-0 break-words">
                 <span className="opt-key font-bold mr-1">
                   {opt.label}
                   .

@@ -126,7 +126,7 @@ export default function QuestionCard({
         <span className="text-[11px] font-semibold text-teal-600 bg-teal-50 px-2.5 py-0.75 rounded-full flex-shrink-0 mt-0.5 border border-teal-200">
           {question.type}
         </span>
-        <div className="flex-1 text-[15.5px] font-medium text-slate-900 leading-relaxed">
+        <div className="flex-1 min-w-0 text-[15.5px] font-medium text-slate-900 leading-relaxed">
           <RenderText text={question.text} />
         </div>
       </div>
