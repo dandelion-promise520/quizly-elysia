@@ -101,6 +101,20 @@ bun --filter backend dev
 bun build
 ```
 
+## 💾 本地存储与版本控制
+
+为了防止网站更新（例如测验数据结构变更）后，用户浏览器中残留的旧版本本地存储（LocalStorage）导致页面加载异常或渲染错误，项目引入了**本地存储版本控制机制**。
+
+### 缓存更新与清理机制
+* **核心配置**：在前端的 [useQuizState.ts](file:///D:/workSpace/Code/Project/quizly-elysia/apps/frontend/src/hooks/useQuizState.ts) 中定义了 `STORAGE_VERSION` 常量（例如 `v1.0.0`）。
+* **自动校验**：当用户访问网页时，系统会读取本地缓存并校验其版本号。如果版本号不匹配或缺失，系统将**自动清除旧版缓存**并重新初始化，确保数据兼容性。
+
+### 开发者操作指南
+当你在后续迭代中**修改了本地存储的数据结构**时，请务必执行以下步骤：
+1. 打开 [useQuizState.ts](file:///D:/workSpace/Code/Project/quizly-elysia/apps/frontend/src/hooks/useQuizState.ts)。
+2. 修改 `STORAGE_VERSION` 常量（例如将 `'v1.0.0'` 改为 `'v1.0.1'`）。
+3. 提交并发布。用户在访问新版网页时，其本地的陈旧缓存就会被安全地自动清理。
+
 ---
 
 ## 🧼 代码规范与质量
