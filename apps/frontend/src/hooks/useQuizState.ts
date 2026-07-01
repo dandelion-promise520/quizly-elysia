@@ -250,14 +250,21 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
     const df: Record<number, boolean> = {}
 
     if (saved && Array.isArray(saved.questions)) {
-      q = initialQuestions.map((orig, i) => {
+      const remainingOrigs = [...initialQuestions]
+
+      saved.questions.forEach((savedQ: any, savedQIndex: number) => {
+        if (!savedQ)
+          return
+
         // Find match in saved questions by text and type
-        const savedQIndex = saved.questions.findIndex(
-          (sq: any) => sq && sq.text === orig.text && sq.type === orig.type,
+        const origIndex = remainingOrigs.findIndex(
+          orig => orig.text === savedQ.text && orig.type === savedQ.type,
         )
 
-        if (savedQIndex !== -1) {
-          const savedQ = saved.questions[savedQIndex] as any
+        if (origIndex !== -1) {
+          const orig = remainingOrigs[origIndex]
+          remainingOrigs.splice(origIndex, 1)
+
           const restoredQ = {
             ...orig,
             shuffledOptions: savedQ.shuffledOptions,
@@ -268,24 +275,29 @@ export function useQuizState(initialQuestions: Question[]): QuizHookReturn {
 
           fillMissingShuffle(restoredQ, orig)
 
+          const newIdx = q.length
+          q.push(restoredQ)
+
           const savedAns = saved.answers[String(savedQIndex)]
           if (savedAns !== undefined) {
-            a[String(i)] = savedAns
-            df[i] = true
+            a[String(newIdx)] = savedAns
+            df[newIdx] = true
             an++
             const isRight = checkAnswerCorrect(restoredQ, savedAns)
             if (isRight) {
               s += PTS
             }
           }
-
-          return restoredQ
-        }
-        else {
-          // Fallback to fresh shuffle for new questions
-          return shuffleQuestions([orig])[0]
         }
       })
+
+      if (remainingOrigs.length > 0) {
+        // Fallback to fresh shuffle for new questions
+        const newShuffled = shuffleQuestions(remainingOrigs)
+        newShuffled.forEach((newQ) => {
+          q.push(newQ)
+        })
+      }
     }
     else {
       q = shuffleQuestions(initialQuestions)
