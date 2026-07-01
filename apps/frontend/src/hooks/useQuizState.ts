@@ -67,11 +67,19 @@ function shuffleQuestions(questions: Question[]): Question[] {
   })
 }
 
+const STORAGE_VERSION = 'v1.0.0'
+
 function loadSaved(): { state: { score: number, answered: number }, answers: SavedAnswer, questions: Partial<Question>[], score?: number, answered?: number } | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw)
-      return JSON.parse(raw)
+    if (raw) {
+      const data = JSON.parse(raw)
+      if (data && data.version === STORAGE_VERSION) {
+        return data
+      }
+      // 版本不匹配或数据格式陈旧，主动清理本地存储
+      localStorage.removeItem(STORAGE_KEY)
+    }
   }
   catch { /* ignore */ }
   return null
@@ -79,6 +87,7 @@ function loadSaved(): { state: { score: number, answered: number }, answers: Sav
 
 function persist(questions: Question[], answers: SavedAnswer, score: number, answered: number) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    version: STORAGE_VERSION,
     score,
     answered,
     questions: questions.map(q => ({
