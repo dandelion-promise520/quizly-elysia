@@ -14,7 +14,6 @@ import QuestionCard from './QuestionCard'
 import QuizFooter from './QuizFooter'
 import ResultBanner from './ResultBanner'
 import Scoreboard from './Scoreboard'
-import SponsorButton from './SponsorButton'
 
 export default function QuizPage() {
   const { data: initialQuestions = [], isLoading: isQuestionsLoading, error: questionsError, refetch: refetchQuestions } = useQuery<Question[]>({
@@ -274,7 +273,6 @@ export default function QuizPage() {
         )}
       </main>
       {isDbOrSqlActive && <DbSchemaHelper />}
-      <SponsorButton />
     </div>
   )
 }

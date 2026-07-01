@@ -67,7 +67,7 @@ function shuffleQuestions(questions: Question[]): Question[] {
   })
 }
 
-const STORAGE_VERSION = 'v1.0.1'
+const STORAGE_VERSION = 'v1.0.2'
 
 function loadSaved(): { state: { score: number, answered: number }, answers: SavedAnswer, questions: Partial<Question>[], score?: number, answered?: number } | null {
   try {

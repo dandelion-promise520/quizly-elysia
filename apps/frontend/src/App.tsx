@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from '@tanstack/react-router'
 import AdminDashboard from '@/components/AdminDashboard'
+import FloatingActions from '@/components/FloatingActions'
 import QuizPage from '@/components/QuizPage'
 
 const queryClient = new QueryClient({
@@ -19,7 +20,12 @@ const queryClient = new QueryClient({
 })
 
 const rootRoute = createRootRoute({
-  component: () => <Outlet />,
+  component: () => (
+    <>
+      <Outlet />
+      <FloatingActions />
+    </>
+  ),
 })
 
 const indexRoute = createRoute({

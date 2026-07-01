@@ -80,12 +80,11 @@ export default function DbSchemaHelper() {
 
   return (
     <>
-      {/* Floating Action Button */}
       <motion.button
         whileHover={{ scale: 1.08, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-teal-500/20 backdrop-blur-md cursor-pointer group"
+        className="fixed bottom-6 right-20 z-40 flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-teal-500/20 backdrop-blur-md cursor-pointer group"
       >
         <Database className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
         <span className="text-sm font-semibold tracking-wide">数据库表结构</span>
