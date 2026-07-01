@@ -64,7 +64,7 @@ function QuestionCard({
             ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
             : userAnswers[b] === fillQ.answer[b]
           const status = isBlankCorrect ? '✓' : '✗'
-          parts.push(`${status} 第${b + 1}空：你填"${userAnswers[b] || ''}"，正确答案"${fillQ.answer[b]}"`)
+          parts.push(`${status} 第${b + 1}空：你填 <span class="font-medium text-slate-800 dark:text-slate-200">"${userAnswers[b] || ''}"</span>，正确答案 <span class="font-bold text-success dark:text-emerald-400">"${fillQ.answer[b]}"</span>`)
         }
         const statusText = blankCorrect === 0 ? '回答错误。' : '部分正确。'
         feedbackMsg = `<strong>${statusText}</strong><br>${parts.join('<br>')}`
@@ -75,14 +75,14 @@ function QuestionCard({
     if (selectedIndices !== undefined) {
       if (isCorrect) {
         feedbackType = 'correct'
-        feedbackMsg = `<strong>回答正确。</strong> 正确答案：${question.answer}`
+        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
       }
       else {
         const opts = question.shuffledOptions || question.options
         const selectedLabels = selectedIndices.map(idx => opts[idx]?.label).filter(Boolean).sort().join(',')
         const label = selectedLabels || '无'
         feedbackType = 'wrong'
-        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 ${question.answer}`
+        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
       }
     }
   }
@@ -90,13 +90,13 @@ function QuestionCard({
     if (selectedIdx !== undefined) {
       if (isCorrect) {
         feedbackType = 'correct'
-        feedbackMsg = `<strong>回答正确。</strong> 正确答案：${question.answer}`
+        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
       }
       else {
         const opts = question.shuffledOptions || question.options
         const label = selectedIdx >= 0 ? opts[selectedIdx]?.label : '?'
         feedbackType = 'wrong'
-        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 ${question.answer}`
+        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
       }
     }
   }
