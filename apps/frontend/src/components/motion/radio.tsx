@@ -100,24 +100,24 @@ export function RadioGroupItem({
 
   let borderBgClass = ''
   if (isCorrectAnswer) {
-    borderBgClass = 'border-green-600 bg-green-50'
+    borderBgClass = 'border-success bg-success-light'
   }
   else if (isWrongSelection) {
-    borderBgClass = 'border-red-600 bg-red-50'
+    borderBgClass = 'border-destructive bg-error-light'
   }
   else if (selected) {
-    borderBgClass = 'border-teal-600 bg-teal-50'
+    borderBgClass = 'border-accent bg-accent-light'
   }
   else {
     borderBgClass = 'border-slate-300 hover:border-slate-400 bg-white'
   }
 
-  let dotColorClass = 'bg-teal-600'
+  let dotColorClass = 'bg-accent'
   if (isCorrectAnswer) {
-    dotColorClass = 'bg-green-600'
+    dotColorClass = 'bg-success'
   }
   else if (isWrongSelection) {
-    dotColorClass = 'bg-red-600'
+    dotColorClass = 'bg-destructive'
   }
 
   return (

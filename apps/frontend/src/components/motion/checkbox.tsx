@@ -28,13 +28,13 @@ export function Checkbox({
 
   let borderBgClass = ''
   if (isCorrectAnswer) {
-    borderBgClass = 'border-green-600 bg-green-500 text-white'
+    borderBgClass = 'border-success bg-success text-white'
   }
   else if (isWrongSelection) {
-    borderBgClass = 'border-red-600 bg-red-500 text-white'
+    borderBgClass = 'border-destructive bg-destructive text-white'
   }
   else if (checked) {
-    borderBgClass = 'border-teal-600 bg-teal-600 text-white'
+    borderBgClass = 'border-accent bg-accent text-white'
   }
   else {
     borderBgClass = 'border-slate-300 hover:border-slate-400 bg-white'
