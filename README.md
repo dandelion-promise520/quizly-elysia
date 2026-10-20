@@ -21,7 +21,7 @@ Quizly 是一个现代化、轻量级的在线测验与刷题管理系统。该�
 ### 后端服务 (`apps/backend`)
 - **后端框架**：[ElysiaJS](https://elysiajs.com/) (基于 Bun 的高性能 Web 框架)
 - **ORM**：[Prisma](https://www.prisma.io/)
-- **数据库**：PostgreSQL
+- **数据库**：SQLite（通过 Prisma + libSQL adapter 访问）
 - **缓存**：Redis
 
 ---
@@ -55,10 +55,12 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 1. 进入后端目录：`apps/backend/`
 2. 创建或修改 `.env` 文件，填入以下变量（可以参考 `.env.example`）：
    ```env
-   DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db_name>"
+   DATABASE_URL="file:./prisma/dev.db"
    ADMIN_PASSWORD="your-admin-password"
    REDIS_URL="<redis_host>:<redis_port>"
    ```
+   > `DATABASE_URL` 使用 SQLite 文件路径。注意该路径是相对于 **`prisma/` 目录**解析的，
+   > 因此 `file:./prisma/dev.db` 实际指向 `apps/backend/prisma/dev.db`。
 
 ### 3. 安装依赖
 在项目根目录下执行以下命令安装所有依赖：
@@ -74,6 +76,9 @@ bun --cwd apps/backend prisma generate
 
 # 数据库迁移
 bun --cwd apps/backend prisma migrate dev
+
+# 导入初始题库（可选，使用根目录的 questions.json 重建数据）
+bun --cwd apps/backend prisma/seed.ts
 ```
 
 ### 5. 启动开发服务器
@@ -100,6 +105,22 @@ bun --filter backend dev
 ```bash
 bun build
 ```
+
+### 数据库持久化（重要）
+后端容器使用 SQLite，数据存放在容器内的 `/data/quizly.db`。
+**必须把 `/data` 挂载到宿主机**，否则每次重新部署（`docker rm` 重建容器）都会丢失全部数据：
+```bash
+docker run -d \
+  --name quizly-backend \
+  -p 3000:3000 \
+  -v /opt/quizly-data:/data \
+  -e DATABASE_URL="file:/data/quizly.db" \
+  --restart always \
+  quizly-backend:latest
+```
+备份数据库只需复制 `/opt/quizly-data/quizly.db` 这一个文件。
+
+首次部署若需要灌入初始题库，追加环境变量 `-e SEED=true`，容器启动时会自动执行一次种子脚本（该脚本会**清空并重建**题库数据，仅首次使用）。
 
 ## 💾 本地存储与版本控制
 

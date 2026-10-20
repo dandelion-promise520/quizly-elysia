@@ -8,14 +8,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@elysiajs/cors": "^1.4.2",
-    "@prisma/adapter-pg": "^7.8.0",
+    "@elysia/cors": "rc",
+    "@prisma/adapter-libsql": "^7.10.1",
     "@prisma/client": "^7.8.0",
     "@quizly/types": "workspace:*",
     "dotenv": "^17.4.2",
-    "elysia": "latest",
+    "elysia": "rc",
     "ioredis": "^5.11.1",
-    "pg": "^8.22.0",
     "prismabox": "^1.1.26"
   },
   "devDependencies": {

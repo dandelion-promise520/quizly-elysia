@@ -52,11 +52,15 @@ jobs:
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
 
-            # 运行新容器，注入 DATABASE_URL 并映射 3000 端口
+            # 运行新容器，映射 3000 端口与 SQLite 数据目录
+            # SQLite 数据文件必须挂载到宿主机，否则每次重建容器都会丢失数据
+            mkdir -p /opt/quizly-data
+
             docker run -d \
               --name $CONTAINER_NAME \
               -p 3000:3000 \
-              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              -v /opt/quizly-data:/data \
+              -e DATABASE_URL="file:/data/quizly.db" \
               --restart always \
               quizly-backend:latest
 

@@ -8,19 +8,19 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model Course {
   id        Int        @id @default(autoincrement())
-  name      String     @unique @db.VarChar(100)
+  name      String     @unique
   questions Question[]
   Category  Category[]
 }
 
 model Category {
   id        Int        @id @default(autoincrement())
-  name      String     @db.VarChar(100)
+  name      String
   courseId  Int
   course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
   questions Question[]
@@ -30,9 +30,9 @@ model Category {
 
 model Question {
   id         Int       @id @default(autoincrement())
-  type       String    @db.VarChar(20)
-  text       String    @db.Text
-  answer     String    @default("") @db.VarChar(50)
+  type       String
+  text       String
+  answer     String    @default("")
   categoryId Int?
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   courseId   Int?
@@ -43,15 +43,15 @@ model Question {
 
 model Option {
   id         Int      @id @default(autoincrement())
-  label      String   @db.VarChar(5)
-  text       String   @db.Text
+  label      String
+  text       String
   questionId Int
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
 model Blank {
   id         Int      @id @default(autoincrement())
-  text       String   @db.Text
+  text       String
   order      Int      @default(0)
   questionId Int
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)

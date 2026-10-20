@@ -1,5 +1,5 @@
 import process from 'node:process'
-import { cors } from '@elysiajs/cors'
+import { cors } from '@elysia/cors'
 import { Elysia } from 'elysia'
 import { batchBindQuestions, getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase } from './lib/db'
 import { delCache, getCache, setCache } from './lib/redis'

@@ -18,9 +18,11 @@
   - **技术栈**：Vite + React + Tailwind CSS (v4) + shadcn/ui
   - **组件配置**：[components.json](file:///D:/workSpace/Code/Project/quizly/apps/frontend/components.json)
 - **后端服务**（[apps/backend](file:///D:/workSpace/Code/Project/quizly/apps/backend)）：
-  - **技术栈**：ElysiaJS + Prisma + PostgreSQL
+  - **技术栈**：ElysiaJS (v2) + Prisma + SQLite
   - **数据库 Schema**：[schema.prisma](file:///D:/workSpace/Code/Project/quizly/apps/backend/prisma/schema.prisma)
   - **Prisma 客户端输出目录**：`apps/backend/generated/prisma`
+  - **SQLite 访问方式**：通过 `@prisma/adapter-libsql` 适配器（`better-sqlite3` 在 Bun 下无法加载原生模块，不要使用）
+  - **种子数据脚本**：`apps/backend/prisma/seed.ts`（使用根目录 `questions.json` 重建数据）
 
 ## 3. 常用开发命令
 
