@@ -6,7 +6,11 @@ export default antfu(
     react: true,
     ignores: [
       '**/generated/**',
-      '**/prisma/migrations/**',
+      // Drizzle Kit 生成的迁移文件与元数据
+      '**/drizzle/**',
+      '**/scripts/seed.sql',
+      // Cloudflare Workers 本地状态
+      '**/.wrangler/**',
     ],
   },
   {

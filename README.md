@@ -19,10 +19,10 @@ Quizly 是一个现代化、轻量级的在线测验与刷题管理系统。该�
 - **动效库**：[Motion](https://motion.dev/)
 
 ### 后端服务 (`apps/backend`)
-- **后端框架**：[ElysiaJS](https://elysiajs.com/) (基于 Bun 的高性能 Web 框架)
-- **ORM**：[Prisma](https://www.prisma.io/)
-- **数据库**：SQLite（通过 Prisma + libSQL adapter 访问）
-- **缓存**：Redis
+- **后端框架**：[ElysiaJS](https://elysiajs.com/) (v2，运行于 Cloudflare Workers)
+- **ORM**：[Drizzle ORM](https://orm.drizzle.team/)（类 SQL 查询语法）
+- **数据库**：[Cloudflare D1](https://developers.cloudflare.com/d1/)（SQLite 语义的托管数据库）
+- **部署**：Cloudflare Workers
 
 ---
 
@@ -51,16 +51,14 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 ```
 
 ### 2. 环境配置
-在启动服务前，需要配置后端的环境变量：
+本地开发只需配置管理后台密码（`wrangler dev` 会自动加载 `apps/backend/.env`）：
 1. 进入后端目录：`apps/backend/`
-2. 创建或修改 `.env` 文件，填入以下变量（可以参考 `.env.example`）：
+2. 创建或修改 `.env` 文件（可参考 `.env.example`）：
    ```env
-   DATABASE_URL="file:./prisma/dev.db"
    ADMIN_PASSWORD="your-admin-password"
-   REDIS_URL="<redis_host>:<redis_port>"
    ```
-   > `DATABASE_URL` 使用 SQLite 文件路径。注意该路径是相对于 **`prisma/` 目录**解析的，
-   > 因此 `file:./prisma/dev.db` 实际指向 `apps/backend/prisma/dev.db`。
+   > 线上环境请用 `wrangler secret put ADMIN_PASSWORD` 设置，不要写进仓库。
+   > 数据库连接由 `wrangler.jsonc` 中的 D1 绑定提供，无需连接串。
 
 ### 3. 安装依赖
 在项目根目录下执行以下命令安装所有依赖：
@@ -68,17 +66,29 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 bun install
 ```
 
-### 4. 数据库迁移与生成
-在首次启动或修改了数据库 Schema（`apps/backend/prisma/schema.prisma`）后，需要同步数据库并生成 Prisma 客户端：
+### 4. 数据库迁移与种子数据
+数据库 Schema 定义在 `apps/backend/src/db/schema.ts`，修改后需生成迁移并应用：
+
 ```bash
-# 生成 Prisma Client 客户端代码
-bun --cwd apps/backend prisma generate
+# 由 schema 生成 SQL 迁移文件（输出到 apps/backend/drizzle）
+bun --cwd apps/backend db:generate
 
-# 数据库迁移
-bun --cwd apps/backend prisma migrate dev
+# 应用到本地 D1（数据位于 apps/backend/.wrangler/state）
+bun --cwd apps/backend db:migrate:local
 
-# 导入初始题库（可选，使用根目录的 questions.json 重建数据）
-bun --cwd apps/backend prisma/seed.ts
+# 应用到线上 D1
+bun --cwd apps/backend db:migrate:remote
+```
+
+导入初始题库（基于根目录的 `questions.json`，会**清空并重建**数据）：
+
+```bash
+# 由 questions.json 生成 seed.sql
+bun --cwd apps/backend db:seed:generate
+
+# 导入本地 / 线上 D1
+bun --cwd apps/backend db:seed:local
+bun --cwd apps/backend db:seed:remote
 ```
 
 ### 5. 启动开发服务器
@@ -86,6 +96,7 @@ bun --cwd apps/backend prisma/seed.ts
 ```bash
 bun dev
 ```
+后端由 `wrangler dev` 提供（默认 `http://127.0.0.1:8787`），前端 Vite 会把 `/api` 代理到该地址。
 
 *若只想启动单个应用，可使用 Turborepo 过滤器：*
 ```bash
@@ -101,26 +112,53 @@ bun --filter backend dev
 ## 📦 构建与部署
 
 ### 生产环境构建
-构建整个项目（包括共享类型定义、前端和后端）：
+构建整个项目（包括共享类型定义、前端）：
 ```bash
 bun build
 ```
 
-### 数据库持久化（重要）
-后端容器使用 SQLite，数据存放在容器内的 `/data/quizly.db`。
-**必须把 `/data` 挂载到宿主机**，否则每次重新部署（`docker rm` 重建容器）都会丢失全部数据：
-```bash
-docker run -d \
-  --name quizly-backend \
-  -p 3000:3000 \
-  -v /opt/quizly-data:/data \
-  -e DATABASE_URL="file:/data/quizly.db" \
-  --restart always \
-  quizly-backend:latest
-```
-备份数据库只需复制 `/opt/quizly-data/quizly.db` 这一个文件。
+### 部署到 Cloudflare（重要）
 
-首次部署若需要灌入初始题库，追加环境变量 `-e SEED=true`，容器启动时会自动执行一次种子脚本（该脚本会**清空并重建**题库数据，仅首次使用）。
+前后端分别部署，二者通过同域路由协作，因此**不需要配置 CORS**：
+
+| 组件 | 平台 | 说明 |
+|---|---|---|
+| 后端 | Cloudflare Workers | `apps/backend/wrangler.jsonc`，绑定 D1 `DB` |
+| 前端 | Cloudflare Pages | 项目名 `quizly`，构建产物 `apps/frontend/dist` |
+
+部署命令（在 `apps/backend` 目录下）：
+```bash
+# 首次：应用数据库迁移并导入初始题库
+bunx wrangler d1 migrations apply quizly --remote
+bunx wrangler d1 execute quizly --remote --file=./scripts/seed.sql
+
+# 发布 Worker
+bunx wrangler deploy
+```
+
+前端部署（在仓库根目录）：
+```bash
+bun run build --filter=frontend
+bunx wrangler pages deploy apps/frontend/dist --project-name=quizly --branch=main
+```
+
+GitHub Actions 需要配置的 Secrets：
+- `CLOUDFLARE_API_TOKEN`：具备 Workers Scripts 与 D1 编辑权限的 API Token
+- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 账户 ID
+
+> **路由说明**：前端使用相对路径 `/api` 请求后端。请把 Pages 自定义域名的 `/api/*`
+> 通过 Cloudflare Routes 指向后端 Worker，使 API 请求在边缘被 Worker 接管，
+> 避免落到 Pages 的 SPA 回退规则上。
+
+### 关于 D1 的事务限制
+
+D1 不支持交互式事务（即「事务内先读取、再依据结果决定写入」）。因此
+[db.ts](apps/backend/src/lib/db.ts) 中的保存逻辑采用：
+
+1. 一次性读出全部相关数据，在内存中比对算出差异；
+2. 把差异攒成语句，用 `db.batch()` 原子提交。
+
+新增题目需要父表自增 id，所以拆成「插入父表 → 插入子表」两段 batch。
 
 ## 💾 本地存储与版本控制
 

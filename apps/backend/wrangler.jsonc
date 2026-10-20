@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "quizly-backend",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "quizly",
+      "database_id": "403209dd-c92d-466b-be7d-f58cf0280654",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

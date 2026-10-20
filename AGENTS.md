@@ -17,12 +17,14 @@
 - **前端应用**（[apps/frontend](file:///D:/workSpace/Code/Project/quizly/apps/frontend)）：
   - **技术栈**：Vite + React + Tailwind CSS (v4) + shadcn/ui
   - **组件配置**：[components.json](file:///D:/workSpace/Code/Project/quizly/apps/frontend/components.json)
-- **后端服务**（[apps/backend](file:///D:/workSpace/Code/Project/quizly/apps/backend)）：
-  - **技术栈**：ElysiaJS (v2) + Prisma + SQLite
-  - **数据库 Schema**：[schema.prisma](file:///D:/workSpace/Code/Project/quizly/apps/backend/prisma/schema.prisma)
-  - **Prisma 客户端输出目录**：`apps/backend/generated/prisma`
-  - **SQLite 访问方式**：通过 `@prisma/adapter-libsql` 适配器（`better-sqlite3` 在 Bun 下无法加载原生模块，不要使用）
-  - **种子数据脚本**：`apps/backend/prisma/seed.ts`（使用根目录 `questions.json` 重建数据）
+- **后端服务**（[apps/backend](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend)）：
+  - **技术栈**：ElysiaJS (v2) + Drizzle ORM + Cloudflare D1，运行于 Cloudflare Workers
+  - **数据库 Schema**：[schema.ts](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend/src/db/schema.ts)
+  - **数据访问层**：[db.ts](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend/src/lib/db.ts)
+  - **D1 绑定配置**：[wrangler.jsonc](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend/wrangler.jsonc)（binding 为 `DB`，库名 `quizly`）
+  - **种子数据**：`apps/backend/scripts/generate-seed-sql.ts` 由根目录 `questions.json` 生成 `seed.sql`
+  - **本地开发**：`wrangler dev`（默认端口 8787），本地 D1 数据存放于 `apps/backend/.wrangler/state`
+  - **重要约束**：D1 不支持交互式事务，写操作必须采用「先读 → 内存比对 → `db.batch()` 原子提交」
 
 ## 3. 常用开发命令
 
@@ -51,19 +53,29 @@
   bun --filter backend dev
   ```
 
-## 4. 后端 Prisma 常用命令
+## 4. 后端数据库常用命令
 
-在对 [schema.prisma](file:///D:/workSpace/Code/Project/quizly/apps/backend/prisma/schema.prisma) 进行修改后，可通过以下命令在 [apps/backend](file:///D:/workSpace/Code/Project/quizly/apps/backend) 目录下操作：
+修改 [schema.ts](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend/src/db/schema.ts) 后，在 [apps/backend](file:///D:/workSpace/Code/Project/quizly-elysia/apps/backend) 目录下操作：
 
-- **生成 Prisma Client**：
+- **生成 SQL 迁移文件**（输出到 `apps/backend/drizzle`）：
   ```bash
-  bun --cwd apps/backend prisma generate
+  bun --cwd apps/backend db:generate
   ```
-- **数据库迁移**：
+- **应用到本地 D1**：
   ```bash
-  bun --cwd apps/backend prisma migrate dev
+  bun --cwd apps/backend db:migrate:local
   ```
-- **打开 Prisma Studio 查看数据**：
+- **应用到线上 D1**：
   ```bash
-  bun --cwd apps/backend prisma studio
+  bun --cwd apps/backend db:migrate:remote
+  ```
+- **重建种子数据**（先由 `questions.json` 生成 SQL，再导入）：
+  ```bash
+  bun --cwd apps/backend db:seed:generate
+  bun --cwd apps/backend db:seed:local
+  bun --cwd apps/backend db:seed:remote
+  ```
+- **直接查询本地 D1**：
+  ```bash
+  bunx wrangler d1 execute quizly --local --command "SELECT COUNT(*) FROM Question"
   ```

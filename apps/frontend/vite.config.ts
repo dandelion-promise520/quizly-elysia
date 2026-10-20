@@ -14,9 +14,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // 本地后端由 wrangler dev 提供，默认端口 8787
+        target: 'http://127.0.0.1:8787',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/api/, ''), // 如果后端路由本身没有 /api 前缀，请取消这行注释
       },
     },
   },

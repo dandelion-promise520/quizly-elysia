@@ -22,4 +22,11 @@ package-lock.json
 *.db-wal
 *.db-shm
 
+# Cloudflare Workers 本地运行状态（含本地 D1 数据）
+.wrangler/
+.dev.vars
+
+# 由 questions.json 生成的种子 SQL（体积大，可随时重建）
+apps/backend/scripts/seed.sql
+
 

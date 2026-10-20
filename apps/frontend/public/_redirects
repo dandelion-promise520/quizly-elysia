@@ -1,0 +1,5 @@
+# Cloudflare Pages 部署配置
+# TanStack Router 为客户端路由，未命中静态资源的路径回退到 index.html。
+# 注意：/api/* 由后端 Worker 通过 Cloudflare Routes 在边缘先行接管，
+# 不会到达 Pages，因此这里无需（也不应）为它单独写规则。
+/*    /index.html   200
