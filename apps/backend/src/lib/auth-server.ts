@@ -15,6 +15,7 @@ export interface AuthEnv {
   DB: D1Database
   BETTER_AUTH_SECRET?: string
   BETTER_AUTH_URL?: string
+  TRUSTED_ORIGINS?: string
 }
 
 /**
@@ -22,12 +23,52 @@ export interface AuthEnv {
  *
  * 前端在 pages.dev、后端在 workers.dev，属于不同站点，
  * 因此走 bearer token 而不是第三方 cookie（后者会被浏览器拦截）。
+ * 额外的自定义域名可用 TRUSTED_ORIGINS 环境变量（逗号分隔）追加。
  */
 const TRUSTED_ORIGINS = [
   'https://quizly.pages.dev',
   'http://localhost:5173',
+  'http://localhost:5199',
   'http://localhost:4173',
 ]
+
+/**
+ * 判断某个 Origin 是否放行。
+ *
+ * Better Auth 只认「列表里有没有这个字符串」，所以命中规则的 Origin 会被
+ * 原样追加进返回值 —— 这样 Pages 预览域名、本地任意端口、局域网调试都不用手工登记。
+ */
+function isTrustedOrigin(origin: string, extra: string[]): boolean {
+  if (!origin || origin === 'null')
+    return true
+  if (TRUSTED_ORIGINS.includes(origin) || extra.includes(origin))
+    return true
+
+  try {
+    const { hostname } = new URL(origin)
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]')
+      return true
+    // Pages 的预览部署是 <hash>.quizly.pages.dev
+    if (hostname === 'quizly.pages.dev' || hostname.endsWith('.quizly.pages.dev'))
+      return true
+    // 私有网段，便于手机在局域网内联调
+    if (/^(?:192\.168|10)\.\d{1,3}\.\d{1,3}(?:\.\d{1,3})?$/.test(hostname))
+      return true
+    if (/^172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname))
+      return true
+  }
+  catch {
+    // Origin 不是合法 URL，按不可信处理
+  }
+  return false
+}
+
+function readExtraOrigins(env: AuthEnv): string[] {
+  return (env.TRUSTED_ORIGINS ?? '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
+}
 
 function createAuth(env: AuthEnv) {
   return betterAuth({
@@ -35,7 +76,14 @@ function createAuth(env: AuthEnv) {
     baseURL: env.BETTER_AUTH_URL ?? 'https://quizly-backend.dandelionpromise.workers.dev',
     basePath: '/api/auth',
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: TRUSTED_ORIGINS,
+    trustedOrigins: (request) => {
+      const extra = readExtraOrigins(env)
+      const origin = request?.headers.get('origin') ?? ''
+      const base = [...TRUSTED_ORIGINS, ...extra]
+      return isTrustedOrigin(origin, extra) && origin && origin !== 'null'
+        ? [...base, origin]
+        : base
+    },
     emailAndPassword: {
       enabled: true,
       // 不开放注册，管理员账号由脚本预置

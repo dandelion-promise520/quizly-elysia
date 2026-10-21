@@ -2,7 +2,7 @@ import type { Course, Question } from '@quizly/types'
 import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff, Lock, Mail, TriangleAlert } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
@@ -395,10 +395,9 @@ export default function AdminDashboard() {
             />
 
             {authError && (
-              <p className="text-destructive text-xs text-center font-medium">
-                ⚠️
-                {' '}
-                {authError}
+              <p className="flex items-start justify-center gap-1.5 text-destructive text-xs font-medium">
+                <TriangleAlert className="size-3.5 shrink-0 mt-px" />
+                <span>{authError}</span>
               </p>
             )}
 
@@ -833,7 +832,7 @@ export default function AdminDashboard() {
                         }
                         return (
                           <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30">
-                            ⚠️ 当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
+                            当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
                           </div>
                         )
                       })()

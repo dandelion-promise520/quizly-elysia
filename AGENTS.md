@@ -6,6 +6,11 @@
 - **语言要求**：全部使用 **中文** 进行日常沟通和代码注释。
 - **Git Commit**：Commit message 必须使用 **中文**。
 - **修改原则**：精准修改，保持现有风格，不进行非必要的重构；代码力求简洁，不添加不必要的抽象或推测性设计。
+- **禁止 Emoji**：界面文案、提示语、日志、文档标题一律不使用 emoji（`⚠️` `✅` `💡` `☕️` `🚀` 等）。
+  需要视觉标记时用 `lucide-react` 图标组件（如 `<TriangleAlert className="size-3.5" />`），不要塞字符图形。
+- **配色**：只用语义 token（`bg-background` `bg-card` `text-foreground` `text-muted-foreground` `border-border`
+  `bg-primary` `bg-accent` `bg-success` `bg-warning` `bg-destructive`），基座是 beUI 官方 `theme.css`。
+  禁止硬编码 `bg-white` / `text-slate-600` / `text-teal-600` 这类调色板类，也不要自绘品牌色板。
 
 ## 2. 目录与技术栈结构
 

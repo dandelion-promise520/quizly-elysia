@@ -1,4 +1,4 @@
-import { Check, Copy, Database, Maximize2, X } from 'lucide-react'
+import { Check, Copy, Database, Lightbulb, Maximize2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { memo, useState } from 'react'
 
@@ -269,7 +269,8 @@ function DbSchemaHelper() {
                 {/* SQL Tips */}
                 <div className="bg-muted rounded-xl p-4 border border-border">
                   <h4 className="text-xs font-bold text-foreground/80 mb-1.5 flex items-center gap-1">
-                    💡 答题建议
+                    <Lightbulb className="size-3.5" />
+                    答题建议
                   </h4>
                   <ul className="text-xs text-muted-foreground flex flex-col gap-1 list-disc list-inside leading-relaxed pl-1">
                     <li>

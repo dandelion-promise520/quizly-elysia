@@ -44,8 +44,13 @@ export async function signIn(email: string, password: string): Promise<{ error?:
     body: JSON.stringify({ email, password }),
   })
   const data = await res.json().catch(() => ({}))
-  if (!res.ok)
-    return { error: data?.message ?? '登录失败，请检查邮箱与密码' }
+  if (!res.ok) {
+    const message: string = data?.message ?? ''
+    // Better Auth 的 Origin 校验失败时报英文，转成能照着处理的说明
+    if (message.toLowerCase().includes('invalid origin'))
+      return { error: `后端未信任当前站点 ${location.origin}，需加入后端 TRUSTED_ORIGINS` }
+    return { error: message || '登录失败，请检查邮箱与密码' }
+  }
 
   const token = res.headers.get('set-auth-token')
   if (token)

@@ -63,8 +63,8 @@ function QuestionCard({
           const isBlankCorrect = question.category?.name === 'SQL填空题'
             ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
             : userAnswers[b] === fillQ.answer[b]
-          const status = isBlankCorrect ? '✓' : '✗'
-          parts.push(`${status} 第${b + 1}空：你填 <span class="font-medium text-foreground dark:text-foreground">"${userAnswers[b] || ''}"</span>，正确答案 <span class="font-bold text-success dark:text-success">"${fillQ.answer[b]}"</span>`)
+          const status = isBlankCorrect ? '答对' : '答错'
+          parts.push(`第${b + 1}空（${status}）：你填 <span class="font-medium text-foreground dark:text-foreground">"${userAnswers[b] || ''}"</span>，正确答案 <span class="font-bold text-success dark:text-success">"${fillQ.answer[b]}"</span>`)
         }
         const statusText = blankCorrect === 0 ? '回答错误。' : '部分正确。'
         feedbackMsg = `<strong>${statusText}</strong><br>${parts.join('<br>')}`

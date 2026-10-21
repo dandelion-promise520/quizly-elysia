@@ -1,4 +1,5 @@
 import type { Option, Question } from '@quizly/types'
+import { Check, Trash2 } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { memo, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -256,7 +257,7 @@ function AdminSidebar({
                   }}
                   title={needConfirm ? '确认删除' : '删除'}
                 >
-                  {needConfirm ? '✓' : '×'}
+                  {needConfirm ? <Check className="size-3.5" /> : <Trash2 className="size-3.5" />}
                 </button>
               )}
             </div>

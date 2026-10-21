@@ -200,9 +200,9 @@ export default function FloatingActions() {
                   className="absolute bottom-14 right-0 border border-border p-3 rounded-2xl shadow-xl w-38 flex flex-col items-center gap-2 bg-surface"
                 >
                   <span className="text-[10px] font-bold text-text-muted select-none">
-                    请作者喝杯咖啡 ☕️
+                    请作者喝杯咖啡
                   </span>
-                  <div className="relative size-32 bg-background border border-border rounded-lg overflow-hidden flex items-center justify-center p-1 dark:bg-background">
+                  <div className="relative size-32 bg-background border border-border rounded-lg overflow-hidden flex items-center justify-center p-1">
                     <img
                       src="/sponsor-qr.png"
                       alt="微信打赏码"

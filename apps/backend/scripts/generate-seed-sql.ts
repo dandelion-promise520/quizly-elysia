@@ -113,7 +113,7 @@ async function main() {
 
   await writeFile(outPath, lines.join('\n'), 'utf-8')
 
-  console.log(`✅ 已生成 ${path.relative(process.cwd(), outPath)}`)
+  console.log(`已生成 ${path.relative(process.cwd(), outPath)}`)
   console.log(`   课程 ${courseMap.size} / 分类 ${categoryMap.size} / 题目 ${questionsJson.length}`)
   console.log(`   选项 ${optionLines.length} / 填空 ${blankLines.length}`)
 }
