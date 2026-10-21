@@ -27,6 +27,7 @@ export interface AuthEnv {
  */
 const TRUSTED_ORIGINS = [
   'https://quizly.pages.dev',
+  'https://quizly.ljflovezxm.cn',
   'http://localhost:5173',
   'http://localhost:5199',
   'http://localhost:4173',
@@ -50,6 +51,9 @@ function isTrustedOrigin(origin: string, extra: string[]): boolean {
       return true
     // Pages 的预览部署是 <hash>.quizly.pages.dev
     if (hostname === 'quizly.pages.dev' || hostname.endsWith('.quizly.pages.dev'))
+      return true
+    // 自定义域名及其子域
+    if (hostname === 'ljflovezxm.cn' || hostname.endsWith('.ljflovezxm.cn'))
       return true
     // 私有网段，便于手机在局域网内联调
     if (/^(?:192\.168|10)\.\d{1,3}\.\d{1,3}(?:\.\d{1,3})?$/.test(hostname))
