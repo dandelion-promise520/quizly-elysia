@@ -1,3 +1,6 @@
+'use client'
+// beui.dev/components/motion/tilt-card
+
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from 'motion/react'
 import { type ReactNode, useRef } from 'react'
 import { SPRING_MOUSE } from '@/lib/ease'
@@ -55,15 +58,13 @@ export function TiltCard({ children, max = 12, glare = true, className }: TiltCa
       className={cn('relative overflow-hidden rounded-2xl will-change-transform', className)}
     >
       {children}
-      {glare && enabled
-        ? (
-            <motion.div
-              aria-hidden
-              style={{ background: glareBg }}
-              className="pointer-events-none absolute inset-0 opacity-15"
-            />
-          )
-        : null}
+      {glare && enabled ? (
+        <motion.div
+          aria-hidden
+          style={{ background: glareBg }}
+          className="pointer-events-none absolute inset-0 opacity-15"
+        />
+      ) : null}
     </motion.div>
   )
 }

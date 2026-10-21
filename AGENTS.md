@@ -12,6 +12,30 @@
   `bg-primary` `bg-accent` `bg-success` `bg-warning` `bg-destructive`），基座是 beUI 官方 `theme.css`。
   禁止硬编码 `bg-white` / `text-slate-600` / `text-teal-600` 这类调色板类，也不要自绘品牌色板。
 
+## 1.1 组件使用铁律
+
+- **`src/components/motion/**` 是 beUI 原装组件**，由 registry（`https://beui.dev/r/<name>.json`）直接落盘。
+  **不得修改其实现**，也不得为了"适合本项目"删分支、改默认值、砍 api。缺能力就在调用处组合，不要去改库。
+  唯一例外：上游类型与本机 TypeScript 严格模式不兼容时，可加最小类型断言，并在旁边写注释说明。
+- **调用原装组件时不要覆盖它的样式**。`className` 只用于布局（宽高、flex、间距、`w-full`、`flex-1`），
+  不要传 `bg-*` / `text-*` / 圆角 / 字号去改观感，更不要用 `classNames={{ label: ... }}` 逐槽改色。
+  组件自带的 variant、size、状态就是设计好的样子，直接选，别自己拼。
+- 现成组件优先，顺序：beUI（`components/motion/`）→ shadcn 基础件 → 手写。
+  禁止 `bun add`、`shadcn add`（会打坏本机 node_modules），要组件就拉 registry JSON 手工落盘。
+- **新增 beUI 组件后必须跑一遍 `eslint --fix`**：上游用双引号加分号，会被本项目 antfu 规则刷一遍；
+  `eslint.config.mjs` 里已对 `components/motion/**`、`lib/hooks/**` 放宽三条与上游写法冲突的规则。
+
+## 1.2 交互反馈约定
+
+- 任何会写数据的操作（保存、创建、删除、启停、导入导出、登录登出）**必须给出结果反馈**，
+  成功和失败都要有，不能只靠界面变化让用户猜。
+- 统一走 `useToast()`（`@/components/toast-provider`，底层是 beUI 的 Animated Toast Stack）：
+  `toast.success('题目已保存')` / `toast.error('创建失败', err.message)`。
+  失败文案要带原因，别只写"操作失败"。
+- 表单内的字段级错误用组件自带能力（`<Input error="..." />`、`<Alert variant="destructive">`），
+  不要再手写一行红色小字。整页级错误用 `<Alert>`，别用 div 拼红框。
+- 破坏性操作（删除等）要有二次确认，用 beUI `<CenterMorphModal>`。
+
 ## 2. 目录与技术栈结构
 
 本项目是基于 [Bun](https://bun.sh/) Workspaces 和 [Turborepo](https://turbo.build/) 的单体大仓（Monorepo）。

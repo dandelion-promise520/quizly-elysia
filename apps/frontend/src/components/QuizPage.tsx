@@ -177,7 +177,6 @@ export default function QuizPage() {
                         key={cat.id}
                         value={String(cat.id)}
                         className="text-sm py-2 px-4 text-center"
-                        wrapperClassName="flex justify-center"
                       >
                         {cat.name}
                       </TabsTrigger>

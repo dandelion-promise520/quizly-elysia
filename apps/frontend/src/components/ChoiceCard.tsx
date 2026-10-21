@@ -89,10 +89,6 @@ function ChoiceCard({
               <RadioGroupItem
                 value={String(oi)}
                 disabled={done}
-                isCorrectAnswer={done && oi === correctIdx}
-                isWrongSelection={
-                  done && oi === selectedIdx && oi !== correctIdx
-                }
                 className="pointer-events-none relative z-10"
               />
               <span className={cn(

@@ -1,8 +1,15 @@
+'use client'
+// beui.dev/components/motion/select
+
 import { Check, ChevronDown } from 'lucide-react'
 import {
+  animate,
   motion,
-  type Transition,
+  type MotionValue,
+  useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
+  useTransform,
   type Variants,
 } from 'motion/react'
 import {
@@ -18,19 +25,32 @@ import {
   useState,
 } from 'react'
 import { EASE_OUT } from '@/lib/ease'
+import { type ListboxRow, useListbox } from '@/lib/hooks/use-listbox'
 import { cn } from '@/lib/utils'
 
-// Spring with bounce powers the unfold/separation; per-property timings in the
-// content choreograph it (see SelectContent). Mirrors bouncy-accordion's feel.
-const CHEVRON_TRANSITION: Transition = { type: 'spring', duration: 0.4, bounce: 0.3 }
+// One progress value drives the surface, gap, corners and chevron. This short
+// spring suits the full reveal distance; each reader clamps its small internal
+// overshoot, so all visible endpoints settle together. Rows share a short
+// reveal so long lists have no late entries.
+const UNFOLD_SPRING = {
+  type: 'spring',
+  visualDuration: 0.2,
+  bounce: 0.12,
+} as const
+// Exits are faster than entrances: the panel folds back on a short ease.
+const UNFOLD_EXIT = { duration: 0.2, ease: EASE_OUT } as const
+const RADIUS = 12
+// How far the open panel sits from the trigger once it has pulled away.
+const GAP = 8
+// The surface starts as a thin lip flush against the trigger's edge.
+const LIP = 8
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
-const LIST_VARIANTS: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.035, delayChildren: 0.05 } },
-}
 const ITEM_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: -6, filter: 'blur(3px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)' },
+  // A shared short reveal keeps late rows in long, scrolled lists ready with
+  // the surface. Per-index staggering can delay visible rows by over a second.
+  hidden: { opacity: 0, y: -4, transition: { duration: 0.08, ease: EASE_OUT } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.12, ease: EASE_OUT } },
 }
 
 type Placement = 'bottom' | 'top'
@@ -40,10 +60,14 @@ interface SelectContextValue {
   open: boolean
   setOpen: (open: boolean) => void
   select: (value: string) => void
-  register: (value: string, label: string) => void
+  register: (value: string, label: string, disabled: boolean) => void
   unregister: (value: string) => void
   labelFor: (value: string | undefined) => string | undefined
+  rows: ListboxRow[]
+  /** Closes the panel; focus inside it returns to the trigger. */
+  close: () => void
   reduce: boolean
+  progress: MotionValue<number>
   triggerId: string
   listId: string
   disabled: boolean
@@ -52,6 +76,8 @@ interface SelectContextValue {
 }
 
 const SelectContext = createContext<SelectContextValue | null>(null)
+// The option keyboard focus is on, resolved during render by the content.
+const ActiveOptionContext = createContext<string | undefined>(undefined)
 
 function useSelectContext(component: string) {
   const ctx = useContext(SelectContext)
@@ -64,6 +90,20 @@ export interface SelectProps {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
+  /**
+   * Controlled open state of the panel. A layout that stacks selects can hold
+   * this to keep exactly one panel open — the panel is absolutely positioned
+   * inside its field, so two open at once paint over each other's options.
+   */
+  open?: boolean
+  /** Uncontrolled initial open state. Default false. */
+  defaultOpen?: boolean
+  /**
+   * Fires whenever the panel opens or closes. The panel is absolutely
+   * positioned inside the field, so a layout that stacks selects has to know
+   * which one is open to paint it above its neighbours.
+   */
+  onOpenChange?: (open: boolean) => void
   disabled?: boolean
   className?: string
   children: ReactNode
@@ -73,6 +113,9 @@ export function Select({
   value,
   defaultValue,
   onValueChange,
+  open: openProp,
+  defaultOpen = false,
+  onOpenChange,
   disabled = false,
   className,
   children,
@@ -80,26 +123,58 @@ export function Select({
   const reduce = useReducedMotion() ?? false
   const baseId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
   const [internal, setInternal] = useState(defaultValue)
-  const [labels, setLabels] = useState<Map<string, string>>(new Map())
+  const [labels, setLabels] = useState<
+    Map<string, { label: string, disabled: boolean }>
+  >(new Map())
   const [placement, setPlacement] = useState<Placement>('bottom')
 
   const controlled = value !== undefined
   const current = controlled ? value : internal
+  const openControlled = openProp !== undefined
+  const open = openControlled ? openProp : internalOpen
+  const progress = useMotionValue(open ? 1 : 0)
+
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (!openControlled)
+        setInternalOpen(next)
+      onOpenChange?.(next)
+    },
+    [onOpenChange, openControlled],
+  )
+
+  // The panel turns inert as it closes, which would drop focus held inside it
+  // on the page body. Hand it back to the trigger before that happens.
+  const close = useCallback(() => {
+    const trigger = document.getElementById(`${baseId}-trigger`)
+    if (
+      rootRef.current?.contains(document.activeElement)
+      && document.activeElement !== trigger
+    ) {
+      trigger?.focus()
+    }
+    setOpen(false)
+  }, [baseId, setOpen])
 
   const select = useCallback(
     (next: string) => {
       if (!controlled)
         setInternal(next)
       onValueChange?.(next)
-      setOpen(false)
+      close()
     },
-    [controlled, onValueChange],
+    [controlled, onValueChange, close],
   )
 
-  const register = useCallback((v: string, label: string) => {
-    setLabels(m => (m.get(v) === label ? m : new Map(m).set(v, label)))
+  const register = useCallback((v: string, label: string, disabled: boolean) => {
+    setLabels((m) => {
+      const entry = m.get(v)
+      if (entry?.label === label && entry.disabled === disabled)
+        return m
+      return new Map(m).set(v, { label, disabled })
+    })
   }, [])
   const unregister = useCallback((v: string) => {
     setLabels((m) => {
@@ -111,11 +186,21 @@ export function Select({
     })
   }, [])
 
+  // Reduced motion has no travel, so the progress only carries a short fade.
+  useEffect(() => {
+    const animation = animate(
+      progress,
+      open ? 1 : 0,
+      reduce ? { duration: 0.12 } : open ? UNFOLD_SPRING : UNFOLD_EXIT,
+    )
+    return () => animation.stop()
+  }, [open, progress, reduce])
+
   // close on outside pointer / escape
   useEffect(() => {
     if (!open)
       return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
     const onPointer = (e: PointerEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node))
         setOpen(false)
@@ -126,7 +211,17 @@ export function Select({
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('pointerdown', onPointer)
     }
-  }, [open])
+  }, [open, setOpen, close])
+
+  const rows = useMemo(
+    () =>
+      Array.from(labels, ([id, entry]) => ({
+        id,
+        label: entry.label,
+        disabled: entry.disabled,
+      })),
+    [labels],
+  )
 
   const ctx = useMemo<SelectContextValue>(
     () => ({
@@ -136,8 +231,11 @@ export function Select({
       select,
       register,
       unregister,
-      labelFor: v => (v === undefined ? undefined : labels.get(v)),
+      labelFor: v => (v === undefined ? undefined : labels.get(v)?.label),
+      rows,
+      close,
       reduce,
+      progress,
       triggerId: `${baseId}-trigger`,
       listId: `${baseId}-list`,
       disabled,
@@ -147,11 +245,15 @@ export function Select({
     [
       current,
       open,
+      setOpen,
       select,
       register,
       unregister,
       labels,
+      rows,
+      close,
       reduce,
+      progress,
       baseId,
       disabled,
       placement,
@@ -175,15 +277,16 @@ export interface SelectTriggerProps {
 export function SelectTrigger({ className, children }: SelectTriggerProps) {
   const ctx = useSelectContext('SelectTrigger')
   const isTop = ctx.placement === 'top'
-  // edge facing the panel flattens then rounds; the far edge stays rounded.
-  // All four corners are specified so none gets stranded when placement flips.
-  const kf = ctx.open ? [0, 0, 12] : [12, 0, 12]
-  const kfT: Transition = ctx.reduce
-    ? { duration: 0 }
-    : ctx.open
-      ? { duration: 0.6, times: [0, 0.4, 1], ease: EASE_OUT }
-      : { duration: 0.42, times: [0, 0.5, 1], ease: EASE_OUT }
-  const flatT: Transition = { duration: 0 }
+  // The edge facing the panel flattens while the panel is attached to it and
+  // rounds back as the panel pulls away — the two pinch apart — on the same
+  // curve the panel moves on. The far edge stays rounded.
+  const nearRadius = useTransform(
+    ctx.progress,
+    [0, 0.2, 0.4, 1],
+    [RADIUS, 0, 0, RADIUS],
+  )
+  const rotate = useTransform(ctx.progress, p =>
+    ctx.reduce ? (ctx.open ? 180 : 0) : Math.min(1, Math.max(0, p)) * 180)
   return (
     <motion.button
       type="button"
@@ -193,23 +296,23 @@ export function SelectTrigger({ className, children }: SelectTriggerProps) {
       aria-expanded={ctx.open}
       aria-controls={ctx.listId}
       onClick={() => ctx.setOpen(!ctx.open)}
-      // Gooey: the edge facing the panel snaps flat (panel attached) then rounds
-      // back once the panel pulls away — the two pinch apart.
-      initial={false}
-      animate={{
-        borderTopLeftRadius: isTop ? kf : 12,
-        borderTopRightRadius: isTop ? kf : 12,
-        borderBottomLeftRadius: isTop ? 12 : kf,
-        borderBottomRightRadius: isTop ? 12 : kf,
+      onKeyDown={(event) => {
+        if (
+          !ctx.open
+          && (event.key === 'ArrowDown' || event.key === 'ArrowUp')
+        ) {
+          event.preventDefault()
+          ctx.setOpen(true)
+        }
       }}
-      transition={{
-        borderTopLeftRadius: isTop ? kfT : flatT,
-        borderTopRightRadius: isTop ? kfT : flatT,
-        borderBottomLeftRadius: isTop ? flatT : kfT,
-        borderBottomRightRadius: isTop ? flatT : kfT,
+      style={{
+        borderTopLeftRadius: ctx.reduce || !isTop ? RADIUS : nearRadius,
+        borderTopRightRadius: ctx.reduce || !isTop ? RADIUS : nearRadius,
+        borderBottomLeftRadius: ctx.reduce || isTop ? RADIUS : nearRadius,
+        borderBottomRightRadius: ctx.reduce || isTop ? RADIUS : nearRadius,
       }}
       className={cn(
-        'relative z-10 flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors',
+        'relative z-10 flex w-full items-center justify-between gap-2 border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors',
         'hover:border-(--color-border-strong) focus-visible:ring-2 focus-visible:ring-foreground/20',
         'disabled:pointer-events-none disabled:opacity-50',
         className,
@@ -218,8 +321,7 @@ export function SelectTrigger({ className, children }: SelectTriggerProps) {
       {children}
       <motion.span
         aria-hidden
-        animate={{ rotate: ctx.open ? 180 : 0 }}
-        transition={ctx.reduce ? { duration: 0 } : CHEVRON_TRANSITION}
+        style={{ rotate }}
         className="text-muted-foreground"
       >
         <ChevronDown className="h-4 w-4" />
@@ -252,28 +354,50 @@ export interface SelectContentProps {
 
 export function SelectContent({ className, children }: SelectContentProps) {
   const ctx = useSelectContext('SelectContent')
-  const innerRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const [height, setHeight] = useState(0)
-  const open = ctx.open
-  const { setPlacement } = ctx
+  const { open, progress, reduce, setPlacement } = ctx
+  const { activeId, onKeyDown } = useListbox({
+    open,
+    rows: ctx.rows,
+    selected: ctx.value,
+    list: panelRef,
+  })
+
+  // Keep descendants laid out while hidden: display:none resets nested
+  // scrollers in Chromium. Collapse only the hidden outer footprint after
+  // exit so it cannot extend page scrolling. Opening restores the full box
+  // before measurement or focus; neither layout change is animated.
+  const [exiting, setExiting] = useState(false)
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (!open)
+      setExiting(true)
+  }
+  const present = open || exiting
+  useMotionValueEvent(progress, 'animationComplete', () => {
+    if (progress.get() === 0)
+      setExiting(false)
+  })
 
   useLayoutEffect(() => {
-    const node = innerRef.current
-    if (!node)
+    const node = panelRef.current
+    if (!node || !present)
       return
     const measure = () => setHeight(node.offsetHeight)
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(node)
     return () => observer.disconnect()
-  })
+  }, [present])
 
   // On open, flip upward when there isn't room below and there's more above.
   useLayoutEffect(() => {
     if (!open)
       return
     const trigger = document.getElementById(ctx.triggerId)
-    const node = innerRef.current
+    const node = panelRef.current
     if (!trigger || !node)
       return
     const rect = trigger.getBoundingClientRect()
@@ -283,88 +407,84 @@ export function SelectContent({ className, children }: SelectContentProps) {
     setPlacement(below < h + 16 && above > below ? 'top' : 'bottom')
   }, [open, ctx.triggerId, setPlacement])
 
-  // Specify EVERY corner + both margins each render. The near edge (facing the
-  // trigger) animates flat->round and the gap opens on that side; the far edge
-  // stays rounded and its margin pinned to 0. Setting all of them avoids a
-  // stranded square corner when the placement flips between opens.
   const isTop = ctx.placement === 'top'
-  const nearGap = open ? 8 : 0
-  const nearRadius = open ? 12 : 0
 
-  const gapT: Transition = open
-    ? { type: 'spring', duration: 0.6, bounce: 0.5, delay: 0.12 }
-    : { type: 'spring', duration: 0.3, bounce: 0.1 }
-  const radiusT: Transition = open
-    ? { duration: 0.3, ease: EASE_OUT, delay: 0.14 }
-    : { duration: 0.16, ease: EASE_OUT }
-  const instant: Transition = { duration: 0 }
+  // Reveal a full-size panel from its near edge. No ancestor scales the list,
+  // so rows, borders and shadow keep their natural thickness. The clip and
+  // corner writes can paint; only the gap uses a transform. All read one
+  // progress value, with no animated layout properties.
+  const ready = height > 0 && !reduce
+  const fromY = ready ? (isTop ? GAP : -GAP) : 0
+  const detach = useTransform(progress, [0.4, 1], [0, 1])
+  const y = useTransform(detach, d => lerp(fromY, 0, d))
+  const nearRadius = useTransform(detach, d => (ready ? RADIUS * d : RADIUS))
+  const borderRadius = useTransform(nearRadius, near =>
+    isTop
+      ? `${RADIUS}px ${RADIUS}px ${near}px ${near}px`
+      : `${near}px ${near}px ${RADIUS}px ${RADIUS}px`)
+  const clipPath = useTransform([progress, nearRadius], ([p, near]: number[]) => {
+    if (!ready)
+      return 'none'
+    // Clamp overshoot so the clip never extends into the trigger or exposes
+    // overflowing children. At rest remove it so the native shadow is whole.
+    const reveal = Math.min(1, Math.max(0, p))
+    if (reveal === 1)
+      return 'none'
+    const hidden = Math.max(0, (height - LIP) * (1 - reveal))
+    const inset = isTop ? `${hidden}px 0 0 0` : `0 0 ${hidden}px 0`
+    const corners = isTop
+      ? `${RADIUS}px ${RADIUS}px ${near}px ${near}px`
+      : `${near}px ${near}px ${RADIUS}px ${RADIUS}px`
+    return `inset(${inset} round ${corners})`
+  })
+  // The surface materialises over its first frames rather than popping in as
+  // a lip; with reduced motion the fade is the whole entrance.
+  const opacity = useTransform(progress, reduce ? [0, 1] : [0, 0.12], [0, 1])
 
-  // Items stay mounted (open just animates the panel) so each item's label
-  // registration persists — otherwise the trigger would fall back to the
-  // placeholder the moment the panel closes.
   return (
     <motion.div
+      ref={panelRef}
       id={ctx.listId}
       role="listbox"
       aria-labelledby={ctx.triggerId}
       aria-hidden={!open}
-      initial={false}
-      animate={
-        ctx.reduce
-          ? { opacity: open ? 1 : 0, height: open ? height : 0 }
-          : {
-              opacity: open ? 1 : 0,
-              height: open ? height : 0,
-              // gap opens on the side facing the trigger
-              marginTop: isTop ? 0 : nearGap,
-              marginBottom: isTop ? nearGap : 0,
-              // near corners go flat->round; far corners stay rounded
-              borderTopLeftRadius: isTop ? 12 : nearRadius,
-              borderTopRightRadius: isTop ? 12 : nearRadius,
-              borderBottomLeftRadius: isTop ? nearRadius : 12,
-              borderBottomRightRadius: isTop ? nearRadius : 12,
-            }
-      }
-      transition={
-        ctx.reduce
-          ? { duration: 0.12 }
-          : {
-              opacity: open
-                ? { duration: 0.18 }
-                : { duration: 0.16, delay: 0.12 },
-              height: open
-                ? { type: 'spring', duration: 0.42, bounce: 0.14 }
-                : { duration: 0.26, ease: EASE_OUT, delay: 0.14 },
-              marginTop: isTop ? instant : gapT,
-              marginBottom: isTop ? gapT : instant,
-              borderTopLeftRadius: isTop ? instant : radiusT,
-              borderTopRightRadius: isTop ? instant : radiusT,
-              borderBottomLeftRadius: isTop ? radiusT : instant,
-              borderBottomRightRadius: isTop ? radiusT : instant,
-            }
-      }
+      inert={!open}
+      onKeyDown={(event) => {
+        // Tab leaves the list from the trigger, so focus moves on to the
+        // control after the select rather than into the closing panel.
+        if (event.key === 'Tab')
+          ctx.close()
+        else onKeyDown(event)
+      }}
       style={{
-        transformOrigin: isTop ? 'bottom' : 'top',
-        overflow: 'hidden',
+        visibility: present ? undefined : 'hidden',
+        maxHeight: present ? undefined : 0,
+        borderWidth: present ? undefined : 0,
+        y,
+        clipPath,
+        borderRadius,
+        opacity,
         pointerEvents: open ? 'auto' : 'none',
+        marginTop: isTop ? 0 : GAP,
+        marginBottom: isTop ? GAP : 0,
       }}
       // flush against the trigger, then separates into its own rounded pill;
       // sits above or below depending on available space
       className={cn(
-        'absolute left-0 right-0 z-20 rounded-xl border border-border bg-background shadow-lg',
+        'absolute left-0 right-0 z-20 overflow-hidden border border-border bg-background shadow-lg',
         isTop ? 'bottom-full' : 'top-full',
         className,
       )}
     >
-      <motion.div
-        ref={innerRef}
-        variants={ctx.reduce ? undefined : LIST_VARIANTS}
-        initial={false}
-        animate={open ? 'show' : 'hidden'}
-        className="p-1"
-      >
-        {children}
-      </motion.div>
+      <ActiveOptionContext value={activeId}>
+        <motion.div
+          initial={false}
+          animate={open ? 'show' : 'hidden'}
+          className="p-1"
+        >
+          {children}
+        </motion.div>
+      </ActiveOptionContext>
     </motion.div>
   )
 }
@@ -383,23 +503,25 @@ export function SelectItem({
   children,
 }: SelectItemProps) {
   const ctx = useSelectContext('SelectItem')
+  const activeId = useContext(ActiveOptionContext)
   const selected = ctx.value === value
   const label = typeof children === 'string' ? children : value
 
-  const { register, unregister } = ctx
-
   useLayoutEffect(() => {
-    register(value, label)
-    return () => unregister(value)
-  }, [register, unregister, value, label])
+    ctx.register(value, label, disabled)
+  }, [ctx.register, value, label, disabled])
+  useLayoutEffect(() => () => ctx.unregister(value), [ctx.unregister, value])
 
   return (
-    <motion.li variants={ctx.reduce ? undefined : ITEM_VARIANTS}>
+    <motion.div variants={ctx.reduce ? undefined : ITEM_VARIANTS}>
       <button
         type="button"
         role="option"
         aria-selected={selected}
         disabled={disabled}
+        // One tab stop: the active option, which focus follows while open.
+        tabIndex={activeId === value ? 0 : -1}
+        data-listbox-id={value}
         onClick={() => ctx.select(value)}
         className={cn(
           'flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm outline-none transition-colors',
@@ -413,6 +535,6 @@ export function SelectItem({
         {children}
         {selected ? <Check className="h-3.5 w-3.5 shrink-0" /> : null}
       </button>
-    </motion.li>
+    </motion.div>
   )
 }

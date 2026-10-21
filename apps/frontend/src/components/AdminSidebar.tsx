@@ -1,8 +1,10 @@
 import type { Option, Question } from '@quizly/types'
-import { Check, Trash2 } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
+import { Check, Search, Trash2 } from 'lucide-react'
 import { memo, useMemo, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { AnimatedBadge } from './motion/animated-badge'
+import { Button } from './motion/button'
+import { Checkbox } from './motion/checkbox'
+import { Input } from './motion/input'
 import { Tabs, TabsList, TabsTrigger } from './motion/tabs'
 
 interface AdminSidebarProps {
@@ -47,8 +49,6 @@ function AdminSidebar({
   onOpenBatchModal,
 }: AdminSidebarProps) {
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
-  const reduce = useReducedMotion()
 
   const filtered = useMemo(() => {
     return questions.filter((q) => {
@@ -57,27 +57,26 @@ function AdminSidebar({
       if (search) {
         const options = 'options' in q ? (q.options as Option[]) : []
         const blanks = 'blanks' in q ? (q.blanks as string[]) : []
-        const haystack = [q.text, ...options.map(o => o.text), ...blanks].join(
-          ' ',
-        )
+        const haystack = [q.text, ...options.map(o => o.text), ...blanks].join(' ')
         return haystack.toLowerCase().includes(search.toLowerCase())
       }
       return true
     })
   }, [questions, typeFilter, search])
 
-  return (
-    <aside className="w-[340px] flex-shrink-0 bg-sidebar border-r border-border flex flex-col h-screen sticky top-0">
-      {/* Toolbar */}
-      <div className="p-4 border-b border-border flex flex-col gap-3">
-        <h2 className="text-base font-bold text-text-secondary">题目管理</h2>
+  const allSelected = filtered.length > 0
+    && filtered.every(q => q.id !== undefined && selectedIds.has(q.id))
 
-        <input
-          type="text"
-          placeholder="搜索题干或选项…"
-          className="w-full px-3 py-2 text-sm border border-border rounded-lg outline-none focus:border-accent focus:ring-1 focus:ring-accent transition bg-background text-foreground placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
+  return (
+    <aside className="flex h-full w-[340px] flex-shrink-0 flex-col border-r border-border bg-sidebar">
+      <div className="flex flex-col gap-3 border-b border-border p-4">
+        <h2 className="text-sm font-semibold text-foreground">题目管理</h2>
+
+        <Input
+          leftIcon={<Search />}
+          placeholder="搜索题干或选项"
           value={search}
-          onChange={e => onSearchChange(e.target.value)}
+          onChange={onSearchChange}
         />
 
         <Tabs
@@ -86,202 +85,151 @@ function AdminSidebar({
           variant="segment"
           className="w-full"
         >
-          <TabsList className="w-full justify-between">
+          <TabsList className="w-full">
             {Object.entries(TYPE_LABELS).map(([val, label]) => (
-              <TabsTrigger
-                key={val}
-                value={val}
-                className="flex-1 text-xs px-2.5 py-1.5"
-              >
+              <TabsTrigger key={val || 'all'} value={val}>
                 {label}
               </TabsTrigger>
             ))}
           </TabsList>
         </Tabs>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div>
+        <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span>
             共
             {' '}
             {questions.length}
             {' '}
-            题，筛选
+            题 · 筛选出
             {' '}
             {filtered.length}
             {' '}
             题
-          </div>
-          <button
-            type="button"
+          </span>
+          <Button
+            variant={isBatchMode ? 'primary' : 'ghost'}
+            size="sm"
             onClick={onToggleBatchMode}
-            className={cn(
-              'px-2 py-1 rounded border text-xs font-semibold cursor-pointer transition-all duration-200',
-              isBatchMode
-                ? 'bg-primary border-primary text-white shadow-sm hover:bg-primary/90'
-                : 'bg-sidebar border-border text-primary dark:text-success hover:bg-primary/10 dark:hover:bg-success/15 hover:border-primary/30 dark:hover:border-success/40',
-            )}
           >
             {isBatchMode ? '退出批量' : '批量操作'}
-          </button>
+          </Button>
         </div>
 
         {isBatchMode && (
-          <div className="flex justify-between items-center bg-background border border-border p-2.5 rounded-lg text-xs transition-all">
-            <label className="flex items-center gap-2 cursor-pointer font-semibold text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={
-                  filtered.length > 0
-                  && filtered.every(q => q.id !== undefined && selectedIds.has(q.id))
-                }
-                onChange={(e) => {
-                  const filteredIds = filtered
-                    .map(q => q.id)
-                    .filter((id): id is number => id !== undefined)
-                  onSelectAll(filteredIds, e.target.checked)
-                }}
-                className="rounded border-border text-accent focus:ring-accent size-3.5 cursor-pointer accent-accent"
-              />
-              全选当前筛选 (
-              {filtered.length}
-              {' '}
-              题)
-            </label>
-            <div className="text-muted-foreground font-bold">
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background p-2.5">
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={(checked) => {
+                const filteredIds = filtered
+                  .map(q => q.id)
+                  .filter((id): id is number => id !== undefined)
+                onSelectAll(filteredIds, checked)
+              }}
+              label={`全选当前筛选（${filtered.length} 题）`}
+            />
+            <span className="text-xs text-muted-foreground">
               已选
               {' '}
               {selectedIds.size}
-              {' '}
-              题
-            </div>
+            </span>
           </div>
         )}
       </div>
 
-      {/* List */}
-      <div
-        className="flex-1 overflow-y-auto bg-sidebar relative z-0"
-        onMouseLeave={() => setHoveredIdx(null)}
-      >
-        {filtered.map((q) => {
-          const realIdx = questions.indexOf(q)
-          const isSelected = selectedId === realIdx
-          const isChecked = q.id !== undefined && selectedIds.has(q.id)
-          const needConfirm = confirmDelete === realIdx
-          const preview
-            = q.text.length > 40 ? `${q.text.slice(0, 40)}…` : q.text
+      <div className="flex-1 overflow-y-auto">
+        {filtered.length === 0 && (
+          <p className="px-4 py-8 text-center text-xs text-muted-foreground">
+            没有匹配的题目
+          </p>
+        )}
 
-          return (
-            <div
-              key={q.id ?? `temp-${realIdx}`}
-              className={cn(
-                'relative flex items-start gap-2.5 px-4 py-3 cursor-pointer border-b border-border transition-colors',
-                isSelected && !isBatchMode && 'bg-primary/10 dark:bg-success/15 border-l-4 border-l-teal-600 dark:border-l-emerald-500',
-                isChecked && isBatchMode && 'bg-primary/5 dark:bg-success/10',
-              )}
-              onClick={() => {
-                if (isBatchMode) {
-                  if (q.id !== undefined) {
-                    onToggleSelect(q.id, !isChecked)
-                  }
+        <ul className="divide-y divide-border">
+          {filtered.map((q) => {
+            const realIdx = questions.indexOf(q)
+            const isSelected = selectedId === realIdx
+            const isChecked = q.id !== undefined && selectedIds.has(q.id)
+            const needConfirm = confirmDelete === realIdx
+            const preview = q.text.length > 40 ? `${q.text.slice(0, 40)}…` : q.text
+
+            return (
+              <li
+                key={q.id ?? `temp-${realIdx}`}
+                className={
+                  isSelected && !isBatchMode
+                    ? 'flex cursor-pointer items-start gap-2.5 bg-muted px-4 py-3'
+                    : 'flex cursor-pointer items-start gap-2.5 px-4 py-3 transition-colors hover:bg-muted/60'
                 }
-                else {
-                  onSelect(realIdx)
-                }
-              }}
-              onMouseEnter={() => setHoveredIdx(realIdx)}
-            >
-              {/* Sliding Hover Highlight */}
-              {realIdx === hoveredIdx && !isSelected && !isBatchMode && (
-                <motion.span
-                  layoutId="admin-sidebar-hover"
-                  className="absolute inset-0 z-[-1] bg-muted dark:bg-white/5"
-                  transition={
-                    reduce
-                      ? { duration: 0 }
-                      : {
-                          type: 'spring',
-                          stiffness: 350,
-                          damping: 30,
-                        }
+                onClick={() => {
+                  if (isBatchMode) {
+                    if (q.id !== undefined)
+                      onToggleSelect(q.id, !isChecked)
                   }
-                />
-              )}
+                  else {
+                    onSelect(realIdx)
+                  }
+                }}
+              >
+                {isBatchMode
+                  ? (
+                      <span className="mt-0.5 flex-shrink-0">
+                        <Checkbox
+                          checked={isChecked}
+                          disabled={q.id === undefined}
+                          aria-label={`选择第 ${realIdx + 1} 题`}
+                          onCheckedChange={(checked) => {
+                            if (q.id !== undefined)
+                              onToggleSelect(q.id, checked)
+                          }}
+                        />
+                      </span>
+                    )
+                  : (
+                      <span className="mt-0.5 flex-shrink-0 text-xs text-muted-foreground tabular-nums">
+                        {realIdx + 1}
+                      </span>
+                    )}
 
-              {isBatchMode
-                ? (
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      disabled={q.id === undefined}
-                      onClick={e => e.stopPropagation()}
-                      onChange={(e) => {
-                        if (q.id !== undefined) {
-                          onToggleSelect(q.id, e.target.checked)
-                        }
-                      }}
-                      className="relative z-10 rounded border-border text-primary focus:ring-primary/40 size-4 mt-1 cursor-pointer accent-teal-600 flex-shrink-0"
-                    />
-                  )
-                : (
-                    <span className="relative z-10 text-xs font-bold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">
-                      {realIdx + 1}
-                    </span>
-                  )}
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className="truncate text-sm text-foreground">{preview || '（空题干）'}</span>
+                  <AnimatedBadge size="sm" status="neutral">{q.type}</AnimatedBadge>
+                </div>
 
-              <span className="relative z-10 text-[10px] font-semibold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
-                {q.type}
-              </span>
-              <span className="relative z-10 flex-1 text-sm text-foreground truncate">
-                {preview}
-              </span>
-
-              {!isBatchMode && (
-                <button
-                  type="button"
-                  className={cn(
-                    'relative z-10 flex-shrink-0 size-6 rounded flex items-center justify-center text-xs transition',
-                    needConfirm
-                      ? 'bg-error text-white'
-                      : 'text-text-muted hover:text-error hover:bg-error-light',
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (needConfirm) {
-                      onDelete(realIdx)
-                      setConfirmDelete(null)
-                    }
-                    else {
-                      setConfirmDelete(realIdx)
-                    }
-                  }}
-                  title={needConfirm ? '确认删除' : '删除'}
-                >
-                  {needConfirm ? <Check className="size-3.5" /> : <Trash2 className="size-3.5" />}
-                </button>
-              )}
-            </div>
-          )
-        })}
+                {!isBatchMode && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={needConfirm ? '确认删除这道题' : '删除这道题'}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (needConfirm) {
+                        onDelete(realIdx)
+                        setConfirmDelete(null)
+                      }
+                      else {
+                        setConfirmDelete(realIdx)
+                      }
+                    }}
+                  >
+                    {needConfirm ? <Check /> : <Trash2 />}
+                  </Button>
+                )}
+              </li>
+            )
+          })}
+        </ul>
       </div>
 
       {isBatchMode && (
-        <div className="p-4 border-t border-border bg-background flex flex-col gap-2">
-          <button
-            type="button"
+        <div className="border-t border-border p-4">
+          <Button
+            className="w-full"
             disabled={selectedIds.size === 0}
             onClick={onOpenBatchModal}
-            className={cn(
-              'w-full py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer text-center',
-              selectedIds.size === 0
-                ? 'bg-border text-text-muted cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90 dark:bg-success dark:hover:bg-success/90 text-white shadow-lg shadow-primary/10',
-            )}
           >
-            修改所属课程与分类 (
+            修改所属课程与分类（
             {selectedIds.size}
-            )
-          </button>
+            ）
+          </Button>
         </div>
       )}
     </aside>

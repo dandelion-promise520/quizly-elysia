@@ -9,8 +9,9 @@ import {
 import AdminDashboard from '@/components/AdminDashboard'
 import FloatingActions from '@/components/FloatingActions'
 import QuizPage from '@/components/QuizPage'
-
 import { ThemeProvider } from '@/components/theme-provider'
+
+import { ToastProvider } from '@/components/toast-provider'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,18 +23,18 @@ const queryClient = new QueryClient({
 })
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <FloatingActions />
-    </>
-  ),
+  component: () => <Outlet />,
 })
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: QuizPage,
+  component: () => (
+    <>
+      <QuizPage />
+      <FloatingActions />
+    </>
+  ),
 })
 
 const adminRoute = createRoute({
@@ -56,7 +57,9 @@ export function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="quizly-theme-v2">
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

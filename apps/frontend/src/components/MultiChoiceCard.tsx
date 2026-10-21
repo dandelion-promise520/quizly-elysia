@@ -113,8 +113,6 @@ function MultiChoiceCard({
                 checked={isSelected}
                 onCheckedChange={() => toggleOption(oi)}
                 disabled={done}
-                isCorrectAnswer={done && isCorrect}
-                isWrongSelection={done && isSelected && !isCorrect}
                 className="pointer-events-none relative z-10"
               />
               <span className={cn(

@@ -1,3 +1,6 @@
+'use client'
+// beui.dev/components/motion/button
+
 import {
   AnimatePresence,
   type HTMLMotionProps,
@@ -25,17 +28,29 @@ export interface ButtonProps extends Omit<
   variant?: ButtonVariant
   size?: ButtonSize
   pressScale?: number
+  /** Spawn a Material-style ripple from the press point. Off by default. */
   ripple?: boolean
+  children?: ReactNode
+}
+
+export interface ButtonLinkProps extends Omit<
+  HTMLMotionProps<'a'>,
+  'children'
+> {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  pressScale?: number
   children?: ReactNode
 }
 
 interface Ripple { id: number, x: number, y: number, size: number }
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-white hover:bg-primary/90',
-  secondary: 'border border-border bg-card text-foreground/80 hover:bg-background',
-  ghost: 'text-muted-foreground hover:text-foreground hover:bg-background',
-  outline: 'border border-border bg-transparent text-foreground/80 hover:bg-background',
+  primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+  secondary: 'border border-border bg-card text-foreground hover:border-border',
+  ghost: 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
+  outline:
+    'border border-border bg-transparent text-foreground hover:bg-muted/60',
 }
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
@@ -58,10 +73,11 @@ export const Button = function Button(
       if (ripple && !reduce) {
         const rect = event.currentTarget.getBoundingClientRect()
         const size = Math.max(rect.width, rect.height) * 2
+        const id = nextId.current++
         setRipples(prev => [
           ...prev,
           {
-            id: nextId.current++,
+            id,
             x: event.clientX - rect.left,
             y: event.clientY - rect.top,
             size,
@@ -82,8 +98,8 @@ export const Button = function Button(
       transition={SPRING_PRESS}
       onPointerDown={handlePointerDown}
       className={cn(
-        'inline-flex items-center justify-center font-semibold select-none',
-        'transition-colors duration-200 cursor-pointer',
+        'inline-flex items-center justify-center font-medium select-none',
+        'transition-colors',
         'disabled:pointer-events-none disabled:opacity-50',
         ripple && 'relative overflow-hidden',
         VARIANT_CLASS[variant],
@@ -108,7 +124,7 @@ export const Button = function Button(
                       x: '-50%',
                       y: '-50%',
                     }}
-                    initial={{ scale: 0, opacity: 0.3 }}
+                    initial={{ scale: 0.05, opacity: 0.3 }}
                     animate={{ scale: 1, opacity: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.6, ease: EASE_OUT }}
@@ -122,5 +138,31 @@ export const Button = function Button(
         : null}
       {children}
     </motion.button>
+  )
+}
+
+export const ButtonLink = function ButtonLink(
+  { ref, variant = 'primary', size = 'md', pressScale = 0.93, className, children, ...rest }: ButtonLinkProps & { ref?: React.RefObject<HTMLAnchorElement | null> },
+) {
+  const reduce = useReducedMotion()
+  const canHover = useHoverCapable()
+
+  return (
+    <motion.a
+      ref={ref}
+      whileTap={reduce ? undefined : { scale: pressScale }}
+      whileHover={reduce || !canHover ? undefined : { scale: 1.02 }}
+      transition={SPRING_PRESS}
+      className={cn(
+        'inline-flex items-center justify-center font-medium select-none',
+        'transition-colors',
+        VARIANT_CLASS[variant],
+        SIZE_CLASS[size],
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </motion.a>
   )
 }

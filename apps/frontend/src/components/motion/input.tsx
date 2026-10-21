@@ -1,3 +1,4 @@
+'use client'
 // beui.dev/components/motion/input
 
 import {

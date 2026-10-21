@@ -18,4 +18,20 @@ export default antfu(
       'no-console': 'off',
     },
   },
+  {
+    // beUI 原装组件（由 registry 直接落盘，保持上游实现，不按项目风格重写）
+    files: [
+      'apps/frontend/src/components/motion/**',
+      'apps/frontend/src/lib/hooks/**',
+      'apps/frontend/src/lib/presence-gate.tsx',
+      'apps/frontend/src/lib/touch.ts',
+    ],
+    rules: {
+      'ts/no-redeclare': 'off',
+      'ts/no-use-before-define': 'off',
+      'style/multiline-ternary': 'off',
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+    },
+  },
 )

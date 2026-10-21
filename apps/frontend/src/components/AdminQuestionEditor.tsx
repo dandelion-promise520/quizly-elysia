@@ -1,6 +1,8 @@
 import type { Course, FillQuestion, Option, Question } from '@quizly/types'
+import { Plus, Trash2 } from 'lucide-react'
 import { memo, useEffect, useState } from 'react'
 import { Button, StatefulButton } from './motion/button'
+import { Input } from './motion/input'
 import {
   Select,
   SelectContent,
@@ -382,33 +384,32 @@ function AdminQuestionEditor({
                 variant="ghost"
                 size="sm"
                 onClick={addOption}
-                className="text-xs text-primary hover:text-primary/80 font-semibold px-2 h-7"
               >
-                + 添加选项
+                <Plus />
+                添加选项
               </Button>
             </div>
 
             {(draft.options ?? []).map((opt: Option, i: number) => (
               <div key={opt.label} className="flex items-center gap-2">
-                <input
+                <Input
+                  className="w-14 shrink-0"
                   value={opt.label}
-                  onChange={e => updateOption(i, 'label', e.target.value)}
-                  className="w-10 px-2 py-2 text-sm border border-border rounded text-center font-bold outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
+                  onChange={value => updateOption(i, 'label', value)}
                 />
-                <input
+                <Input
+                  className="flex-1"
                   value={opt.text}
-                  onChange={e => updateOption(i, 'text', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
+                  onChange={value => updateOption(i, 'text', value)}
                   placeholder="选项内容"
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeOption(i)}
-                  className="size-8 rounded text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 transition"
-                  title="删除选项"
+                  aria-label={`删除选项 ${opt.label}`}
                 >
-                  ×
+                  <Trash2 />
                 </Button>
               </div>
             ))}
@@ -449,9 +450,12 @@ function AdminQuestionEditor({
                       .filter(Boolean)
                     const isCorrect = correctLabels.includes(opt.label)
                     return (
-                      <button
+                      <Button
                         key={opt.label}
-                        type="button"
+                        variant={isCorrect ? 'primary' : 'secondary'}
+                        size="icon"
+                        aria-label={`${isCorrect ? '取消' : '设为'}正确答案 ${opt.label}`}
+                        aria-pressed={isCorrect}
                         onClick={() => {
                           let nextLabels
                           if (isCorrect) {
@@ -473,14 +477,9 @@ function AdminQuestionEditor({
                             answer: nextLabels.join(','),
                           }))
                         }}
-                        className={`size-10 rounded-lg border text-sm font-bold transition-all duration-200 cursor-pointer flex items-center justify-center ${
-                          isCorrect
-                            ? 'bg-primary border-primary text-white shadow-sm'
-                            : 'bg-background border-border text-foreground hover:bg-muted'
-                        }`}
                       >
                         {opt.label}
-                      </button>
+                      </Button>
                     )
                   })}
                 </div>
@@ -503,33 +502,32 @@ function AdminQuestionEditor({
                 variant="ghost"
                 size="sm"
                 onClick={addBlank}
-                className="text-xs text-primary hover:text-primary/80 font-semibold px-2 h-7"
               >
-                + 添加空位
+                <Plus />
+                添加空位
               </Button>
             </div>
 
             {(draft.blanks ?? []).map((_: string, i: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <div key={`blank-${i}`} className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground w-6 text-center">
+                <span className="w-6 text-center text-sm text-muted-foreground tabular-nums">
                   {i + 1}
                   .
                 </span>
-                <input
+                <Input
+                  className="flex-1"
                   value={(draft.answer as string[])[i]}
-                  onChange={e => updateBlank(i, e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
+                  onChange={value => updateBlank(i, value)}
                   placeholder={`第 ${i + 1} 空答案`}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeBlank(i)}
-                  className="size-8 rounded text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 transition"
-                  title="删除空位"
+                  aria-label={`删除第 ${i + 1} 空`}
                 >
-                  ×
+                  <Trash2 />
                 </Button>
               </div>
             ))}

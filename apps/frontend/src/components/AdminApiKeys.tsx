@@ -1,11 +1,17 @@
 import type { ApiKeyItem } from '@/lib/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Check, Copy, KeyRound, Loader2, Plus, Power, Trash2, TriangleAlert } from 'lucide-react'
+import { Copy, KeyRound, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from '@/components/motion/button'
+import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/motion/alert'
+import { AnimatedBadge } from '@/components/motion/animated-badge'
+import { Button, StatefulButton } from '@/components/motion/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/motion/card'
+import { CenterMorphModal, CenterMorphModalContent } from '@/components/motion/center-morph-modal'
 import { Input } from '@/components/motion/input'
+import { Loader } from '@/components/motion/loader'
+import { Switch } from '@/components/motion/switch'
+import { useToast } from '@/components/toast-provider'
 import { createApiKey, deleteApiKey, listApiKeys, setApiKeyEnabled } from '@/lib/api'
-import { cn } from '@/lib/utils'
 
 function formatTime(value: ApiKeyItem['createdAt'] | null | undefined): string {
   if (!value)
@@ -24,16 +30,15 @@ function maskKey(item: ApiKeyItem): string {
 }
 
 export default function AdminApiKeys() {
+  const toast = useToast()
   const queryClient = useQueryClient()
   const [name, setName] = useState('')
   const [creating, setCreating] = useState(false)
   const [newKey, setNewKey] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const [pendingId, setPendingId] = useState<string | null>(null)
-  const [confirmId, setConfirmId] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<ApiKeyItem | null>(null)
 
-  const { data: keys = [], isLoading, error: queryError } = useQuery<ApiKeyItem[]>({
+  const { data: keys = [], isLoading, error: queryError, refetch } = useQuery<ApiKeyItem[]>({
     queryKey: ['api-keys'],
     queryFn: listApiKeys,
   })
@@ -45,16 +50,15 @@ export default function AdminApiKeys() {
     if (!trimmed || creating)
       return
     setCreating(true)
-    setError(null)
-    setNewKey(null)
     try {
       const created = await createApiKey(trimmed)
       setNewKey(created.key)
       setName('')
       await refresh()
+      toast.success('密钥已创建', `「${trimmed}」的明文只在下面显示这一次。`)
     }
     catch (err) {
-      setError(err instanceof Error ? err.message : '创建失败')
+      toast.error('创建失败', err instanceof Error ? err.message : '请稍后重试')
     }
     finally {
       setCreating(false)
@@ -66,39 +70,41 @@ export default function AdminApiKeys() {
       return
     try {
       await navigator.clipboard.writeText(newKey)
-      setCopied(true)
-      setTimeout(setCopied, 1600, false)
+      toast.success('已复制到剪贴板')
     }
     catch {
-      setError('浏览器拒绝了剪贴板写入，请手动选中复制')
+      toast.error('复制失败', '浏览器拒绝了剪贴板写入，请手动选中复制')
     }
   }
 
   const handleToggle = async (item: ApiKeyItem) => {
     setPendingId(item.id)
-    setError(null)
     try {
       await setApiKeyEnabled(item.id, !item.enabled)
       await refresh()
+      toast.success(item.enabled ? '密钥已停用' : '密钥已启用', item.name || undefined)
     }
     catch (err) {
-      setError(err instanceof Error ? err.message : '操作失败')
+      toast.error('操作失败', err instanceof Error ? err.message : '请稍后重试')
     }
     finally {
       setPendingId(null)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    setPendingId(id)
-    setError(null)
+  const handleDelete = async () => {
+    if (!deleteTarget)
+      return
+    const target = deleteTarget
+    setPendingId(target.id)
     try {
-      await deleteApiKey(id)
-      setConfirmId(null)
+      await deleteApiKey(target.id)
+      setDeleteTarget(null)
       await refresh()
+      toast.success('密钥已删除', target.name || undefined)
     }
     catch (err) {
-      setError(err instanceof Error ? err.message : '删除失败')
+      toast.error('删除失败', err instanceof Error ? err.message : '请稍后重试')
     }
     finally {
       setPendingId(null)
@@ -106,185 +112,186 @@ export default function AdminApiKeys() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background">
-      <div className="max-w-4xl mx-auto px-8 py-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-xl font-bold text-foreground">API 密钥</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            给脚本或 AI 调用的长期凭证，可绕过登录直接写接口。请求时放在
+    <div className="flex-1 overflow-y-auto">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-8">
+        <header className="flex flex-col gap-1">
+          <h2 className="text-xl font-semibold text-foreground">API 密钥</h2>
+          <p className="text-sm text-muted-foreground">
+            给脚本或 AI 调用的长期凭证。请求时放进
             {' '}
-            <code className="px-1.5 py-0.5 rounded bg-muted text-foreground/80 text-xs font-mono">Authorization: Bearer &lt;key&gt;</code>
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">Authorization: Bearer &lt;key&gt;</code>
             {' '}
             或
             {' '}
-            <code className="px-1.5 py-0.5 rounded bg-muted text-foreground/80 text-xs font-mono">X-API-Key</code>
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">X-API-Key</code>
             {' '}
-            请求头里。读接口本身公开，不需要密钥。
+            请求头。读接口公开，不需要密钥。
           </p>
-        </div>
+        </header>
 
-        <div className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <Plus className="size-4 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">新建密钥</h3>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <Input
-              value={name}
-              onChange={setName}
-              placeholder="给密钥起个名字，例如 ai-agent"
-              className="flex-1"
-              classNames={{ field: 'bg-background' }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter')
-                  void handleCreate()
-              }}
-            />
-            <Button
-              variant="primary"
-              onClick={() => void handleCreate()}
-              disabled={creating || !name.trim()}
-              className="h-11 px-6 shrink-0"
-            >
-              {creating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-              创建
-            </Button>
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle as="h3">新建密钥</CardTitle>
+            <CardDescription>起一个能认出来的名字，方便日后分辨是谁在用。</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end gap-2">
+              <Input
+                className="flex-1"
+                label="名称"
+                placeholder="例如 ai-agent"
+                value={name}
+                onChange={setName}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter')
+                    void handleCreate()
+                }}
+              />
+              <StatefulButton
+                size="lg"
+                state={creating ? 'loading' : 'idle'}
+                loadingText="创建中"
+                disabled={!name.trim()}
+                onClick={() => void handleCreate()}
+              >
+                创建密钥
+              </StatefulButton>
+            </div>
+          </CardContent>
+        </Card>
 
         {newKey && (
-          <div className="rounded-2xl border border-warning/30 bg-warning/10 p-5 flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-warning">
-              <TriangleAlert className="size-4" />
-              <span className="text-sm font-bold">密钥只显示这一次，关掉就再也看不到</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 min-w-0 px-3 py-2.5 rounded-xl bg-background border border-border text-xs font-mono text-foreground break-all">
+          <Alert variant="warning">
+            <AlertIcon />
+            <AlertContent>
+              <AlertTitle>密钥只显示这一次</AlertTitle>
+              <AlertDescription>关掉这条提示后就再也看不到明文，请先复制保存。</AlertDescription>
+              <code className="mt-2 block rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs break-all text-foreground">
                 {newKey}
               </code>
-              <Button variant="secondary" onClick={() => void handleCopy()} className="px-4 py-2 shrink-0">
-                {copied ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
-                {copied ? '已复制' : '复制'}
-              </Button>
-            </div>
-          </div>
+            </AlertContent>
+            <Button variant="secondary" size="sm" onClick={() => void handleCopy()}>
+              <Copy />
+              复制
+            </Button>
+          </Alert>
         )}
 
-        {error && (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
-        <div className="rounded-2xl border border-border bg-card overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border flex items-center gap-2 bg-background">
-            <KeyRound className="size-4 text-muted-foreground" />
-            <h3 className="text-sm font-bold text-foreground">已有密钥</h3>
-            <span className="text-xs text-muted-foreground">
+        <Card>
+          <CardHeader>
+            <CardTitle as="h3">已有密钥</CardTitle>
+            <CardDescription>
               共
               {' '}
               {keys.length}
               {' '}
-              个
-            </span>
-          </div>
-
-          {isLoading && (
-            <div className="px-5 py-10 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-              <Loader2 className="size-4 animate-spin" />
-              加载中
-            </div>
-          )}
-
-          {queryError && (
-            <div className="px-5 py-10 text-center text-sm text-destructive">
-              {queryError instanceof Error ? queryError.message : '加载失败'}
-            </div>
-          )}
-
-          {!isLoading && !queryError && keys.length === 0 && (
-            <div className="px-5 py-10 text-center text-sm text-muted-foreground">
-              还没有任何密钥，在上方输入名称创建一个。
-            </div>
-          )}
-
-          {keys.map((item) => {
-            const busy = pendingId === item.id
-            const needConfirm = confirmId === item.id
-            return (
-              <div
-                key={item.id}
-                className="px-5 py-4 border-b border-border last:border-b-0 flex items-center gap-4 flex-wrap"
-              >
-                <div className="flex-1 min-w-[220px] flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-foreground">
-                      {item.name || '未命名'}
-                    </span>
-                    <span
-                      className={cn(
-                        'text-[10px] font-bold px-2 py-0.5 rounded-full',
-                        item.enabled
-                          ? 'text-success bg-success/10'
-                          : 'text-muted-foreground bg-muted',
-                      )}
-                    >
-                      {item.enabled ? '启用中' : '已停用'}
-                    </span>
-                  </div>
-                  <code className="text-xs font-mono text-muted-foreground break-all">
-                    {maskKey(item)}
-                  </code>
-                </div>
-
-                <div className="flex flex-col gap-0.5 text-[11px] text-muted-foreground w-[172px] whitespace-nowrap">
-                  <span>
-                    创建
-                    {' '}
-                    {formatTime(item.createdAt)}
-                  </span>
-                  <span className={cn(!item.lastRequest && 'opacity-60')}>
-                    最近使用
-                    {' '}
-                    {formatTime(item.lastRequest)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <Button
-                    variant="ghost"
-                    onClick={() => void handleToggle(item)}
-                    disabled={busy}
-                    className="px-3 py-1.5 text-xs"
-                  >
-                    {busy ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" />}
-                    {item.enabled ? '停用' : '启用'}
-                  </Button>
-                  <Button
-                    variant={needConfirm ? 'primary' : 'ghost'}
-                    onClick={() => {
-                      if (needConfirm)
-                        void handleDelete(item.id)
-                      else
-                        setConfirmId(item.id)
-                    }}
-                    disabled={busy}
-                    className={cn(
-                      'px-3 py-1.5 text-xs',
-                      needConfirm
-                        ? 'bg-destructive hover:bg-destructive/90 text-white'
-                        : 'text-destructive hover:text-destructive',
-                    )}
-                  >
-                    {needConfirm ? <Check className="size-3.5" /> : <Trash2 className="size-3.5" />}
-                    {needConfirm ? '确认删除' : '删除'}
-                  </Button>
-                </div>
+              个，停用后立即失效但记录保留。
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading && (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                <Loader variant="dots" size={20} label="加载密钥" />
+                加载中
               </div>
-            )
-          })}
-        </div>
+            )}
+
+            {queryError && (
+              <Alert variant="destructive">
+                <AlertIcon />
+                <AlertContent>
+                  <AlertTitle>加载失败</AlertTitle>
+                  <AlertDescription>
+                    {queryError instanceof Error ? queryError.message : '请稍后重试'}
+                  </AlertDescription>
+                </AlertContent>
+                <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+                  重试
+                </Button>
+              </Alert>
+            )}
+
+            {!isLoading && !queryError && keys.length === 0 && (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <KeyRound className="size-6 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">还没有任何密钥，在上方输入名称创建一个。</p>
+              </div>
+            )}
+
+            {keys.length > 0 && (
+              <ul className="flex flex-col divide-y divide-border">
+                {keys.map(item => (
+                  <li key={item.id} className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground">{item.name || '未命名'}</span>
+                        <AnimatedBadge size="sm" status={item.enabled ? 'success' : 'neutral'}>
+                          {item.enabled ? '启用中' : '已停用'}
+                        </AnimatedBadge>
+                      </div>
+                      <code className="font-mono text-xs break-all text-muted-foreground">{maskKey(item)}</code>
+                      <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                        <span>
+                          创建
+                          {' '}
+                          {formatTime(item.createdAt)}
+                        </span>
+                        <span>
+                          最近使用
+                          {' '}
+                          {formatTime(item.lastRequest)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Switch
+                      checked={item.enabled}
+                      disabled={pendingId === item.id}
+                      ariaLabel={`切换 ${item.name || '未命名'} 的启用状态`}
+                      onCheckedChange={() => void handleToggle(item)}
+                    />
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`删除 ${item.name || '未命名'}`}
+                      disabled={pendingId === item.id}
+                      onClick={() => setDeleteTarget(item)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      <CenterMorphModal open={Boolean(deleteTarget)} onOpenChange={open => !open && setDeleteTarget(null)}>
+        <CenterMorphModalContent className="p-6" ariaLabel="删除密钥确认">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-base font-semibold text-foreground">删除这个密钥？</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              「
+              {deleteTarget?.name || '未命名'}
+              」删除后立即失效，正在使用它的脚本会立刻收到 401，且无法恢复。
+            </p>
+          </div>
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+              取消
+            </Button>
+            <Button
+              variant="primary"
+              disabled={pendingId !== null}
+              onClick={() => void handleDelete()}
+            >
+              {pendingId ? '删除中' : '确认删除'}
+            </Button>
+          </div>
+        </CenterMorphModalContent>
+      </CenterMorphModal>
     </div>
   )
 }

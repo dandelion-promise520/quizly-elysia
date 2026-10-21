@@ -1,3 +1,5 @@
+'use client'
+
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'motion/react'
 import { type ReactNode, useRef } from 'react'
 import { SPRING_MOUSE } from '@/lib/ease'

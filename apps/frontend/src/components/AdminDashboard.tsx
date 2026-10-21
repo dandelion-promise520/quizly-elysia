@@ -1,15 +1,20 @@
 import type { Course, Question } from '@quizly/types'
-import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Eye, EyeOff, Lock, Mail, TriangleAlert } from 'lucide-react'
+import { Eye, EyeOff, ListChecks, Lock, Mail, Plus, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminApiKeys from '@/components/AdminApiKeys'
 import AdminNav, { type AdminSection } from '@/components/AdminNav'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
-import { Button } from '@/components/motion/button'
+import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/motion/alert'
+import { AnimatedBadge } from '@/components/motion/animated-badge'
+import { AnimatedSidebarProvider } from '@/components/motion/animated-sidebar'
+import { Button, ButtonLink } from '@/components/motion/button'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/motion/card'
+import { CenterMorphModal, CenterMorphModalContent } from '@/components/motion/center-morph-modal'
 import { Input } from '@/components/motion/input'
+import { Loader } from '@/components/motion/loader'
 import {
   Select,
   SelectContent,
@@ -17,9 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/motion/select'
+import { useToast } from '@/components/toast-provider'
 import { batchBindQuestions, getCourses, getQuestions, hasSession, saveCourses, saveQuestions, signIn, signOut } from '@/lib/api'
 
 export default function AdminDashboard() {
+  const toast = useToast()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(hasSession)
   const [emailInput, setEmailInput] = useState('')
   const [passwordInput, setPasswordInput] = useState('')
@@ -63,14 +70,18 @@ export default function AdminDashboard() {
       const { error } = await signIn(emailInput.trim(), passwordInput)
       if (error) {
         setAuthError(error)
+        toast.error('登录失败', error)
         return
       }
       setAuthError(null)
       setIsAuthenticated(true)
+      toast.success('登录成功', '已进入管理后台')
     }
     catch (err) {
       console.error('登录出错:', err)
-      setAuthError('网络错误或后端服务未启动')
+      const message = err instanceof Error ? err.message : '网络错误或后端服务未启动'
+      setAuthError(message)
+      toast.error('登录失败', message)
     }
     finally {
       setIsSubmitting(false)
@@ -81,6 +92,7 @@ export default function AdminDashboard() {
     await signOut()
     setIsAuthenticated(false)
     setPasswordInput('')
+    toast.info('已退出登录')
   }
 
   const { data: fetchedQuestions, isLoading: queryLoading, error: queryError, refetch } = useQuery<Question[]>({
@@ -113,14 +125,18 @@ export default function AdminDashboard() {
         void queryClient.invalidateQueries({ queryKey: ['questions'] })
         setPageError(null)
         setTempCourses(data.courses)
+        toast.success('课程已保存', `共 ${data.courses.length} 个课程`)
       }
       else {
-        setPageError(data.error || '保存课程失败')
+        const message = data.error || '保存课程失败'
+        setPageError(message)
+        toast.error('保存课程失败', message)
       }
     }
     catch (err) {
       console.error('保存课程失败:', err)
       setPageError('保存课程失败')
+      toast.error('保存课程失败', err instanceof Error ? err.message : '请检查网络后重试')
     }
   }
 
@@ -181,14 +197,18 @@ export default function AdminDashboard() {
         setIsBatchMode(false)
         setSelectedIds(new Set())
         setPageError(null)
+        toast.success('已批量修改', `${selectedIds.size} 道题目已更新所属课程与分类`)
       }
       else {
-        setPageError(res.error || '批量修改失败')
+        const message = res.error || '批量修改失败'
+        setPageError(message)
+        toast.error('批量修改失败', message)
       }
     }
     catch (err) {
       console.error('批量修改失败:', err)
       setPageError('网络错误，批量修改失败')
+      toast.error('批量修改失败', err instanceof Error ? err.message : '请检查网络后重试')
     }
   }
 
@@ -231,13 +251,15 @@ export default function AdminDashboard() {
       setIsNew(false)
       try {
         await saveToDisk(next)
+        toast.success('题目已保存')
       }
       catch (err) {
         void refetch()
+        toast.error('保存失败', err instanceof Error ? err.message : '请稍后重试')
         throw err
       }
     },
-    [questions, selectedIndex, saveToDisk, refetch],
+    [questions, selectedIndex, saveToDisk, refetch, toast],
   )
 
   const handleDelete = useCallback(
@@ -254,8 +276,13 @@ export default function AdminDashboard() {
 
       setIsNew(false)
       void saveToDisk(next)
+        .then(() => toast.success('题目已删除'))
+        .catch((err) => {
+          toast.error('删除失败', err instanceof Error ? err.message : '请稍后重试')
+          void refetch()
+        })
     },
-    [questions, selectedIndex, saveToDisk],
+    [questions, selectedIndex, saveToDisk, refetch, toast],
   )
 
   const handleSelect = useCallback((id: number | null) => {
@@ -290,6 +317,7 @@ export default function AdminDashboard() {
     a.download = 'questions.json'
     a.click()
     URL.revokeObjectURL(url)
+    toast.success('已导出 questions.json', `共 ${questions.length} 道题目`)
   }
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -307,10 +335,12 @@ export default function AdminDashboard() {
         }
         else {
           setPageError('导入失败：JSON 文件不是一个题目数组。')
+          toast.error('导入失败', 'JSON 文件不是一个题目数组')
         }
       }
       catch {
         setPageError('JSON 文件格式有误，请检查后重试。')
+        toast.error('导入失败', 'JSON 文件格式有误')
       }
     }
     reader.readAsText(file)
@@ -328,9 +358,11 @@ export default function AdminDashboard() {
       setImportData(null)
       setSelectedIndex(0)
       setIsNew(false)
+      toast.success('导入完成', `已写入 ${importData.length} 道题目`)
     }
     catch (err: any) {
       setPageError(`导入失败：${err.message || err}`)
+      toast.error('导入失败', err instanceof Error ? err.message : '请检查文件后重试')
     }
     finally {
       setIsImporting(false)
@@ -338,122 +370,99 @@ export default function AdminDashboard() {
   }
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden font-sans">
-        {/* 背景动态渐变球 */}
-        <div className="absolute top-[-20%] left-[-10%] size-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] size-[500px] rounded-full bg-accent/10 blur-[120px] pointer-events-none" />
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle as="h2">管理后台</CardTitle>
+            <CardDescription>使用管理员账号登录控制台</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
+              <Input
+                label="邮箱"
+                type="email"
+                required
+                autoComplete="username"
+                placeholder="admin@quizly.dev"
+                value={emailInput}
+                onChange={(value) => {
+                  setEmailInput(value)
+                  if (authError)
+                    setAuthError(null)
+                }}
+                leftIcon={<Mail />}
+                autoFocus
+              />
 
-        <div className="w-full max-w-md bg-card/70 backdrop-blur-xl border border-border p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
-          <div className="size-16 bg-primary/10 border border-primary/25 rounded-full flex items-center justify-center mb-6">
-            <Lock className="size-8 text-accent" />
-          </div>
+              <Input
+                label="密码"
+                type={showPassword ? 'text' : 'password'}
+                required
+                autoComplete="current-password"
+                placeholder="请输入密码"
+                value={passwordInput}
+                onChange={(value) => {
+                  setPasswordInput(value)
+                  if (authError)
+                    setAuthError(null)
+                }}
+                leftIcon={<Lock />}
+                error={authError ?? undefined}
+                rightIcon={(
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                  >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                )}
+              />
 
-          <h2 className="text-2xl font-bold text-foreground mb-2">管理后台认证</h2>
-          <p className="text-muted-foreground/70 text-sm mb-8 text-center">请使用管理员账号登录控制台</p>
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting}
+                className="w-full"
+              >
+                {isSubmitting ? '登录中' : '登录'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-          <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-5">
-            <Input
-              label="管理员邮箱"
-              type="email"
-              required
-              autoComplete="username"
-              placeholder="admin@quizly.dev"
-              value={emailInput}
-              onChange={(value) => {
-                setEmailInput(value)
-                if (authError)
-                  setAuthError(null)
-              }}
-              error={Boolean(authError)}
-              leftIcon={<Mail />}
-              classNames={{
-                label: 'text-muted-foreground/60',
-                field: 'border-border bg-background/60',
-                input: 'text-foreground placeholder:text-muted-foreground/70',
-              }}
-              autoFocus
-            />
-
-            <Input
-              label="密码"
-              type={showPassword ? 'text' : 'password'}
-              required
-              autoComplete="current-password"
-              placeholder="请输入密码..."
-              value={passwordInput}
-              onChange={(value) => {
-                setPasswordInput(value)
-                if (authError)
-                  setAuthError(null)
-              }}
-              error={Boolean(authError)}
-              leftIcon={<Lock />}
-              rightIcon={(
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer"
-                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </button>
-              )}
-              classNames={{
-                label: 'text-muted-foreground/60',
-                field: 'border-border bg-background/60',
-                input: 'text-foreground placeholder:text-muted-foreground/70',
-              }}
-            />
-
-            {authError && (
-              <p className="flex items-start justify-center gap-1.5 text-destructive text-xs font-medium">
-                <TriangleAlert className="size-3.5 shrink-0 mt-px" />
-                <span>{authError}</span>
-              </p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3 h-11 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full text-sm shadow-lg shadow-primary/20 cursor-pointer"
-            >
-              {isSubmitting ? '登录中...' : '登录'}
-            </Button>
-          </form>
-
-          <Link
-            to="/"
-            className="text-xs text-muted-foreground hover:text-accent transition-colors mt-8 font-medium"
-          >
-            ← 返回答题页面
-          </Link>
-        </div>
+        <Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          返回答题页面
+        </Link>
       </div>
     )
   }
 
   if (queryLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-xl font-semibold text-muted-foreground/70">加载中...</div>
-        </div>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background">
+        <Loader variant="dots" size={28} label="加载题目数据" />
+        <p className="text-sm text-muted-foreground">正在加载题目数据</p>
       </div>
     )
   }
 
   if (queryError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center p-8 bg-card rounded-xl shadow-sm border border-border max-w-md">
-          <div className="text-destructive text-lg font-semibold mb-2">加载失败</div>
-          <div className="text-muted-foreground text-sm mb-6">
-            {queryError instanceof Error ? queryError.message : '数据加载失败，请确认后端服务是否启动'}
-          </div>
-          <Button variant="primary" onClick={() => { void refetch() }} className="px-6 py-2">
-            重新加载
-          </Button>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle as="h2">加载失败</CardTitle>
+            <CardDescription>
+              {queryError instanceof Error ? queryError.message : '数据加载失败，请确认后端服务是否启动'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => { void refetch() }}>
+              重新加载
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -464,99 +473,94 @@ export default function AdminDashboard() {
   const renderCourseItems = () => {
     if (tempCourses.length === 0) {
       return (
-        <div className="text-center py-8 text-muted-foreground/70 text-sm">
-          目前暂无课程，请点击下方按钮新增。
+        <div className="py-10 text-center text-sm text-muted-foreground">
+          还没有课程，点下方「新增课程」开始配置。
         </div>
       )
     }
 
-    return tempCourses.map((course, idx) => (
-      <div key={course.id ?? `temp-${idx}`} className="flex flex-col gap-3 p-4 bg-background rounded-xl border border-border shadow-sm relative">
-        <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-2.5 py-1 rounded-md">课程</div>
-          <input
-            type="text"
-            value={course.name}
-            onChange={(e) => {
-              const next = [...tempCourses]
-              next[idx] = { ...next[idx], name: e.target.value }
-              setTempCourses(next)
-            }}
-            placeholder="请输入课程名称"
-            className="flex-1 px-3 py-1.5 border border-border rounded-lg outline-none bg-background text-foreground focus:border-primary text-sm font-semibold focus:ring-1 focus:ring-primary/40 transition placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              const next = tempCourses.filter((_, i) => i !== idx)
-              setTempCourses(next)
-            }}
-            className="size-8 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50 flex items-center justify-center text-sm font-bold transition cursor-pointer"
-            title="删除课程"
-          >
-            ×
-          </button>
-        </div>
+    const updateCourse = (idx: number, patch: Partial<Course>) => {
+      const next = [...tempCourses]
+      next[idx] = { ...next[idx], ...patch }
+      setTempCourses(next)
+    }
 
-        <div className="pl-6 border-l-2 border-border flex flex-col gap-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-muted-foreground">内部 Tab 分类:</span>
-            <button
-              type="button"
+    return tempCourses.map((course, idx) => (
+      <Card key={course.id ?? `temp-${idx}`} size="compact">
+        <CardHeader>
+          <Input
+            value={course.name}
+            onChange={value => updateCourse(idx, { name: value })}
+            placeholder="课程名称"
+          />
+          <CardAction>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`删除课程 ${course.name || '未命名'}`}
               onClick={() => {
-                const next = [...tempCourses]
-                const cats = [...(next[idx].categories || [])]
-                cats.push({ id: undefined as any, name: '新分类', courseId: course.id })
-                next[idx] = { ...next[idx], categories: cats }
-                setTempCourses(next)
+                setTempCourses(tempCourses.filter((_, i) => i !== idx))
+                toast.info('课程已从列表中移除', '记得点「保存并应用」才会生效')
               }}
-              className="text-[10px] font-bold text-primary bg-primary/10 hover:bg-primary/20 dark:text-success dark:bg-success/15 dark:hover:bg-success/25 px-2 py-0.5 rounded transition cursor-pointer"
             >
-              + 添加分类
-            </button>
+              <Trash2 />
+            </Button>
+          </CardAction>
+        </CardHeader>
+
+        <CardContent className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground">内部分类</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const categories = [...(course.categories || [])]
+                categories.push({ id: undefined as any, name: '新分类', courseId: course.id })
+                updateCourse(idx, { categories })
+              }}
+            >
+              <Plus />
+              添加分类
+            </Button>
           </div>
 
           {(course.categories || []).length === 0
             ? (
-                <div className="text-[10px] text-muted-foreground/70 italic">暂无分类，请添加</div>
+                <p className="text-xs text-muted-foreground">还没有分类，添加后题目才能归类。</p>
               )
             : (course.categories || []).map((cat, catIdx) => (
                 <div key={cat.id ?? `cat-${catIdx}`} className="flex items-center gap-2">
-                  <input
-                    type="text"
+                  <Input
+                    className="flex-1"
                     value={cat.name}
-                    onChange={(e) => {
-                      const next = [...tempCourses]
-                      const cats = [...(next[idx].categories || [])]
-                      cats[catIdx] = { ...cats[catIdx], name: e.target.value }
-                      next[idx] = { ...next[idx], categories: cats }
-                      setTempCourses(next)
-                    }}
                     placeholder="分类名称"
-                    className="flex-1 px-2.5 py-1 border border-border rounded-md outline-none bg-background text-foreground focus:border-primary text-xs focus:ring-1 focus:ring-primary/40 transition placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = [...tempCourses]
-                      const cats = (next[idx].categories || []).filter((_, i) => i !== catIdx)
-                      next[idx] = { ...next[idx], categories: cats }
-                      setTempCourses(next)
+                    onChange={(value) => {
+                      const categories = [...(course.categories || [])]
+                      categories[catIdx] = { ...categories[catIdx], name: value }
+                      updateCourse(idx, { categories })
                     }}
-                    className="size-6 rounded border border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive flex items-center justify-center text-xs font-semibold transition cursor-pointer"
-                    title="删除分类"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`删除分类 ${cat.name || '未命名'}`}
+                    onClick={() => {
+                      const categories = (course.categories || []).filter((_, i) => i !== catIdx)
+                      updateCourse(idx, { categories })
+                    }}
                   >
-                    ×
-                  </button>
+                    <Trash2 />
+                  </Button>
                 </div>
               ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     ))
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <AnimatedSidebarProvider defaultOpen={false} className="h-screen overflow-hidden bg-background">
       <AdminNav active={section} onChange={handleSectionChange} />
 
       {section === 'questions' && (
@@ -578,35 +582,20 @@ export default function AdminDashboard() {
         />
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <div className="flex items-center gap-3 px-6 py-4 bg-card border-b border-border">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center gap-2 border-b border-border bg-card px-6 py-3">
           {section === 'questions' && (
             <>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleNew}
-                className="px-5 py-2"
-              >
-                + 新增题目
+              <Button size="sm" onClick={handleNew}>
+                <Plus />
+                新增题目
               </Button>
 
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleExport}
-                className="px-5 py-2"
-              >
+              <Button variant="secondary" size="sm" onClick={handleExport}>
                 导出 JSON
               </Button>
 
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-5 py-2"
-              >
+              <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
                 导入 JSON
               </Button>
               <input
@@ -621,25 +610,24 @@ export default function AdminDashboard() {
 
           <div className="flex-1" />
 
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="text-sm text-muted-foreground hover:text-foreground font-medium cursor-pointer mr-4"
-          >
+          <Button variant="ghost" size="sm" onClick={() => void handleSignOut()}>
             退出登录
-          </button>
+          </Button>
 
-          <Link
-            to="/"
-            className="text-sm text-primary hover:text-primary/80 font-semibold"
-          >
-            ← 返回答题页面
-          </Link>
+          <ButtonLink variant="ghost" size="sm" href="/">
+            返回答题页面
+          </ButtonLink>
         </div>
 
         {pageError && (
-          <div className="mx-6 mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {pageError}
+          <div className="px-6 pt-4">
+            <Alert variant="destructive">
+              <AlertIcon />
+              <AlertContent>
+                <AlertTitle>操作未完成</AlertTitle>
+                <AlertDescription>{pageError}</AlertDescription>
+              </AlertContent>
+            </Alert>
           </div>
         )}
 
@@ -650,33 +638,35 @@ export default function AdminDashboard() {
             )
           : section === 'courses'
             ? (
-                <div className="flex-1 flex flex-col min-h-0 bg-background">
+                <div className="flex min-h-0 flex-1 flex-col bg-background">
                   <div className="flex-1 overflow-y-auto px-6 py-6">
-                    <div className="max-w-3xl mx-auto flex flex-col gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <h2 className="text-xl font-bold text-foreground">课程管理</h2>
+                    <div className="mx-auto flex max-w-3xl flex-col gap-4">
+                      <header className="flex flex-col gap-1">
+                        <h2 className="text-xl font-semibold text-foreground">课程管理</h2>
                         <p className="text-sm text-muted-foreground">
-                          增删改课程与其下的 Tab 分类；删除课程会解除其下所有题目的关联。
+                          增删改课程与它下面的分类；删除课程会解除其下所有题目的关联。
                         </p>
-                      </div>
+                      </header>
                       {renderCourseItems()}
                     </div>
                   </div>
-                  <div className="px-6 py-4 border-t border-border bg-card flex items-center justify-between pr-20">
+                  <div className="flex items-center justify-between border-t border-border bg-card px-6 py-4">
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => setTempCourses(prev => [...prev, { id: undefined as any, name: '新课程', categories: [{ id: undefined as any, name: '基础题', courseId: undefined as any }] }])}
-                      className="px-4 py-2"
                     >
-                      + 新增课程
+                      <Plus />
+                      新增课程
                     </Button>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setTempCourses(courses)}
-                        className="px-4 py-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setTempCourses(courses)
+                          toast.info('已重置为已保存的内容')
+                        }}
                       >
                         重置
                       </Button>
@@ -684,7 +674,6 @@ export default function AdminDashboard() {
                         variant="primary"
                         size="sm"
                         onClick={handleSaveCourses}
-                        className="px-5 py-2"
                       >
                         保存并应用
                       </Button>
@@ -694,36 +683,42 @@ export default function AdminDashboard() {
               )
             : isBatchMode
               ? (
-                  <div className="flex-1 flex flex-col items-center justify-center bg-background p-8 text-center">
-                    <div className="size-16 bg-primary/10 border border-primary/15 rounded-2xl flex items-center justify-center text-primary mb-4 animate-pulse">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground mb-2">批量操作模式已启用</h3>
-                    <p className="text-muted-foreground text-sm max-w-md mb-6">
-                      在左侧侧边栏中勾选您需要修改的题目。
+                  <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-background p-8 text-center">
+                    <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <ListChecks className="size-6" />
+                    </span>
+                    <h3 className="text-base font-semibold text-foreground">批量操作模式</h3>
+                    <p className="max-w-md text-sm text-muted-foreground">
+                      在左侧列表里勾选要修改的题目。
                       {selectedIds.size > 0
-                        ? `已选中 ${selectedIds.size} 道题目，点击侧边栏下方的“修改所属课程与分类”即可进行批量修改。`
-                        : '当前尚未选择任何题目。'}
+                        ? `已选中 ${selectedIds.size} 道，点侧边栏下方的「修改所属课程与分类」继续。`
+                        : '当前还没有选中任何题目。'}
                     </p>
                     {selectedIds.size > 0 && (
-                      <div className="w-full max-w-md bg-card border border-border/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
-                        <div className="text-xs font-bold text-muted-foreground/70 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
-                        <div className="flex flex-col gap-1.5">
-                          {questions
-                            .filter(q => q.id !== undefined && selectedIds.has(q.id))
-                            .map((q, i) => (
-                              <div key={q.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span className="size-5 bg-primary/10 text-primary font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
-                                  {i + 1}
-                                </span>
-                                <span className="truncate flex-1 font-medium">{q.text}</span>
-                                <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
+                      <Card className="max-h-[320px] w-full max-w-md overflow-y-auto text-left">
+                        <CardHeader>
+                          <CardTitle as="h4">已选题目</CardTitle>
+                          <CardDescription>
+                            共
+                            {selectedIds.size}
+                            {' '}
+                            道
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="flex flex-col divide-y divide-border">
+                            {questions
+                              .filter(q => q.id !== undefined && selectedIds.has(q.id))
+                              .map((q, i) => (
+                                <li key={q.id} className="flex items-center gap-2 py-2 text-sm">
+                                  <span className="text-xs text-muted-foreground">{i + 1}</span>
+                                  <span className="flex-1 truncate text-foreground">{q.text}</span>
+                                  <AnimatedBadge size="sm" status="neutral">{q.type}</AnimatedBadge>
+                                </li>
+                              ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
                     )}
                   </div>
                 )
@@ -739,187 +734,154 @@ export default function AdminDashboard() {
                     />
                   )
                 : (
-                    <div className="flex-1 flex items-center justify-center text-muted-foreground/70 text-sm">
+                    <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
                       请选择或新增一道题目
                     </div>
                   )}
       </div>
 
-      {/* Batch Update Modal */}
-      {isBatchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
-          <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
-            {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-background rounded-t-2xl">
-              <div>
-                <h3 className="text-lg font-bold text-foreground">批量修改所属课程与分类</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  将选中的
-                  {selectedIds.size}
-                  {' '}
-                  道题目关联到指定的课程和分类
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsBatchModalOpen(false)}
-                className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground/70 hover:text-muted-foreground/90 transition"
+      <CenterMorphModal open={isBatchModalOpen} onOpenChange={setIsBatchModalOpen}>
+        <CenterMorphModalContent className="flex flex-col gap-5 p-6" ariaLabel="批量修改所属课程与分类">
+          <div className="flex flex-col gap-1 pr-8">
+            <h3 className="text-base font-semibold text-foreground">批量修改所属课程与分类</h3>
+            <p className="text-sm text-muted-foreground">
+              选中的
+              {' '}
+              {selectedIds.size}
+              {' '}
+              道题目会一起更新。
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="px-1 text-sm font-medium text-foreground">所属课程</span>
+              <Select
+                value={batchCourseId ? String(batchCourseId) : 'none'}
+                onValueChange={(val) => {
+                  const nextCourseId = val === 'none' ? null : Number(val)
+                  const nextCourse = courses.find(c => c.id === nextCourseId)
+                  const nextCategories = nextCourse?.categories || []
+                  setBatchCourseId(nextCourseId)
+                  setBatchCategoryId(nextCategories[0]?.id || null)
+                }}
               >
-                ×
-              </button>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="选择所属课程" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">未分配课程（清除）</SelectItem>
+                  {courses.map(c => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-6 flex flex-col gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
-                  所属课程
-                </label>
-                <Select
-                  value={batchCourseId ? String(batchCourseId) : 'none'}
-                  onValueChange={(val) => {
-                    const nextCourseId = val === 'none' ? null : Number(val)
-                    const nextCourse = courses.find(c => c.id === nextCourseId)
-                    const nextCategories = nextCourse?.categories || []
-                    setBatchCourseId(nextCourseId)
-                    setBatchCategoryId(nextCategories[0]?.id || null)
-                  }}
-                >
-                  <SelectTrigger className="w-full bg-background">
-                    <SelectValue placeholder="选择所属课程" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">未分配课程 (清除)</SelectItem>
-                    {courses.map(c => (
-                      <SelectItem key={c.id} value={String(c.id)}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
-                  分类
-                </label>
-                {batchCourseId
-                  ? (
-                      (() => {
-                        const selectedCourse = courses.find(c => c.id === batchCourseId)
-                        const categoryOptions = selectedCourse?.categories || []
-                        if (categoryOptions.length > 0) {
-                          return (
-                            <Select
-                              value={batchCategoryId ? String(batchCategoryId) : 'none'}
-                              onValueChange={(val) => {
-                                setBatchCategoryId(val === 'none' ? null : Number(val))
-                              }}
-                            >
-                              <SelectTrigger className="w-full bg-background">
-                                <SelectValue placeholder="选择所属分类" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">未分配分类 (清除)</SelectItem>
-                                {categoryOptions.map(cat => (
-                                  <SelectItem key={cat.id} value={String(cat.id)}>
-                                    {cat.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )
-                        }
+            <div className="flex flex-col gap-1.5">
+              <span className="px-1 text-sm font-medium text-foreground">分类</span>
+              {batchCourseId
+                ? (
+                    (() => {
+                      const selectedCourse = courses.find(c => c.id === batchCourseId)
+                      const categoryOptions = selectedCourse?.categories || []
+                      if (categoryOptions.length > 0) {
                         return (
-                          <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30">
-                            当前选择的课程未配置任何内部分类，请先在左侧「课程管理」中配置分类。
-                          </div>
+                          <Select
+                            value={batchCategoryId ? String(batchCategoryId) : 'none'}
+                            onValueChange={(val) => {
+                              setBatchCategoryId(val === 'none' ? null : Number(val))
+                            }}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="选择所属分类" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">未分配分类（清除）</SelectItem>
+                              {categoryOptions.map(cat => (
+                                <SelectItem key={cat.id} value={String(cat.id)}>
+                                  {cat.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         )
-                      })()
-                    )
-                  : (
-                      <Select disabled value="disabled">
-                        <SelectTrigger className="w-full bg-background text-muted-foreground/70 cursor-not-allowed">
-                          <SelectValue placeholder="请先选择所属课程" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="disabled">请先选择所属课程</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-border bg-background flex gap-2 justify-end rounded-b-2xl">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsBatchModalOpen(false)}
-                className="px-4 py-2 text-muted-foreground hover:text-foreground"
-              >
-                取消
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleBatchBind}
-                disabled={batchCourseId !== null && (courses.find(c => c.id === batchCourseId)?.categories || []).length === 0}
-                className="px-5 py-2"
-              >
-                确认修改
-              </Button>
+                      }
+                      return (
+                        <Alert variant="warning">
+                          <AlertIcon />
+                          <AlertContent>
+                            <AlertTitle>这门课还没有分类</AlertTitle>
+                            <AlertDescription>先到「课程管理」里给它加分类，再回来批量绑定。</AlertDescription>
+                          </AlertContent>
+                        </Alert>
+                      )
+                    })()
+                  )
+                : (
+                    <Select disabled value="disabled">
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="请先选择所属课程" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="disabled">请先选择所属课程</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
             </div>
           </div>
-        </div>
-      )}
 
-      {/* 确认导入弹窗 */}
-      <AlertDialog.Root open={isImportConfirmOpen} onOpenChange={setIsImportConfirmOpen}>
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-          <AlertDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex w-[400px] max-w-[calc(100vw-3rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-2xl transition-[scale,opacity] duration-150 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
-            <div className="flex flex-col gap-2">
-              <AlertDialog.Title className="text-lg font-bold text-foreground">确认导入题目</AlertDialog.Title>
-              <AlertDialog.Description className="text-sm text-muted-foreground leading-relaxed">
-                你确定要导入所选的 JSON 文件吗？此操作将**覆盖当前数据库中的所有题目**，且无法撤销。
-                {importData && (
-                  <span className="block mt-2 font-medium text-foreground/80 bg-background border border-border rounded-lg p-2 text-xs">
-                    本次即将导入
-                    {' '}
-                    {importData.length}
-                    {' '}
-                    道题目。
-                  </span>
-                )}
-              </AlertDialog.Description>
-            </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setIsBatchModalOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={handleBatchBind}
+              disabled={batchCourseId !== null && (courses.find(c => c.id === batchCourseId)?.categories || []).length === 0}
+            >
+              确认修改
+            </Button>
+          </div>
+        </CenterMorphModalContent>
+      </CenterMorphModal>
 
-            <div className="flex justify-end gap-3 mt-2">
-              <AlertDialog.Close className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded-xl transition cursor-pointer select-none">
-                取消
-              </AlertDialog.Close>
-              <button
-                type="button"
-                disabled={isImporting}
-                onClick={executeImport}
-                className="px-4 py-2 text-sm font-semibold text-white bg-destructive hover:bg-destructive/90 disabled:bg-destructive/50 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer select-none flex items-center justify-center gap-1.5"
-              >
-                {isImporting
-                  ? (
-                      <>
-                        <span className="size-4 border-2 border-border border-t-transparent rounded-full animate-spin" />
-                        导入中...
-                      </>
-                    )
-                  : (
-                      '确认导入'
-                    )}
-              </button>
-            </div>
-          </AlertDialog.Popup>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
-    </div>
+      <CenterMorphModal open={isImportConfirmOpen} onOpenChange={setIsImportConfirmOpen}>
+        <CenterMorphModalContent className="flex flex-col gap-5 p-6" ariaLabel="确认导入题目">
+          <div className="flex flex-col gap-1 pr-8">
+            <h3 className="text-base font-semibold text-foreground">确认导入题目</h3>
+            <p className="text-sm text-muted-foreground">
+              导入会覆盖当前数据库里的全部题目，无法撤销。
+            </p>
+          </div>
+
+          {importData && (
+            <Alert variant="destructive">
+              <AlertIcon />
+              <AlertContent>
+                <AlertTitle>
+                  将写入
+                  {' '}
+                  {importData.length}
+                  {' '}
+                  道题目
+                </AlertTitle>
+                <AlertDescription>现有题目会被整体替换，建议先导出一份备份。</AlertDescription>
+              </AlertContent>
+            </Alert>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setIsImportConfirmOpen(false)}>
+              取消
+            </Button>
+            <Button disabled={isImporting} onClick={() => void executeImport()}>
+              {isImporting ? '导入中' : '确认导入'}
+            </Button>
+          </div>
+        </CenterMorphModalContent>
+      </CenterMorphModal>
+    </AnimatedSidebarProvider>
   )
 }

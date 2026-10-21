@@ -139,7 +139,6 @@ function createToast(input: ToastInput, defaultDuration: number): AnimatedToast 
   }
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAnimatedToastStack({
   initialToasts = [],
   defaultDuration = 4200,
@@ -294,7 +293,7 @@ export function AnimatedToastStack({
     >
       <AnimatePresence initial={false} mode="popLayout">
         {visibleToasts.map((toast, index) => (
-          // eslint-disable-next-line ts/no-use-before-define
+
           <ToastItem
             key={toast.id}
             toast={toast}
