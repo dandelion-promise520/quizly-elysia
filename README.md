@@ -136,20 +136,27 @@ bunx wrangler d1 execute quizly --remote --file=./scripts/seed.sql
 bunx wrangler deploy
 ```
 
-前端部署（在 `apps/frontend` 目录下）：
+前端部署（已接入 GitHub，推 `main` 即自动构建）：
+
+| 配置项 | 值 |
+|---|---|
+| Pages 项目 | `quizly`（GitHub 集成模式） |
+| 生产分支 | `main` |
+| 构建命令 | `bunx turbo run build --filter=frontend` |
+| 产物目录 | `apps/frontend/dist` |
+| 环境变量 | `VITE_API_BASE=https://quizly-backend.dandelionpromise.workers.dev/api`、`SKIP_INSTALL_SIMPLE_GIT_HOOKS=1` |
+
+> `SKIP_INSTALL_SIMPLE_GIT_HOOKS=1` 是必需的：Cloudflare 构建环境里 bun 的依赖布局会让
+> `simple-git-hooks` 的 postinstall 找不到自身 package.json 而报错退出。
+
+手动构建部署（应急用，绕过 Git 构建）：
 ```bash
-# 接口地址需在构建时注入：Pages 默认域名上没有 /api 路由，相对路径会落到 SPA 回退
+cd apps/frontend
 VITE_API_BASE=https://quizly-backend.dandelionpromise.workers.dev/api bun run build
-cd ../..
-bunx wrangler pages deploy apps/frontend/dist --project-name=quizly --branch=main
+../../apps/backend/node_modules/.bin/wrangler.exe pages deploy dist --project-name=quizly --branch=main
 ```
 
 > 后端已开启 CORS（`origin: '*'`），因此前端跨域直连 Worker 即可，无需为 `/api/*` 配置路由。
-
-GitHub Actions 需要配置的 Secrets：
-- `CLOUDFLARE_API_TOKEN`：具备 Workers Scripts 与 D1 编辑权限的 API Token
-- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare 账户 ID
-- `VITE_API_BASE`（构建时注入的前端变量，值为后端 Worker 地址 + `/api`）
 
 > **路由说明**：前端接口地址由 `VITE_API_BASE` 在构建时决定，未设置时回退为相对路径 `/api`
 > 并依赖 `vite.config.ts` 里的本地代理，因此本地开发无需改动。
