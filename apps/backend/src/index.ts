@@ -1,16 +1,18 @@
+import type { Question } from '@quizly/types'
 import type { DB } from './db'
+import type { AuthEnv } from './lib/auth-server'
 import { cors } from '@elysia/cors'
 import { Elysia } from 'elysia'
 import { WebStandardAdapter } from 'elysia/adapter/web-standard'
 import { createDb } from './db'
-import { batchBindQuestions, getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase } from './lib/db'
+import { getAuth, isAuthorized } from './lib/auth-server'
+import { batchBindQuestions, deleteQuestion, getCourses, getQuestions, saveCoursesToDatabase, saveQuestionsToDatabase, upsertQuestion } from './lib/db'
 
 /**
  * Cloudflare Workers 环境绑定
  */
-export interface Env {
+export interface Env extends AuthEnv {
   DB: D1Database
-  ADMIN_PASSWORD?: string
 }
 
 /**
@@ -22,37 +24,58 @@ export interface Env {
  */
 const envByRequest = new WeakMap<Request, Env>()
 
+function getEnv(request: Request): Env {
+  const env = envByRequest.get(request)
+  if (!env)
+    throw new Error('Workers bindings are not available')
+  return env
+}
+
 /** 从上下文取当前请求的 Drizzle 实例 */
 function db(ctx: { request: Request }): DB {
-  const env = envByRequest.get(ctx.request)
-  if (!env)
-    throw new Error('D1 binding is not available')
-  return createDb(env.DB)
+  return createDb(getEnv(ctx.request).DB)
+}
+
+/**
+ * 写操作需要凭证，读接口保持公开。
+ *
+ * 做题页要读题库，公开读取不泄露数据；只有改动数据才校验登录态或 API Key。
+ * /api/auth/* 是 Better Auth 自己的端点（登录、会话等），不能要求已登录。
+ */
+function requiresCredential(request: Request): boolean {
+  if (request.method === 'GET' || request.method === 'HEAD' || request.method === 'OPTIONS')
+    return false
+  const { pathname } = new URL(request.url)
+  if (!pathname.startsWith('/api'))
+    return false
+  return !pathname.startsWith('/api/auth/')
 }
 
 const app = new Elysia({ adapter: WebStandardAdapter })
   .use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+    // bearer 插件把会话 token 放在这个响应头里，跨域必须显式暴露前端才读得到
+    exposeHeaders: ['set-auth-token'],
   }))
-  .get('/', () => ({ status: 'ok', service: 'quizly-backend' }))
-  .post('/api/admin/verify', async ({ body, request }) => {
-    try {
-      const { password } = body as { password?: string }
-      const correctPassword = envByRequest.get(request)?.ADMIN_PASSWORD || 'admin123'
-      if (password === correctPassword) {
-        return { success: true }
-      }
-      return { success: false, error: '密码错误，请重新输入' }
-    }
-    catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : '服务器内部错误',
-      }
-    }
+  .onBeforeHandle(async ({ request, set }) => {
+    if (!requiresCredential(request))
+      return
+
+    if (await isAuthorized(request, getEnv(request)))
+      return
+
+    set.status = 401
+    return { success: false, error: '未登录或凭证无效' }
   })
+  .get('/', ({ request }) => ({
+    status: 'ok',
+    service: 'quizly-backend',
+    authEnabled: Boolean(getEnv(request).BETTER_AUTH_SECRET),
+  }))
+  // Better Auth 自带端点：登录、登出、会话、API Key 管理
+  .all('/api/auth/*', ({ request }) => getAuth(getEnv(request)).handler(request))
   .get('/api/questions', async (ctx) => {
     try {
       return await getQuestions(db(ctx))
@@ -73,6 +96,39 @@ const app = new Elysia({ adapter: WebStandardAdapter })
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to save to database',
+      }
+    }
+  })
+  // 增量写入：传单条或数组，有 id 则更新，无 id 则新增，不会删除其他题目
+  .post('/api/questions/upsert', async (ctx) => {
+    try {
+      const payload = ctx.body as Question | Question[]
+      const list = Array.isArray(payload) ? payload : [payload]
+      const saved: Question[] = []
+      for (const item of list)
+        saved.push(await upsertQuestion(db(ctx), item))
+      return { success: true, questions: Array.isArray(payload) ? saved : saved[0] }
+    }
+    catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '保存失败',
+      }
+    }
+  })
+  .delete('/api/questions/:id', async (ctx) => {
+    try {
+      const id = Number(ctx.params.id)
+      if (!Number.isInteger(id) || id <= 0) {
+        return { success: false, error: '题目 id 无效' }
+      }
+      const removed = await deleteQuestion(db(ctx), id)
+      return removed ? { success: true } : { success: false, error: '题目不存在' }
+    }
+    catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '删除失败',
       }
     }
   })

@@ -11,7 +11,7 @@ import { defineConfig } from 'drizzle-kit'
  * 不使用 driver: 'd1-http'，避免依赖 Cloudflare API Token。
  */
 export default defineConfig({
-  schema: './src/db/schema.ts',
+  schema: ['./src/db/schema.ts', './src/db/auth-schema.ts'],
   out: './drizzle',
   dialect: 'sqlite',
 })

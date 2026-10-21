@@ -2,11 +2,12 @@ import type { Course, Question } from '@quizly/types'
 import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { Eye, EyeOff, Lock } from 'lucide-react'
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
 import { Button } from '@/components/motion/button'
+import { Input } from '@/components/motion/input'
 import {
   Select,
   SelectContent,
@@ -14,14 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/motion/select'
-import { batchBindQuestions, getCourses, getQuestions, saveCourses, saveQuestions, verifyAdminPassword } from '@/lib/api'
+import { batchBindQuestions, getCourses, getQuestions, hasSession, saveCourses, saveQuestions, signIn, signOut } from '@/lib/api'
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem('quizly_admin_authenticated') === 'true'
-  })
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(hasSession)
+  const [emailInput, setEmailInput] = useState('')
   const [passwordInput, setPasswordInput] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
   const [pageError, setPageError] = useState<string | null>(null)
 
@@ -46,23 +47,33 @@ export default function AdminDashboard() {
   const [batchCourseId, setBatchCourseId] = useState<number | null>(null)
   const [batchCategoryId, setBatchCategoryId] = useState<number | null>(null)
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    verifyAdminPassword(passwordInput)
-      .then((data) => {
-        if (data.success) {
-          sessionStorage.setItem('quizly_admin_authenticated', 'true')
-          setIsAuthenticated(true)
-          setAuthError(null)
-        }
-        else {
-          setAuthError(data.error || '密码错误，请重新输入')
-        }
-      })
-      .catch((err) => {
-        console.error('密码验证出错:', err)
-        setAuthError('网络错误或后端服务未启动')
-      })
+    if (isSubmitting)
+      return
+    setIsSubmitting(true)
+    try {
+      const { error } = await signIn(emailInput.trim(), passwordInput)
+      if (error) {
+        setAuthError(error)
+        return
+      }
+      setAuthError(null)
+      setIsAuthenticated(true)
+    }
+    catch (err) {
+      console.error('登录出错:', err)
+      setAuthError('网络错误或后端服务未启动')
+    }
+    finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+    setIsAuthenticated(false)
+    setPasswordInput('')
   }
 
   const { data: fetchedQuestions, isLoading: queryLoading, error: queryError, refetch } = useQuery<Question[]>({
@@ -327,45 +338,77 @@ export default function AdminDashboard() {
           </div>
 
           <h2 className="text-2xl font-bold text-white mb-2">管理后台认证</h2>
-          <p className="text-slate-400 text-sm mb-8 text-center">请输入管理员密码以访问控制台</p>
+          <p className="text-slate-400 text-sm mb-8 text-center">请使用管理员账号登录控制台</p>
 
           <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-5">
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="请输入密码..."
-                value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value)
-                  if (authError)
-                    setAuthError(null)
-                }}
-                className="w-full px-4 py-3 bg-[#ffffff]/5 border border-[#ffffff]/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all text-sm pr-10"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-              </button>
-            </div>
+            <Input
+              label="管理员邮箱"
+              type="email"
+              required
+              autoComplete="username"
+              placeholder="admin@quizly.dev"
+              value={emailInput}
+              onChange={(value) => {
+                setEmailInput(value)
+                if (authError)
+                  setAuthError(null)
+              }}
+              error={Boolean(authError)}
+              leftIcon={<Mail />}
+              classNames={{
+                label: 'text-slate-300',
+                field: 'border-white/10 bg-white/5',
+                input: 'text-white placeholder:text-slate-500',
+              }}
+              autoFocus
+            />
+
+            <Input
+              label="密码"
+              type={showPassword ? 'text' : 'password'}
+              required
+              autoComplete="current-password"
+              placeholder="请输入密码..."
+              value={passwordInput}
+              onChange={(value) => {
+                setPasswordInput(value)
+                if (authError)
+                  setAuthError(null)
+              }}
+              error={Boolean(authError)}
+              leftIcon={<Lock />}
+              rightIcon={(
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
+              )}
+              classNames={{
+                label: 'text-slate-300',
+                field: 'border-white/10 bg-white/5',
+                input: 'text-white placeholder:text-slate-500',
+              }}
+            />
 
             {authError && (
-              <p className="text-red-400 text-xs mt-1 text-center font-medium animate-pulse">
+              <p className="text-red-400 text-xs text-center font-medium">
                 ⚠️
                 {' '}
                 {authError}
               </p>
             )}
 
-            <button
+            <Button
               type="submit"
-              className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-teal-600/20 cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full py-3 h-11 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-full text-sm shadow-lg shadow-teal-600/20 cursor-pointer"
             >
-              验证密码
-            </button>
+              {isSubmitting ? '登录中...' : '登录'}
+            </Button>
           </form>
 
           <Link
@@ -568,6 +611,14 @@ export default function AdminDashboard() {
           />
 
           <div className="flex-1" />
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="text-sm text-slate-500 hover:text-slate-700 font-medium cursor-pointer mr-4"
+          >
+            退出登录
+          </button>
 
           <Link
             to="/"

@@ -253,6 +253,65 @@ export async function saveQuestionsToDatabase(db: DB, input: Question[]): Promis
 }
 
 /**
+ * 增量写入单条题目：带 id 且已存在则更新，否则新增。
+ *
+ * 与全量保存的区别是不删除任何未提交的题目，适合通过 API 逐条维护。
+ */
+export async function upsertQuestion(db: DB, input: Question): Promise<Question> {
+  const isFill = input.type === '填空题'
+  const data = {
+    type: input.type,
+    text: input.text,
+    answer: isFill ? '' : input.answer,
+    categoryId: input.categoryId ?? null,
+    courseId: input.courseId ?? null,
+  }
+
+  let questionId = input.id
+  const exists = typeof questionId === 'number'
+    ? (await db.select({ id: questions.id }).from(questions).where(eq(questions.id, questionId)).limit(1)).length > 0
+    : false
+
+  if (exists && typeof questionId === 'number') {
+    await db.update(questions).set(data).where(eq(questions.id, questionId))
+  }
+  else {
+    const created = await db.insert(questions).values(data).returning({ id: questions.id })
+    questionId = created[0].id
+  }
+
+  // 子表按「先清后建」重建，与全量保存保持一致
+  const statements: any[] = [
+    db.delete(options).where(eq(options.questionId, questionId)),
+    db.delete(blanks).where(eq(blanks.questionId, questionId)),
+  ]
+  if (!isFill && input.options.length > 0) {
+    statements.push(db.insert(options).values(
+      input.options.map(o => ({ label: o.label, text: o.text, questionId })),
+    ))
+  }
+  if (isFill && input.blanks.length > 0) {
+    statements.push(db.insert(blanks).values(
+      input.blanks.map((text, order) => ({ text, order, questionId })),
+    ))
+  }
+  await runBatch(db, statements)
+
+  const saved = (await getQuestions(db)).find(q => q.id === questionId)
+  if (!saved)
+    throw new Error('题目写入后未能读回')
+  return saved
+}
+
+/**
+ * 删除单条题目，返回是否确实删掉了（题目不存在时为 false）。
+ */
+export async function deleteQuestion(db: DB, id: number): Promise<boolean> {
+  const removed = await db.delete(questions).where(eq(questions.id, id)).returning({ id: questions.id })
+  return removed.length > 0
+}
+
+/**
  * 读取课程（含分类）
  */
 export async function getCourses(db: DB) {

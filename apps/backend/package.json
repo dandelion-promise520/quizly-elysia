@@ -15,8 +15,11 @@
     "db:seed:remote": "wrangler d1 execute quizly --remote --file=./scripts/seed.sql"
   },
   "dependencies": {
+    "@better-auth/api-key": "^1.7.12",
+    "@better-auth/drizzle-adapter": "^1.7.12",
     "@elysia/cors": "rc",
     "@quizly/types": "workspace:*",
+    "better-auth": "^1.7.12",
     "drizzle-orm": "^0.45.4",
     "elysia": "rc"
   },

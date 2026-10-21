@@ -8,6 +8,13 @@
       "when": 1792488673251,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1792562277234,
+      "tag": "0001_loose_iron_patriot",
+      "breakpoints": true
     }
   ]
 }
