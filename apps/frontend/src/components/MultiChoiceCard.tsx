@@ -62,9 +62,9 @@ function MultiChoiceCard({
 
           const optCls = cn(
             'relative isolate flex items-center gap-3 p-3 my-[2px] border rounded-xl cursor-pointer select-none bg-card transition-all duration-200',
-            done ? 'cursor-default pointer-events-none border-border' : 'border-border hover:border-slate-300',
+            done ? 'cursor-default pointer-events-none border-border' : 'border-border hover:border-border-strong',
             isSelected && !done && 'border-accent ring-1 ring-accent',
-            done && isCorrect && 'border-green-500/30 bg-green-500/10 dark:border-emerald-500/40 dark:bg-emerald-500/15 ring-1 ring-green-500/30 dark:ring-emerald-500/40',
+            done && isCorrect && 'border-success/30 bg-success/10 dark:border-success/40 dark:bg-success/15 ring-1 ring-success/30 dark:ring-success/40',
             isWrong && 'border-destructive/30 bg-destructive/10 dark:border-destructive/40 dark:bg-destructive/20 ring-1 ring-destructive/30 dark:ring-destructive/40',
           )
 
@@ -79,7 +79,7 @@ function MultiChoiceCard({
               {oi === hoveredIdx && !isSelected && !done && (
                 <motion.span
                   layoutId={`choice-hover-${index}`}
-                  className="absolute inset-0 z-[-1] rounded-xl bg-slate-100/70 dark:bg-white/5"
+                  className="absolute inset-0 z-[-1] rounded-xl bg-muted/70 dark:bg-white/5"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -119,7 +119,7 @@ function MultiChoiceCard({
               />
               <span className={cn(
                 'relative z-10 text-[14.5px] leading-relaxed flex-1 min-w-0 break-words',
-                (done && isCorrect) ? 'text-green-700 dark:text-emerald-300' : isWrong ? 'text-destructive dark:text-red-400' : 'text-foreground',
+                (done && isCorrect) ? 'text-success dark:text-success' : isWrong ? 'text-destructive dark:text-destructive' : 'text-foreground',
               )}
               >
                 <span className="opt-key font-bold mr-1">

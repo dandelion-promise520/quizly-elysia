@@ -327,18 +327,18 @@ export default function AdminDashboard() {
   }
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 relative overflow-hidden font-sans">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden font-sans">
         {/* 背景动态渐变球 */}
-        <div className="absolute top-[-20%] left-[-10%] size-[500px] rounded-full bg-teal-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] size-[500px] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-20%] left-[-10%] size-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[-20%] right-[-10%] size-[500px] rounded-full bg-accent/10 blur-[120px] pointer-events-none" />
 
-        <div className="w-full max-w-md bg-[#ffffff]/5 backdrop-blur-xl border border-[#ffffff]/10 p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
-          <div className="size-16 bg-teal-500/10 border border-teal-500/20 rounded-full flex items-center justify-center mb-6">
-            <Lock className="size-8 text-teal-400" />
+        <div className="w-full max-w-md bg-card/70 backdrop-blur-xl border border-border p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col items-center">
+          <div className="size-16 bg-primary/10 border border-primary/25 rounded-full flex items-center justify-center mb-6">
+            <Lock className="size-8 text-accent" />
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-2">管理后台认证</h2>
-          <p className="text-slate-400 text-sm mb-8 text-center">请使用管理员账号登录控制台</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">管理后台认证</h2>
+          <p className="text-muted-foreground/70 text-sm mb-8 text-center">请使用管理员账号登录控制台</p>
 
           <form onSubmit={handleAuthSubmit} className="w-full flex flex-col gap-5">
             <Input
@@ -356,9 +356,9 @@ export default function AdminDashboard() {
               error={Boolean(authError)}
               leftIcon={<Mail />}
               classNames={{
-                label: 'text-slate-300',
-                field: 'border-white/10 bg-white/5',
-                input: 'text-white placeholder:text-slate-500',
+                label: 'text-muted-foreground/60',
+                field: 'border-border bg-background/60',
+                input: 'text-foreground placeholder:text-muted-foreground/70',
               }}
               autoFocus
             />
@@ -381,21 +381,21 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                  className="text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer"
                   aria-label={showPassword ? '隐藏密码' : '显示密码'}
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
                 </button>
               )}
               classNames={{
-                label: 'text-slate-300',
-                field: 'border-white/10 bg-white/5',
-                input: 'text-white placeholder:text-slate-500',
+                label: 'text-muted-foreground/60',
+                field: 'border-border bg-background/60',
+                input: 'text-foreground placeholder:text-muted-foreground/70',
               }}
             />
 
             {authError && (
-              <p className="text-red-400 text-xs text-center font-medium">
+              <p className="text-destructive text-xs text-center font-medium">
                 ⚠️
                 {' '}
                 {authError}
@@ -405,7 +405,7 @@ export default function AdminDashboard() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 h-11 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-full text-sm shadow-lg shadow-teal-600/20 cursor-pointer"
+              className="w-full py-3 h-11 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full text-sm shadow-lg shadow-primary/20 cursor-pointer"
             >
               {isSubmitting ? '登录中...' : '登录'}
             </Button>
@@ -413,7 +413,7 @@ export default function AdminDashboard() {
 
           <Link
             to="/"
-            className="text-xs text-slate-500 hover:text-teal-400 transition-colors mt-8 font-medium"
+            className="text-xs text-muted-foreground hover:text-accent transition-colors mt-8 font-medium"
           >
             ← 返回答题页面
           </Link>
@@ -424,9 +424,9 @@ export default function AdminDashboard() {
 
   if (queryLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl font-semibold text-slate-400">加载中...</div>
+          <div className="text-xl font-semibold text-muted-foreground/70">加载中...</div>
         </div>
       </div>
     )
@@ -434,10 +434,10 @@ export default function AdminDashboard() {
 
   if (queryError) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200 max-w-md">
-          <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
-          <div className="text-slate-600 text-sm mb-6">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center p-8 bg-card rounded-xl shadow-sm border border-border max-w-md">
+          <div className="text-destructive text-lg font-semibold mb-2">加载失败</div>
+          <div className="text-muted-foreground text-sm mb-6">
             {queryError instanceof Error ? queryError.message : '数据加载失败，请确认后端服务是否启动'}
           </div>
           <Button variant="primary" onClick={() => { void refetch() }} className="px-6 py-2">
@@ -454,16 +454,16 @@ export default function AdminDashboard() {
   const renderCourseItems = () => {
     if (tempCourses.length === 0) {
       return (
-        <div className="text-center py-8 text-slate-400 text-sm">
+        <div className="text-center py-8 text-muted-foreground/70 text-sm">
           目前暂无课程，请点击下方按钮新增。
         </div>
       )
     }
 
     return tempCourses.map((course, idx) => (
-      <div key={course.id ?? `temp-${idx}`} className="flex flex-col gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100/80 shadow-sm relative">
+      <div key={course.id ?? `temp-${idx}`} className="flex flex-col gap-3 p-4 bg-background rounded-xl border border-border shadow-sm relative">
         <div className="flex items-center gap-3">
-          <div className="text-xs font-bold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-2.5 py-1 rounded-md">课程</div>
+          <div className="text-xs font-bold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-2.5 py-1 rounded-md">课程</div>
           <input
             type="text"
             value={course.name}
@@ -473,7 +473,7 @@ export default function AdminDashboard() {
               setTempCourses(next)
             }}
             placeholder="请输入课程名称"
-            className="flex-1 px-3 py-1.5 border border-border rounded-lg outline-none bg-background text-foreground focus:border-teal-500 text-sm font-semibold focus:ring-1 focus:ring-teal-500 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="flex-1 px-3 py-1.5 border border-border rounded-lg outline-none bg-background text-foreground focus:border-primary text-sm font-semibold focus:ring-1 focus:ring-primary/40 transition placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
           />
           <button
             type="button"
@@ -481,16 +481,16 @@ export default function AdminDashboard() {
               const next = tempCourses.filter((_, i) => i !== idx)
               setTempCourses(next)
             }}
-            className="size-8 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 flex items-center justify-center text-sm font-bold transition cursor-pointer"
+            className="size-8 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50 flex items-center justify-center text-sm font-bold transition cursor-pointer"
             title="删除课程"
           >
             ×
           </button>
         </div>
 
-        <div className="pl-6 border-l-2 border-slate-200/60 flex flex-col gap-2">
+        <div className="pl-6 border-l-2 border-border flex flex-col gap-2">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-slate-500">内部 Tab 分类:</span>
+            <span className="text-xs font-bold text-muted-foreground">内部 Tab 分类:</span>
             <button
               type="button"
               onClick={() => {
@@ -500,7 +500,7 @@ export default function AdminDashboard() {
                 next[idx] = { ...next[idx], categories: cats }
                 setTempCourses(next)
               }}
-              className="text-[10px] font-bold text-teal-700 bg-teal-500/10 hover:bg-teal-500/20 dark:text-emerald-300 dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 px-2 py-0.5 rounded transition cursor-pointer"
+              className="text-[10px] font-bold text-primary bg-primary/10 hover:bg-primary/20 dark:text-success dark:bg-success/15 dark:hover:bg-success/25 px-2 py-0.5 rounded transition cursor-pointer"
             >
               + 添加分类
             </button>
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
 
           {(course.categories || []).length === 0
             ? (
-                <div className="text-[10px] text-slate-400 italic">暂无分类，请添加</div>
+                <div className="text-[10px] text-muted-foreground/70 italic">暂无分类，请添加</div>
               )
             : (course.categories || []).map((cat, catIdx) => (
                 <div key={cat.id ?? `cat-${catIdx}`} className="flex items-center gap-2">
@@ -523,7 +523,7 @@ export default function AdminDashboard() {
                       setTempCourses(next)
                     }}
                     placeholder="分类名称"
-                    className="flex-1 px-2.5 py-1 border border-border rounded-md outline-none bg-background text-foreground focus:border-teal-500 text-xs focus:ring-1 focus:ring-teal-500 transition placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="flex-1 px-2.5 py-1 border border-border rounded-md outline-none bg-background text-foreground focus:border-primary text-xs focus:ring-1 focus:ring-primary/40 transition placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
                   />
                   <button
                     type="button"
@@ -533,7 +533,7 @@ export default function AdminDashboard() {
                       next[idx] = { ...next[idx], categories: cats }
                       setTempCourses(next)
                     }}
-                    className="size-6 rounded border border-red-50 text-red-400 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-xs font-semibold transition cursor-pointer"
+                    className="size-6 rounded border border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive flex items-center justify-center text-xs font-semibold transition cursor-pointer"
                     title="删除分类"
                   >
                     ×
@@ -546,7 +546,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-background">
       <AdminSidebar
         questions={questions}
         search={search}
@@ -615,21 +615,21 @@ export default function AdminDashboard() {
           <button
             type="button"
             onClick={handleSignOut}
-            className="text-sm text-slate-500 hover:text-slate-700 font-medium cursor-pointer mr-4"
+            className="text-sm text-muted-foreground hover:text-foreground font-medium cursor-pointer mr-4"
           >
             退出登录
           </button>
 
           <Link
             to="/"
-            className="text-sm text-teal-600 hover:text-teal-700 font-semibold"
+            className="text-sm text-primary hover:text-primary/80 font-semibold"
           >
             ← 返回答题页面
           </Link>
         </div>
 
         {pageError && (
-          <div className="mx-6 mt-4 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="mx-6 mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {pageError}
           </div>
         )}
@@ -637,14 +637,14 @@ export default function AdminDashboard() {
         {/* Editor */}
         {isBatchMode
           ? (
-              <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 p-8 text-center">
-                <div className="size-16 bg-teal-50 border border-teal-100 rounded-2xl flex items-center justify-center text-teal-600 mb-4 animate-pulse">
+              <div className="flex-1 flex flex-col items-center justify-center bg-background p-8 text-center">
+                <div className="size-16 bg-primary/10 border border-primary/15 rounded-2xl flex items-center justify-center text-primary mb-4 animate-pulse">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-bold text-slate-800 mb-2">批量操作模式已启用</h3>
-                <p className="text-slate-500 text-sm max-w-md mb-6">
+                <h3 className="text-lg font-bold text-foreground mb-2">批量操作模式已启用</h3>
+                <p className="text-muted-foreground text-sm max-w-md mb-6">
                   在左侧侧边栏中勾选您需要修改的题目。
                   {selectedIds.size > 0
                     ? `已选中 ${selectedIds.size} 道题目，点击侧边栏下方的“修改所属课程与分类”即可进行批量修改。`
@@ -652,17 +652,17 @@ export default function AdminDashboard() {
                 </p>
                 {selectedIds.size > 0 && (
                   <div className="w-full max-w-md bg-card border border-border/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
-                    <div className="text-xs font-bold text-slate-400 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
+                    <div className="text-xs font-bold text-muted-foreground/70 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
                     <div className="flex flex-col gap-1.5">
                       {questions
                         .filter(q => q.id !== undefined && selectedIds.has(q.id))
                         .map((q, i) => (
-                          <div key={q.id} className="flex items-center gap-2 text-xs text-slate-600">
-                            <span className="size-5 bg-teal-50 text-teal-600 font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
+                          <div key={q.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="size-5 bg-primary/10 text-primary font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
                               {i + 1}
                             </span>
                             <span className="truncate flex-1 font-medium">{q.text}</span>
-                            <span className="text-[10px] text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
+                            <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
                           </div>
                         ))}
                     </div>
@@ -682,7 +682,7 @@ export default function AdminDashboard() {
                 />
               )
             : (
-                <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+                <div className="flex-1 flex items-center justify-center text-muted-foreground/70 text-sm">
                   请选择或新增一道题目
                 </div>
               )}
@@ -693,15 +693,15 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
           <div className="w-full max-w-lg bg-card rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-background">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">课程管理</h3>
-                <p className="text-xs text-slate-500 mt-0.5">添加、修改或删除课程，删除课程将解除所有关联题目</p>
+                <h3 className="text-lg font-bold text-foreground">课程管理</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">添加、修改或删除课程，删除课程将解除所有关联题目</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCourseModalOpen(false)}
-                className="size-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+                className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground/70 hover:text-muted-foreground/90 transition"
               >
                 ×
               </button>
@@ -713,7 +713,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-border bg-background flex items-center justify-between">
               <Button
                 variant="secondary"
                 size="sm"
@@ -728,7 +728,7 @@ export default function AdminDashboard() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsCourseModalOpen(false)}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-700"
+                  className="px-4 py-2 text-muted-foreground hover:text-foreground"
                 >
                   取消
                 </Button>
@@ -751,10 +751,10 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
           <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-background rounded-t-2xl">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">批量修改所属课程与分类</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <h3 className="text-lg font-bold text-foreground">批量修改所属课程与分类</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   将选中的
                   {selectedIds.size}
                   {' '}
@@ -764,7 +764,7 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setIsBatchModalOpen(false)}
-                className="size-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition"
+                className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground/70 hover:text-muted-foreground/90 transition"
               >
                 ×
               </button>
@@ -773,7 +773,7 @@ export default function AdminDashboard() {
             {/* Modal Content */}
             <div className="p-6 flex flex-col gap-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
                   所属课程
                 </label>
                 <Select
@@ -801,7 +801,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
                   分类
                 </label>
                 {batchCourseId
@@ -832,7 +832,7 @@ export default function AdminDashboard() {
                           )
                         }
                         return (
-                          <div className="text-xs text-amber-600 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200">
+                          <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30">
                             ⚠️ 当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
                           </div>
                         )
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
                     )
                   : (
                       <Select disabled value="disabled">
-                        <SelectTrigger className="w-full bg-slate-50 text-slate-400 cursor-not-allowed">
+                        <SelectTrigger className="w-full bg-background text-muted-foreground/70 cursor-not-allowed">
                           <SelectValue placeholder="请先选择所属课程" />
                         </SelectTrigger>
                         <SelectContent>
@@ -852,12 +852,12 @@ export default function AdminDashboard() {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-border bg-slate-50/50 flex gap-2 justify-end rounded-b-2xl">
+            <div className="px-6 py-4 border-t border-border bg-background flex gap-2 justify-end rounded-b-2xl">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsBatchModalOpen(false)}
-                className="px-4 py-2 text-slate-600 hover:text-slate-700"
+                className="px-4 py-2 text-muted-foreground hover:text-foreground"
               >
                 取消
               </Button>
@@ -881,11 +881,11 @@ export default function AdminDashboard() {
           <AlertDialog.Backdrop className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
           <AlertDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex w-[400px] max-w-[calc(100vw-3rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-2xl transition-[scale,opacity] duration-150 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
             <div className="flex flex-col gap-2">
-              <AlertDialog.Title className="text-lg font-bold text-slate-900">确认导入题目</AlertDialog.Title>
-              <AlertDialog.Description className="text-sm text-slate-500 leading-relaxed">
+              <AlertDialog.Title className="text-lg font-bold text-foreground">确认导入题目</AlertDialog.Title>
+              <AlertDialog.Description className="text-sm text-muted-foreground leading-relaxed">
                 你确定要导入所选的 JSON 文件吗？此操作将**覆盖当前数据库中的所有题目**，且无法撤销。
                 {importData && (
-                  <span className="block mt-2 font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded-lg p-2 text-xs">
+                  <span className="block mt-2 font-medium text-foreground/80 bg-background border border-border rounded-lg p-2 text-xs">
                     本次即将导入
                     {' '}
                     {importData.length}
@@ -897,19 +897,19 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex justify-end gap-3 mt-2">
-              <AlertDialog.Close className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer select-none">
+              <AlertDialog.Close className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded-xl transition cursor-pointer select-none">
                 取消
               </AlertDialog.Close>
               <button
                 type="button"
                 disabled={isImporting}
                 onClick={executeImport}
-                className="px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer select-none flex items-center justify-center gap-1.5"
+                className="px-4 py-2 text-sm font-semibold text-white bg-destructive hover:bg-destructive/90 disabled:bg-destructive/50 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer select-none flex items-center justify-center gap-1.5"
               >
                 {isImporting
                   ? (
                       <>
-                        <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="size-4 border-2 border-border border-t-transparent rounded-full animate-spin" />
                         导入中...
                       </>
                     )

@@ -35,14 +35,14 @@ export default function ResultBanner({ score, total }: ResultBannerProps) {
   }
 
   return (
-    <div className="text-center py-9 mb-6 rounded-xl bg-white border border-slate-200 shadow-md">
-      <div className="text-[56px] font-bold text-teal-600 leading-none">
+    <div className="text-center py-9 mb-6 rounded-xl bg-card border border-border shadow-md">
+      <div className="text-[56px] font-bold text-primary leading-none">
         {score}
         {' '}
         /
         {total}
       </div>
-      <div className="text-sm text-slate-400 mt-2">
+      <div className="text-sm text-muted-foreground/70 mt-2">
         总分
         {total}
         {' '}

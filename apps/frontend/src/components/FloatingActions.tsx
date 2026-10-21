@@ -109,7 +109,7 @@ export default function FloatingActions() {
                 exit={{ opacity: 0, y: 15, scale: 0.8 }}
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2"
+                className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               />
             )}
           >
@@ -131,7 +131,7 @@ export default function FloatingActions() {
                 exit={{ opacity: 0, y: 15, scale: 0.8 }}
                 whileHover={{ scale: 1.1, y: 2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2"
+                className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
               />
             )}
           >
@@ -149,7 +149,7 @@ export default function FloatingActions() {
               layout
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2"
+              className="flex size-11 cursor-pointer items-center justify-center rounded-full border border-border bg-surface/95 text-text-secondary shadow-md backdrop-blur-md transition-colors hover:bg-surface hover:text-text focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             />
           )}
         >
@@ -202,7 +202,7 @@ export default function FloatingActions() {
                   <span className="text-[10px] font-bold text-text-muted select-none">
                     请作者喝杯咖啡 ☕️
                   </span>
-                  <div className="relative size-32 bg-slate-50 border border-border rounded-lg overflow-hidden flex items-center justify-center p-1 dark:bg-slate-950">
+                  <div className="relative size-32 bg-background border border-border rounded-lg overflow-hidden flex items-center justify-center p-1 dark:bg-background">
                     <img
                       src="/sponsor-qr.png"
                       alt="微信打赏码"
@@ -219,7 +219,7 @@ export default function FloatingActions() {
               onClick={() => setIsSponsorOpen(!isSponsorOpen)}
               className={`flex items-center justify-center size-11 border shadow-md rounded-full backdrop-blur-md cursor-pointer transition-colors duration-200 ${
                 isSponsorOpen
-                  ? 'bg-accent border-accent text-white'
+                  ? 'bg-accent border-accent text-accent-foreground'
                   : 'bg-surface/95 border-border text-text-secondary hover:text-text hover:bg-surface'
               }`}
               title="支持作者"

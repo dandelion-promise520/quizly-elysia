@@ -74,7 +74,7 @@ function AdminSidebar({
         <input
           type="text"
           placeholder="搜索题干或选项…"
-          className="w-full px-3 py-2 text-sm border border-border rounded-lg outline-none focus:border-accent focus:ring-1 focus:ring-accent transition bg-background text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500"
+          className="w-full px-3 py-2 text-sm border border-border rounded-lg outline-none focus:border-accent focus:ring-1 focus:ring-accent transition bg-background text-foreground placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
           value={search}
           onChange={e => onSearchChange(e.target.value)}
         />
@@ -116,8 +116,8 @@ function AdminSidebar({
             className={cn(
               'px-2 py-1 rounded border text-xs font-semibold cursor-pointer transition-all duration-200',
               isBatchMode
-                ? 'bg-teal-600 border-teal-600 text-white shadow-sm hover:bg-teal-500'
-                : 'bg-sidebar border-border text-teal-600 dark:text-emerald-400 hover:bg-teal-500/10 dark:hover:bg-emerald-500/15 hover:border-teal-500/20 dark:hover:border-emerald-500/30',
+                ? 'bg-primary border-primary text-white shadow-sm hover:bg-primary/90'
+                : 'bg-sidebar border-border text-primary dark:text-success hover:bg-primary/10 dark:hover:bg-success/15 hover:border-primary/30 dark:hover:border-success/40',
             )}
           >
             {isBatchMode ? '退出批量' : '批量操作'}
@@ -125,7 +125,7 @@ function AdminSidebar({
         </div>
 
         {isBatchMode && (
-          <div className="flex justify-between items-center bg-slate-50 border border-slate-100 p-2.5 rounded-lg text-xs transition-all">
+          <div className="flex justify-between items-center bg-background border border-border p-2.5 rounded-lg text-xs transition-all">
             <label className="flex items-center gap-2 cursor-pointer font-semibold text-muted-foreground">
               <input
                 type="checkbox"
@@ -174,9 +174,9 @@ function AdminSidebar({
             <div
               key={q.id ?? `temp-${realIdx}`}
               className={cn(
-                'relative flex items-start gap-2.5 px-4 py-3 cursor-pointer border-b border-slate-100 transition-colors',
-                isSelected && !isBatchMode && 'bg-teal-500/10 dark:bg-emerald-500/15 border-l-4 border-l-teal-600 dark:border-l-emerald-500',
-                isChecked && isBatchMode && 'bg-teal-500/5 dark:bg-emerald-500/10',
+                'relative flex items-start gap-2.5 px-4 py-3 cursor-pointer border-b border-border transition-colors',
+                isSelected && !isBatchMode && 'bg-primary/10 dark:bg-success/15 border-l-4 border-l-teal-600 dark:border-l-emerald-500',
+                isChecked && isBatchMode && 'bg-primary/5 dark:bg-success/10',
               )}
               onClick={() => {
                 if (isBatchMode) {
@@ -194,7 +194,7 @@ function AdminSidebar({
               {realIdx === hoveredIdx && !isSelected && !isBatchMode && (
                 <motion.span
                   layoutId="admin-sidebar-hover"
-                  className="absolute inset-0 z-[-1] bg-slate-100 dark:bg-white/5"
+                  className="absolute inset-0 z-[-1] bg-muted dark:bg-white/5"
                   transition={
                     reduce
                       ? { duration: 0 }
@@ -219,16 +219,16 @@ function AdminSidebar({
                           onToggleSelect(q.id, e.target.checked)
                         }
                       }}
-                      className="relative z-10 rounded border-border text-teal-600 focus:ring-teal-500 size-4 mt-1 cursor-pointer accent-teal-600 flex-shrink-0"
+                      className="relative z-10 rounded border-border text-primary focus:ring-primary/40 size-4 mt-1 cursor-pointer accent-teal-600 flex-shrink-0"
                     />
                   )
                 : (
-                    <span className="relative z-10 text-xs font-bold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+                    <span className="relative z-10 text-xs font-bold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5">
                       {realIdx + 1}
                     </span>
                   )}
 
-              <span className="relative z-10 text-[10px] font-semibold text-teal-700 bg-teal-500/10 dark:text-emerald-300 dark:bg-emerald-500/15 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+              <span className="relative z-10 text-[10px] font-semibold text-primary bg-primary/10 dark:text-success dark:bg-success/15 px-1.5 py-0.5 rounded-full flex-shrink-0 mt-0.5">
                 {q.type}
               </span>
               <span className="relative z-10 flex-1 text-sm text-foreground truncate">
@@ -265,7 +265,7 @@ function AdminSidebar({
       </div>
 
       {isBatchMode && (
-        <div className="p-4 border-t border-border bg-slate-50 flex flex-col gap-2">
+        <div className="p-4 border-t border-border bg-background flex flex-col gap-2">
           <button
             type="button"
             disabled={selectedIds.size === 0}
@@ -273,8 +273,8 @@ function AdminSidebar({
             className={cn(
               'w-full py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer text-center',
               selectedIds.size === 0
-                ? 'bg-slate-200 text-text-muted cursor-not-allowed'
-                : 'bg-teal-600 hover:bg-teal-500 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-lg shadow-teal-600/10',
+                ? 'bg-border text-text-muted cursor-not-allowed'
+                : 'bg-primary hover:bg-primary/90 dark:bg-success dark:hover:bg-success/90 text-white shadow-lg shadow-primary/10',
             )}
           >
             修改所属课程与分类 (

@@ -84,13 +84,13 @@ function DbSchemaHelper() {
         whileHover={{ scale: 1.08, y: -2 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-20 z-40 flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-teal-500/20 backdrop-blur-md cursor-pointer group db-helper-btn"
+        className="fixed bottom-6 right-20 z-40 flex items-center gap-2 bg-gradient-to-r from-primary to-accent text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-primary/25 backdrop-blur-md cursor-pointer group db-helper-btn"
       >
         <Database data-icon="inline-start" className="group-hover:rotate-12 transition-transform duration-300" />
         <span className="text-sm font-semibold tracking-wide">数据库表结构</span>
         <span className="absolute -top-1 -right-1 flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
         </span>
       </motion.button>
 
@@ -113,19 +113,19 @@ function DbSchemaHelper() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-full sm:w-[480px] md:w-[560px] lg:w-[640px] bg-slate-50 border-l border-slate-200 shadow-2xl z-50 flex flex-col"
+              className="fixed top-0 right-0 h-full w-full sm:w-[480px] md:w-[560px] lg:w-[640px] bg-background border-l border-border shadow-2xl z-50 flex flex-col"
             >
               {/* Header */}
-              <div className="p-6 bg-white border-b border-slate-100 flex items-center justify-between shadow-xs">
+              <div className="p-6 bg-card border-b border-border flex items-center justify-between shadow-xs">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-teal-50 rounded-lg text-teal-600 border border-teal-100">
+                  <div className="p-2 bg-primary/10 rounded-lg text-primary border border-primary/15">
                     <Database className="size-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                       数据库表结构参考
                     </h2>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       所有 SQL 题目均基于以下三张表的数据和结构
                     </p>
                   </div>
@@ -133,14 +133,14 @@ function DbSchemaHelper() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full hover:bg-muted text-muted-foreground/70 hover:text-muted-foreground/90 transition-colors cursor-pointer"
                 >
                   <X className="size-5" />
                 </button>
               </div>
 
               {/* Navigation Tabs */}
-              <div className="px-6 py-3 bg-white border-b border-slate-100 flex gap-2 overflow-x-auto scrollbar-none">
+              <div className="px-6 py-3 bg-card border-b border-border flex gap-2 overflow-x-auto scrollbar-none">
                 {dbTables.map(table => (
                   <button
                     type="button"
@@ -148,8 +148,8 @@ function DbSchemaHelper() {
                     onClick={() => setActiveTab(table.id)}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex-shrink-0 cursor-pointer ${
                       activeTab === table.id
-                        ? 'bg-teal-600 text-white shadow-sm'
-                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800'
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'bg-background text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
                     {table.name}
@@ -166,32 +166,32 @@ function DbSchemaHelper() {
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
                 {/* Table Introduction */}
-                <div className="bg-gradient-to-r from-teal-50/50 to-emerald-50/30 p-4 rounded-xl border border-teal-100/50">
-                  <h3 className="text-sm font-bold text-teal-800 flex items-center gap-1.5 mb-1">
+                <div className="bg-gradient-to-r from-primary/5 to-accent/5 p-4 rounded-xl border border-primary/10">
+                  <h3 className="text-sm font-bold text-primary flex items-center gap-1.5 mb-1">
                     表用途说明
                   </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     {activeTable.description}
                   </p>
                 </div>
 
                 {/* Table Image Visualizer */}
-                <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs relative group/img">
-                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="bg-card p-4 rounded-xl border border-border shadow-xs relative group/img">
+                  <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                       表数据样例截图 (可放大查看)
                     </span>
                     <button
                       type="button"
                       onClick={() => setFullscreenImage(activeTable.imageSrc)}
-                      className="flex items-center gap-1 text-[11px] font-semibold text-teal-600 hover:text-teal-700 transition cursor-pointer"
+                      className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition cursor-pointer"
                     >
                       <Maximize2 className="size-3" />
                       全屏查看
                     </button>
                   </div>
 
-                  <div className="relative overflow-hidden rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center p-2 min-h-[140px]">
+                  <div className="relative overflow-hidden rounded-lg border border-border bg-background flex items-center justify-center p-2 min-h-[140px]">
                     <img
                       src={activeTable.imageSrc}
                       alt={activeTable.name}
@@ -201,7 +201,7 @@ function DbSchemaHelper() {
                       onClick={() => setFullscreenImage(activeTable.imageSrc)}
                       className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center cursor-zoom-in"
                     >
-                      <div className="bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 shadow-md flex items-center gap-1">
+                      <div className="bg-card/90 backdrop-blur-xs px-3 py-1.5 rounded-full text-xs font-semibold text-foreground/80 shadow-md flex items-center gap-1">
                         <Maximize2 className="w-3.5 h-3.5" />
                         点击放大图片
                       </div>
@@ -210,35 +210,35 @@ function DbSchemaHelper() {
                 </div>
 
                 {/* Fields Table Schema */}
-                <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
-                  <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <div className="bg-card rounded-xl border border-border shadow-xs overflow-hidden">
+                  <div className="p-4 border-b border-border bg-background">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                       字段结构与释义
                     </h3>
                   </div>
 
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-border">
                     {activeTable.columns.map(col => (
                       <div
                         key={col.name}
-                        className="p-4 flex items-start sm:items-center justify-between hover:bg-slate-50/60 transition-colors group/row"
+                        className="p-4 flex items-start sm:items-center justify-between hover:bg-background transition-colors group/row"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-1">
                           <div className="flex items-center gap-2">
-                            <code className="text-xs font-mono font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                            <code className="text-xs font-mono font-bold text-foreground bg-muted px-2 py-0.5 rounded border border-border">
                               {col.name}
                             </code>
-                            <span className="text-[10px] font-mono text-slate-400 bg-slate-50 px-1.5 py-0.25 rounded">
+                            <span className="text-[10px] font-mono text-muted-foreground/70 bg-background px-1.5 py-0.25 rounded">
                               {col.type}
                             </span>
                           </div>
-                          <div className="text-xs text-slate-600">
+                          <div className="text-xs text-muted-foreground">
                             {col.description}
                           </div>
                           {col.example && (
-                            <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                              <span className="font-semibold text-slate-300">例:</span>
-                              <code className="font-mono text-slate-500 bg-slate-50/80 px-1 rounded">{col.example}</code>
+                            <div className="text-[11px] text-muted-foreground/70 flex items-center gap-1">
+                              <span className="font-semibold text-muted-foreground/60">例:</span>
+                              <code className="font-mono text-muted-foreground bg-background px-1 rounded">{col.example}</code>
                             </div>
                           )}
                         </div>
@@ -248,8 +248,8 @@ function DbSchemaHelper() {
                           onClick={() => handleCopy(col.name)}
                           className={`p-1.5 rounded-lg border transition-all duration-200 cursor-pointer flex-shrink-0 ${
                             copiedField === col.name
-                              ? 'bg-green-50 border-green-200 text-green-600'
-                              : 'bg-white border-slate-200 text-slate-400 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50/20'
+                              ? 'bg-success/10 border-success/30 text-success'
+                              : 'bg-card border-border text-muted-foreground/70 hover:text-primary/80 hover:border-primary/35 hover:bg-primary/5'
                           }`}
                           title="复制字段名"
                         >
@@ -267,11 +267,11 @@ function DbSchemaHelper() {
                 </div>
 
                 {/* SQL Tips */}
-                <div className="bg-slate-100 rounded-xl p-4 border border-slate-200/50">
-                  <h4 className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1">
+                <div className="bg-muted rounded-xl p-4 border border-border">
+                  <h4 className="text-xs font-bold text-foreground/80 mb-1.5 flex items-center gap-1">
                     💡 答题建议
                   </h4>
-                  <ul className="text-xs text-slate-500 flex flex-col gap-1 list-disc list-inside leading-relaxed pl-1">
+                  <ul className="text-xs text-muted-foreground flex flex-col gap-1 list-disc list-inside leading-relaxed pl-1">
                     <li>
                       点击字段名右侧的
                       <Copy className="size-3 inline mx-0.5" />
@@ -318,7 +318,7 @@ function DbSchemaHelper() {
                 alt="数据库表结构放大图"
                 className="max-w-full max-h-[75vh] object-contain mx-auto"
               />
-              <div className="text-center text-xs text-slate-400 mt-4 font-semibold tracking-wider">
+              <div className="text-center text-xs text-muted-foreground/70 mt-4 font-semibold tracking-wider">
                 点击背景或右上角关闭
               </div>
             </motion.div>

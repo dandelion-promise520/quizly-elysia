@@ -64,7 +64,7 @@ function QuestionCard({
             ? normalizeSql(userAnswers[b]) === normalizeSql(fillQ.answer[b])
             : userAnswers[b] === fillQ.answer[b]
           const status = isBlankCorrect ? '✓' : '✗'
-          parts.push(`${status} 第${b + 1}空：你填 <span class="font-medium text-slate-800 dark:text-slate-200">"${userAnswers[b] || ''}"</span>，正确答案 <span class="font-bold text-success dark:text-emerald-400">"${fillQ.answer[b]}"</span>`)
+          parts.push(`${status} 第${b + 1}空：你填 <span class="font-medium text-foreground dark:text-foreground">"${userAnswers[b] || ''}"</span>，正确答案 <span class="font-bold text-success dark:text-success">"${fillQ.answer[b]}"</span>`)
         }
         const statusText = blankCorrect === 0 ? '回答错误。' : '部分正确。'
         feedbackMsg = `<strong>${statusText}</strong><br>${parts.join('<br>')}`
@@ -75,14 +75,14 @@ function QuestionCard({
     if (selectedIndices !== undefined) {
       if (isCorrect) {
         feedbackType = 'correct'
-        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
+        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-success">${question.answer}</span>`
       }
       else {
         const opts = question.shuffledOptions || question.options
         const selectedLabels = selectedIndices.map(idx => opts[idx]?.label).filter(Boolean).sort().join(',')
         const label = selectedLabels || '无'
         feedbackType = 'wrong'
-        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
+        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-success">${question.answer}</span>`
       }
     }
   }
@@ -90,13 +90,13 @@ function QuestionCard({
     if (selectedIdx !== undefined) {
       if (isCorrect) {
         feedbackType = 'correct'
-        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
+        feedbackMsg = `<strong>回答正确。</strong> 正确答案：<span class="font-bold text-success dark:text-success">${question.answer}</span>`
       }
       else {
         const opts = question.shuffledOptions || question.options
         const label = selectedIdx >= 0 ? opts[selectedIdx]?.label : '?'
         feedbackType = 'wrong'
-        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-emerald-400">${question.answer}</span>`
+        feedbackMsg = `<strong>回答错误。</strong> 你选择了 ${label}，正确答案是 <span class="font-bold text-success dark:text-success">${question.answer}</span>`
       }
     }
   }
@@ -104,30 +104,30 @@ function QuestionCard({
   const cardBorder = done
     ? question.type === '填空题'
       ? userAnswers && isCorrect
-        ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+        ? 'border-success/30 dark:border-success/40 ring-1 ring-success/30 dark:ring-success/40'
         : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
       : question.type === '多选题'
         ? selectedIndices && isCorrect
-          ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+          ? 'border-success/30 dark:border-success/40 ring-1 ring-success/30 dark:ring-success/40'
           : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
         : selectedIdx !== undefined && isCorrect
-          ? 'border-green-500/30 dark:border-emerald-500/40 ring-1 ring-green-500/30 dark:ring-emerald-500/40'
+          ? 'border-success/30 dark:border-success/40 ring-1 ring-success/30 dark:ring-success/40'
           : 'border-destructive/30 dark:border-destructive/40 ring-1 ring-destructive/30 dark:ring-destructive/40'
     : ''
 
   return (
     <div
-      className={`bg-white border border-slate-200 rounded-xl p-6 mb-3 shadow-sm transition-all duration-300 ${cardBorder}`}
+      className={`bg-card border border-border rounded-xl p-6 mb-3 shadow-sm transition-all duration-300 ${cardBorder}`}
     >
       {/* Question header */}
       <div className="flex items-start gap-2.5 mb-4.5">
-        <span className="text-sm font-semibold text-white bg-teal-600 px-3 py-0.5 rounded-full flex-shrink-0 mt-0.5">
+        <span className="text-sm font-semibold text-white bg-primary px-3 py-0.5 rounded-full flex-shrink-0 mt-0.5">
           {displayIndex ?? (index + 1)}
         </span>
-        <span className="text-[11px] font-semibold text-teal-600 bg-teal-50 px-2.5 py-0.75 rounded-full flex-shrink-0 mt-0.5 border border-teal-200">
+        <span className="text-[11px] font-semibold text-primary bg-primary/10 px-2.5 py-0.75 rounded-full flex-shrink-0 mt-0.5 border border-primary/25">
           {question.type}
         </span>
-        <div className="flex-1 min-w-0 text-[15.5px] font-medium text-slate-900 leading-relaxed">
+        <div className="flex-1 min-w-0 text-[15.5px] font-medium text-foreground leading-relaxed">
           <RenderText text={question.text} />
         </div>
       </div>

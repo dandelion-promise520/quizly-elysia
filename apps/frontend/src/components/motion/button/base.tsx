@@ -32,10 +32,10 @@ export interface ButtonProps extends Omit<
 interface Ripple { id: number, x: number, y: number, size: number }
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-  primary: 'bg-teal-600 text-white hover:bg-teal-700',
-  secondary: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-  ghost: 'text-slate-600 hover:text-slate-900 hover:bg-slate-50',
-  outline: 'border border-slate-200 bg-transparent text-slate-700 hover:bg-slate-50',
+  primary: 'bg-primary text-white hover:bg-primary/90',
+  secondary: 'border border-border bg-card text-foreground/80 hover:bg-background',
+  ghost: 'text-muted-foreground hover:text-foreground hover:bg-background',
+  outline: 'border border-border bg-transparent text-foreground/80 hover:bg-background',
 }
 
 const SIZE_CLASS: Record<ButtonSize, string> = {

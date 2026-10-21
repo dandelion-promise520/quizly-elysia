@@ -34,10 +34,10 @@ export function Checkbox({
     borderBgClass = 'border-destructive bg-destructive text-white'
   }
   else if (checked) {
-    borderBgClass = 'border-accent bg-accent text-white'
+    borderBgClass = 'border-accent bg-accent text-accent-foreground'
   }
   else {
-    borderBgClass = 'border-slate-300 hover:border-slate-400 bg-white'
+    borderBgClass = 'border-border-strong hover:border-border-strong bg-card'
   }
 
   return (

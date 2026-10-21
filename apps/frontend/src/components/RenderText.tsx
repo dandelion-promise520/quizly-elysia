@@ -92,7 +92,7 @@ export default function RenderText({ text }: { text: string }) {
     }
 
     elements.push(
-      <pre key={start} className="bg-slate-50 border border-slate-200 rounded-md p-3 overflow-auto text-sm font-mono">
+      <pre key={start} className="bg-background border border-border rounded-md p-3 overflow-auto text-sm font-mono">
         <code className={lang ? `language-${lang}` : ''}>
           {code}
         </code>

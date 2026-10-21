@@ -3,63 +3,144 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
 
-@custom-variant dark (&:is(.dark *));
+/* ------------------------------------------------------------------
+   beUI 官方主题（原样取自 https://beui.dev/theme.css）
+   仅补充了项目需要的 radius / sidebar / chart 与中文业务别名，
+   不再重映射 Tailwind 调色盘，配色一律走语义 token。
+   ------------------------------------------------------------------ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+    /* Base palette */
+    --background: oklch(99% 0 0);
+    --foreground: oklch(15% 0 0);
+    --card: oklch(97% 0 0);
+    --muted-foreground: oklch(50% 0 0);
+    --border: oklch(15% 0 0 / 0.06);
+
+    /* beUI extensions */
+    --border-strong: oklch(15% 0 0 / 0.12);
+    --accent-fg: oklch(15% 0 0);
+    --neon: oklch(80% 0.22 145);
+    --violet: oklch(68% 0.22 295);
+    --danger: oklch(62% 0.22 25);
+    --success: oklch(70% 0.18 155);
+    --warning: oklch(78% 0.18 75);
+    --glass-bg: oklch(99% 0 0 / 0.55);
+    --glass-border: oklch(15% 0 0 / 0.08);
+    --glass-strong-bg: rgb(255 255 255 / 0.7);
+    --glass-thin-bg: rgb(255 255 255 / 0.45);
+
+    /* shadcn semantic tokens */
+    --card-foreground: var(--foreground);
+    --popover: var(--card);
+    --popover-foreground: var(--foreground);
+    --primary: #0285f7;
+    --primary-foreground: #ffffff;
+    --secondary: var(--card);
+    --secondary-foreground: var(--foreground);
+    --muted: var(--card);
+    --accent: oklch(72% 0.18 195);
+    --accent-foreground: var(--accent-fg);
+    --destructive: var(--danger);
+    --input: var(--border);
+    --ring: var(--border-strong);
+
+    /* 项目补充 */
+    --text-secondary: oklch(38% 0 0);
+    --radius: 0.75rem;
+    --chart-1: var(--primary);
+    --chart-2: var(--accent);
+    --chart-3: var(--success);
+    --chart-4: var(--warning);
+    --chart-5: var(--danger);
+    --sidebar: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--card);
+    --sidebar-accent-foreground: var(--foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+}
+
+/* beUI 默认暗色：中性灰黑，不做品牌色偏移 */
+.dark {
+    --background: #151515;
+    --foreground: oklch(96% 0 0);
+    --card: #1c1c1c;
+    --muted-foreground: oklch(62% 0 0);
+    --border: rgb(255 255 255 / 0.05);
+    --border-strong: rgb(255 255 255 / 0.1);
+    --accent: oklch(80% 0.18 195);
+    --accent-fg: #151515;
+    --glass-bg: rgb(28 28 28 / 0.55);
+    --glass-border: rgb(255 255 255 / 0.08);
+    --glass-strong-bg: rgb(28 28 28 / 0.6);
+    --glass-thin-bg: rgb(21 21 21 / 0.45);
+
+    --text-secondary: oklch(78% 0 0);
+}
 
 @theme inline {
-    --font-heading: var(--font-sans);
     --font-sans: 'Inter Variable', sans-serif;
-    --color-bg: #f8fafc;
-    --color-surface: #ffffff;
-    --color-text: #0f172a;
-    --color-text-secondary: #475569;
-    --color-text-muted: #94a3b8;
-    --color-accent: #0d9488;
-    --color-accent-light: #f0fdfa;
-    --color-accent-border: #99f6e4;
-    --color-accent-dark: #0f766e;
-    --color-success: #16a34a;
-    --color-success-light: #f0fdf4;
-    --color-success-border: #86efac;
-    --color-error: #dc2626;
-    --color-error-light: #fef2f2;
-    --color-error-border: #fca5a5;
-    --color-warn-light: #fffbeb;
-    --color-warn-border: #fde68a;
-    --color-border: #e2e8f0;
-    --radius-default: 10px;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
+    --font-heading: var(--font-sans);
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
     --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
+    --color-border-strong: var(--border-strong);
+    --color-neon: var(--neon);
+    --color-violet: var(--violet);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
     --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    /* 业务别名：沿用旧类名（bg-surface / text-text 等）但指向 beUI token */
+    --color-bg: var(--background);
+    --color-surface: var(--card);
+    --color-text: var(--foreground);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-muted: var(--muted-foreground);
+    --color-accent-light: color-mix(in oklab, var(--accent) 14%, transparent);
+    --color-error: var(--danger);
+    --color-error-light: color-mix(in oklab, var(--danger) 14%, transparent);
+    --color-success-light: color-mix(in oklab, var(--success) 14%, transparent);
+    --color-warn-light: color-mix(in oklab, var(--warning) 14%, transparent);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -69,127 +150,72 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-}
+@theme {
+    --animate-marquee: marquee 30s linear infinite;
+    --animate-marquee-vertical: marquee-vertical 30s linear infinite;
+    --animate-shimmer: shimmer 2.5s linear infinite;
 
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-
-    /* 映射定制业务基础变量，使得原版业务卡片与页面整体同步变色 */
-    --color-bg: oklch(0.12 0 0);
-    --color-surface: oklch(0.18 0 0);
-    --color-text: oklch(0.985 0 0);
-    --color-text-secondary: oklch(0.75 0 0);
-    --color-text-muted: oklch(0.556 0 0);
-    --color-border: oklch(1 0 0 / 10%);
-
-    /* 重映射 Tailwind 核心调色盘变量，使得硬编码了 bg-white / text-slate-xxx 的原生组件自动进入暗黑模式 */
-    --color-white: oklch(0.18 0 0); /* 将白色背景转换成深色表面 */
-    --color-slate-50: oklch(0.12 0 0);
-    --color-slate-100: oklch(0.15 0 0);
-    --color-slate-200: oklch(1 0 0 / 10%); /* 边框调暗 */
-    --color-slate-300: oklch(1 0 0 / 15%);
-
-    --color-slate-900: oklch(0.985 0 0); /* 深色字反转为亮白 */
-    --color-slate-800: oklch(0.90 0 0);
-    --color-slate-700: oklch(0.80 0 0);
-    --color-slate-600: oklch(0.70 0 0);
-    --color-slate-500: oklch(0.556 0 0);
-    --color-slate-400: oklch(0.40 0 0);
-
-    --color-accent-light: oklch(0.18 0.03 180 / 15%);
-    --color-accent-border: oklch(0.4 0.12 180 / 40%);
-    
-    --color-success-light: oklch(0.2 0.05 140 / 15%);
-    --color-success-border: oklch(0.45 0.15 140 / 40%);
-    
-    --color-error-light: oklch(0.2 0.05 20 / 15%);
-    --color-error-border: oklch(0.45 0.15 20 / 40%);
-    
-    --color-warn-light: oklch(0.2 0.05 70 / 15%);
-    --color-warn-border: oklch(0.45 0.15 70 / 40%);
+    @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(calc(-100% - var(--gap, 1rem))); }
+    }
+    @keyframes marquee-vertical {
+        from { transform: translateY(0); }
+        to { transform: translateY(calc(-100% - var(--gap, 1rem))); }
+    }
+    @keyframes shimmer {
+        from { background-position: 200% 0; }
+        to { background-position: -200% 0; }
+    }
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+    html {
+        @apply font-sans;
+        color-scheme: light;
     }
-  html {
-    @apply font-sans;
+    html.dark {
+        color-scheme: dark;
+    }
+    body {
+        @apply bg-background text-foreground;
+        line-height: 1.7;
+        font-size: 15px;
+        -webkit-font-smoothing: antialiased;
     }
 }
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  line-height: 1.7;
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
+@layer utilities {
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { scrollbar-width: none; }
+
+    .mask-radial-fade {
+        mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+    }
+    .mask-b-fade {
+        mask-image: linear-gradient(to bottom, black 60%, transparent);
+    }
+
+    .glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px) saturate(160%);
+        border: 1px solid var(--glass-border);
+        box-shadow:
+            0 1px 0 0 rgb(255 255 255 / 0.06) inset,
+            0 24px 60px -24px rgb(0 0 0 / 0.45);
+    }
+    .glass-strong {
+        background: var(--glass-strong-bg);
+        backdrop-filter: blur(16px);
+    }
+    .glass-thin {
+        background: var(--glass-thin-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+    }
 }
 
 /* 统一约束右下角悬浮按钮列中的图标大小，避免在 JSX 标签上写死 size-5 等类名 */

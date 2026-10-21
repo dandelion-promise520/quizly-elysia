@@ -46,9 +46,9 @@ function FillCard({
             <input
               type="text"
               className={cn(
-                'flex-1 px-3.5 py-2 border border-border rounded-lg text-[14.5px] font-sans outline-none transition-colors duration-200 bg-background disabled:cursor-default text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-100',
-                done && isBlankCorrect && 'border-success-border bg-success-light text-green-700 dark:text-emerald-300 disabled:text-green-700 dark:disabled:text-emerald-300',
-                done && !isBlankCorrect && 'border-error-border bg-error-light text-destructive dark:text-red-400 disabled:text-destructive dark:disabled:text-red-400',
+                'flex-1 px-3.5 py-2 border border-border rounded-lg text-[14.5px] font-sans outline-none transition-colors duration-200 bg-background disabled:cursor-default text-foreground placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70 disabled:opacity-100',
+                done && isBlankCorrect && 'border-success-border bg-success-light text-success dark:text-success disabled:text-success dark:disabled:text-success',
+                done && !isBlankCorrect && 'border-error-border bg-error-light text-destructive dark:text-destructive disabled:text-destructive dark:disabled:text-destructive',
               )}
               placeholder="请输入答案"
               disabled={done}

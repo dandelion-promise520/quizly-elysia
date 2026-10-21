@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
+    <script>
+      // 首屏即定主题，避免暗色默认下闪白（React 挂载后 ThemeProvider 会接管）
+      (function () {
+        try {
+          var saved = localStorage.getItem('quizly-theme-v2')
+          var isDark = saved
+            ? saved === 'dark'
+              || (saved === 'system'
+                && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            : true
+          if (isDark) document.documentElement.classList.add('dark')
+        }
+        catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

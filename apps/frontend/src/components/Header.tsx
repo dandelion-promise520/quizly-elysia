@@ -6,14 +6,14 @@ interface HeaderProps {
 
 function Header({ total }: HeaderProps) {
   return (
-    <header className="bg-white border-b border-slate-200 pt-14 pb-12 text-center">
-      <span className="inline-block text-xs font-semibold tracking-wide text-teal-600 bg-teal-50 px-4 py-1.5 rounded-full mb-5 border border-teal-200">
+    <header className="bg-card border-b border-border pt-14 pb-12 text-center">
+      <span className="inline-block text-xs font-semibold tracking-wide text-primary bg-primary/10 px-4 py-1.5 rounded-full mb-5 border border-primary/25">
         数据库系统原理
       </span>
-      <h1 className="text-[30px] font-bold text-slate-900 tracking-tight mb-2">
+      <h1 className="text-[30px] font-bold text-foreground tracking-tight mb-2">
         综合测试
       </h1>
-      <p className="text-sm text-slate-500 max-w-[480px] mx-auto">
+      <p className="text-sm text-muted-foreground max-w-[480px] mx-auto">
         共
         {' '}
         {total}

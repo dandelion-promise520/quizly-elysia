@@ -243,7 +243,7 @@ function AdminQuestionEditor({
         {/* Header */}
         <div className="flex items-center gap-3">
           {!isNew && (
-            <span className="text-sm font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full">
+            <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
               第
               {' '}
               {index + 1}
@@ -251,7 +251,7 @@ function AdminQuestionEditor({
               题
             </span>
           )}
-          <span className="text-sm font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+          <span className="text-sm font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full">
             {draft.type}
           </span>
         </div>
@@ -296,7 +296,7 @@ function AdminQuestionEditor({
 
         {/* Course selector */}
         <div className="max-w-lg">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+          <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
             所属课程
           </label>
           <Select
@@ -328,7 +328,7 @@ function AdminQuestionEditor({
 
         {/* Category selector */}
         <div className="max-w-lg">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+          <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
             分类
           </label>
           {categoryOptions.length > 0
@@ -352,7 +352,7 @@ function AdminQuestionEditor({
                 </Select>
               )
             : (
-                <div className="text-xs text-amber-600 bg-amber-50 px-4 py-3 rounded-lg border border-amber-200 inline-block w-full">
+                <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30 inline-block w-full">
                   ⚠️ 当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
                 </div>
               )}
@@ -360,11 +360,11 @@ function AdminQuestionEditor({
 
         {/* Question text */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+          <label className="block text-sm font-semibold text-foreground/80 mb-1.5">
             题干
           </label>
           <textarea
-            className="w-full px-4 py-3 border border-border rounded-lg outline-none bg-background text-foreground focus:border-teal-500 focus:ring-1 focus:ring-teal-500 resize-y min-h-[80px] text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="w-full px-4 py-3 border border-border rounded-lg outline-none bg-background text-foreground focus:border-primary focus:ring-1 focus:ring-primary/40 resize-y min-h-[80px] text-sm placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
             value={draft.text}
             onChange={e => setText(e.target.value)}
             placeholder="输入题干内容…"
@@ -375,14 +375,14 @@ function AdminQuestionEditor({
         {draft.type !== '填空题' && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-slate-700">
+              <label className="text-sm font-semibold text-foreground/80">
                 选项
               </label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={addOption}
-                className="text-xs text-teal-600 hover:text-teal-700 font-semibold px-2 h-7"
+                className="text-xs text-primary hover:text-primary/80 font-semibold px-2 h-7"
               >
                 + 添加选项
               </Button>
@@ -393,19 +393,19 @@ function AdminQuestionEditor({
                 <input
                   value={opt.label}
                   onChange={e => updateOption(i, 'label', e.target.value)}
-                  className="w-10 px-2 py-2 text-sm border border-border rounded text-center font-bold outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-10 px-2 py-2 text-sm border border-border rounded text-center font-bold outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
                 />
                 <input
                   value={opt.text}
                   onChange={e => updateOption(i, 'text', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
                   placeholder="选项内容"
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeOption(i)}
-                  className="size-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
+                  className="size-8 rounded text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 transition"
                   title="删除选项"
                 >
                   ×
@@ -415,7 +415,7 @@ function AdminQuestionEditor({
 
             {draft.type !== '多选题' && typeof draft.answer === 'string' && (
               <div className="flex flex-col gap-2">
-                <label className="block text-sm font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-foreground/80">
                   正确答案
                 </label>
                 <Select value={draft.answer} onValueChange={setAnswerLabel}>
@@ -438,7 +438,7 @@ function AdminQuestionEditor({
 
             {draft.type === '多选题' && typeof draft.answer === 'string' && (
               <div className="flex flex-col gap-2">
-                <label className="block text-sm font-semibold text-slate-700">
+                <label className="block text-sm font-semibold text-foreground/80">
                   正确答案（可多选）
                 </label>
                 <div className="flex gap-2.5">
@@ -475,7 +475,7 @@ function AdminQuestionEditor({
                         }}
                         className={`size-10 rounded-lg border text-sm font-bold transition-all duration-200 cursor-pointer flex items-center justify-center ${
                           isCorrect
-                            ? 'bg-teal-600 border-teal-600 text-white shadow-sm'
+                            ? 'bg-primary border-primary text-white shadow-sm'
                             : 'bg-background border-border text-foreground hover:bg-muted'
                         }`}
                       >
@@ -493,7 +493,7 @@ function AdminQuestionEditor({
         {draft.type === '填空题' && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-semibold text-slate-700">
+              <label className="text-sm font-semibold text-foreground/80">
                 填空答案（
                 {(draft.blanks ?? []).length}
                 {' '}
@@ -503,7 +503,7 @@ function AdminQuestionEditor({
                 variant="ghost"
                 size="sm"
                 onClick={addBlank}
-                className="text-xs text-teal-600 hover:text-teal-700 font-semibold px-2 h-7"
+                className="text-xs text-primary hover:text-primary/80 font-semibold px-2 h-7"
               >
                 + 添加空位
               </Button>
@@ -512,21 +512,21 @@ function AdminQuestionEditor({
             {(draft.blanks ?? []).map((_: string, i: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <div key={`blank-${i}`} className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500 w-6 text-center">
+                <span className="text-xs font-bold text-muted-foreground w-6 text-center">
                   {i + 1}
                   .
                 </span>
                 <input
                   value={(draft.answer as string[])[i]}
                   onChange={e => updateBlank(i, e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-teal-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="flex-1 px-3 py-2 text-sm border border-border rounded outline-none bg-background text-foreground focus:border-primary placeholder:text-muted-foreground/70 dark:placeholder:text-muted-foreground/70"
                   placeholder={`第 ${i + 1} 空答案`}
                 />
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => removeBlank(i)}
-                  className="size-8 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition"
+                  className="size-8 rounded text-muted-foreground/70 hover:text-destructive hover:bg-destructive/10 transition"
                   title="删除空位"
                 >
                   ×

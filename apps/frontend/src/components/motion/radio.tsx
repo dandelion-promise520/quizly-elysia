@@ -109,7 +109,7 @@ export function RadioGroupItem({
     borderBgClass = 'border-accent bg-accent-light'
   }
   else {
-    borderBgClass = 'border-slate-300 hover:border-slate-400 bg-white'
+    borderBgClass = 'border-border-strong hover:border-border-strong bg-card'
   }
 
   let dotColorClass = 'bg-accent'
@@ -158,7 +158,7 @@ export function RadioGroupItem({
       </motion.button>
       {label
         ? (
-            <span className={cn('select-none text-sm text-slate-700', disabled && 'opacity-60')}>
+            <span className={cn('select-none text-sm text-foreground/80', disabled && 'opacity-60')}>
               {label}
             </span>
           )

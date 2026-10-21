@@ -1,6 +1,5 @@
 import type { Course, Question } from '@quizly/types'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { checkAnswerCorrect, useQuizState } from '@/hooks/useQuizState'
 
@@ -103,9 +102,9 @@ export default function QuizPage() {
 
   if (isLoading || !hydrated) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl font-semibold text-slate-400">加载中...</div>
+          <div className="text-xl font-semibold text-muted-foreground/70">加载中...</div>
         </div>
       </div>
     )
@@ -113,16 +112,16 @@ export default function QuizPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center p-8 bg-white rounded-xl shadow-sm border border-slate-200 max-w-md w-full">
-          <div className="text-red-500 text-lg font-semibold mb-2">加载失败</div>
-          <div className="text-slate-600 text-sm mb-6">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="text-center p-8 bg-card rounded-xl shadow-sm border border-border max-w-md w-full">
+          <div className="text-destructive text-lg font-semibold mb-2">加载失败</div>
+          <div className="text-muted-foreground text-sm mb-6">
             {error instanceof Error ? error.message : '数据加载失败，请确认后端服务是否启动'}
           </div>
           <button
             type="button"
             onClick={refetch}
-            className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-semibold transition cursor-pointer"
+            className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-semibold transition cursor-pointer"
           >
             重新加载
           </button>
@@ -132,7 +131,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900">
+    <div className="min-h-screen bg-background font-sans antialiased text-foreground">
       <Header total={tabTotal} />
       <Scoreboard score={tabScore} answered={tabAnswered} total={tabTotal} />
       <ProgressBar answered={tabAnswered} total={tabTotal} />
@@ -142,9 +141,9 @@ export default function QuizPage() {
         {courses.length > 0
           ? (
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-slate-500">切换课程:</span>
+                <span className="text-xs font-semibold text-muted-foreground">切换课程:</span>
                 <Select value={activeCourseIdStr} onValueChange={setActiveCourseTab}>
-                  <SelectTrigger className="w-[180px] h-8 bg-white border border-slate-200 shadow-sm rounded-lg text-xs font-medium focus:ring-1 focus:ring-teal-500 outline-none">
+                  <SelectTrigger className="w-[180px] h-8 bg-card border border-border shadow-sm rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary/40 outline-none">
                     <SelectValue placeholder="切换课程" />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,10 +159,6 @@ export default function QuizPage() {
           : (
               <div />
             )}
-
-        <Link to="/admin" className="text-sm font-semibold text-teal-600 hover:text-teal-700">
-          进入管理后台 →
-        </Link>
       </div>
 
       <main className="max-w-[720px] mx-auto px-5 py-6 pb-20">
@@ -193,7 +188,7 @@ export default function QuizPage() {
             )}
 
             {categoryList.length === 0 && (
-              <div className="text-center py-8 text-slate-400 text-sm">
+              <div className="text-center py-8 text-muted-foreground/70 text-sm">
                 当前课程未配置分类，请到后台为该课程添加分类。
               </div>
             )}
@@ -202,7 +197,7 @@ export default function QuizPage() {
 
             {categoryList.length > 0 && (
               <>
-                <div className="text-sm font-semibold text-slate-900 mt-4 mb-4 pb-2.5 border-b-2 border-teal-600 inline-block">
+                <div className="text-sm font-semibold text-foreground mt-4 mb-4 pb-2.5 border-b-2 border-primary inline-block">
                   题目列表
                 </div>
 
@@ -249,7 +244,7 @@ export default function QuizPage() {
                 )}
 
                 {filteredItems.length === 0 && (
-                  <div className="text-center py-12 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-white text-sm">
+                  <div className="text-center py-12 text-muted-foreground/70 border border-dashed border-border rounded-2xl bg-card text-sm">
                     当前分类下暂无题目。
                   </div>
                 )}
@@ -267,7 +262,7 @@ export default function QuizPage() {
         )}
 
         {courses.length === 0 && (
-          <div className="text-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-white text-sm">
+          <div className="text-center py-16 text-muted-foreground/70 border border-dashed border-border rounded-2xl bg-card text-sm">
             暂无已发布课程，请到后台管理添加课程并关联题目。
           </div>
         )}

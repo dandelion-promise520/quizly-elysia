@@ -54,7 +54,7 @@ declare module '@tanstack/react-router' {
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="quizly-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="quizly-theme-v2">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
       </QueryClientProvider>

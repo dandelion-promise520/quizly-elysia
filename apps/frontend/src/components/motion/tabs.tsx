@@ -65,9 +65,9 @@ export function Tabs({
 }
 
 const listClasses: Record<Variant, string> = {
-  pill: 'inline-flex items-center gap-1 rounded-full bg-slate-100 p-1 border border-slate-200/50',
-  underline: 'inline-flex items-center gap-1 border-b border-slate-200',
-  segment: 'inline-flex items-center gap-0 rounded-lg bg-slate-100 p-0.5 border border-slate-200/50',
+  pill: 'inline-flex items-center gap-1 rounded-full bg-muted p-1 border border-border',
+  underline: 'inline-flex items-center gap-1 border-b border-border',
+  segment: 'inline-flex items-center gap-0 rounded-lg bg-muted p-0.5 border border-border',
 }
 
 export function TabsList({ children, className }: { children: ReactNode, className?: string }) {
@@ -104,7 +104,7 @@ export function TabsTrigger({
         onClick={() => setValue(value)}
         className={cn(
           'relative isolate px-3 pb-2.5 pt-1 -mb-px text-sm font-semibold transition-colors min-h-[40px] inline-flex items-center cursor-pointer',
-          active ? 'text-teal-600' : 'text-slate-500 hover:text-slate-800',
+          active ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
           className,
         )}
       >
@@ -114,7 +114,7 @@ export function TabsTrigger({
               <motion.span
                 layoutId={layoutId}
                 className={cn(
-                  'absolute -bottom-px left-0 right-0 h-[2px] bg-teal-600',
+                  'absolute -bottom-px left-0 right-0 h-[2px] bg-primary',
                   indicatorClassName,
                 )}
               />
@@ -134,7 +134,7 @@ export function TabsTrigger({
               layoutId={layoutId}
               style={{ borderRadius: variant === 'pill' ? 9999 : 6 }}
               className={cn(
-                'absolute inset-0 bg-white shadow-sm border border-slate-200/20',
+                'absolute inset-0 bg-card shadow-sm border border-border',
                 radius,
                 indicatorClassName,
               )}
@@ -148,7 +148,7 @@ export function TabsTrigger({
         onClick={() => setValue(value)}
         className={cn(
           'relative z-10 inline-flex items-center justify-center whitespace-nowrap bg-transparent px-3.5 py-1.5 text-sm font-semibold transition-colors outline-none cursor-pointer',
-          active ? 'text-teal-600' : 'text-slate-500 hover:text-slate-800',
+          active ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
           radius,
           className,
         )}
