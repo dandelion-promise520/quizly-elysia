@@ -1,6 +1,7 @@
 import type { Course, Question } from '@quizly/types'
 
-const API_BASE = '/api'
+// 本地开发走 vite 代理的相对路径；线上构建通过 VITE_API_BASE 指向后端 Worker
+const API_BASE = import.meta.env.VITE_API_BASE ?? '/api'
 
 export async function getQuestions(): Promise<Question[]> {
   const res = await fetch(`${API_BASE}/questions`)
