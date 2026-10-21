@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Eye, EyeOff, Lock, Mail, TriangleAlert } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import AdminApiKeys from '@/components/AdminApiKeys'
+import AdminNav, { type AdminSection } from '@/components/AdminNav'
 import AdminQuestionEditor from '@/components/AdminQuestionEditor'
 import AdminSidebar from '@/components/AdminSidebar'
 import { Button } from '@/components/motion/button'
@@ -34,8 +36,13 @@ export default function AdminDashboard() {
   const [isNew, setIsNew] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [isCourseModalOpen, setIsCourseModalOpen] = useState(false)
   const [tempCourses, setTempCourses] = useState<Course[]>([])
+
+  // 侧边栏当前分区，可用 ?section=api-keys 直接定位到某个分区
+  const [section, setSection] = useState<AdminSection>(() => {
+    const wanted = new URLSearchParams(window.location.search).get('section')
+    return wanted === 'courses' || wanted === 'api-keys' ? wanted : 'questions'
+  })
 
   const [isImportConfirmOpen, setIsImportConfirmOpen] = useState(false)
   const [importData, setImportData] = useState<Question[] | null>(null)
@@ -88,10 +95,14 @@ export default function AdminDashboard() {
     enabled: isAuthenticated,
   })
 
-  const handleOpenCourseModal = () => {
-    setTempCourses(courses)
+  const handleSectionChange = (next: AdminSection) => {
+    // 进入课程分区时把服务端数据同步到编辑副本
+    if (next === 'courses')
+      setTempCourses(courses)
+    setIsBatchMode(false)
+    setSelectedIds(new Set())
     setPageError(null)
-    setIsCourseModalOpen(true)
+    setSection(next)
   }
 
   const handleSaveCourses = async () => {
@@ -101,7 +112,7 @@ export default function AdminDashboard() {
         void queryClient.invalidateQueries({ queryKey: ['courses'] })
         void queryClient.invalidateQueries({ queryKey: ['questions'] })
         setPageError(null)
-        setIsCourseModalOpen(false)
+        setTempCourses(data.courses)
       }
       else {
         setPageError(data.error || '保存课程失败')
@@ -546,68 +557,67 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <AdminSidebar
-        questions={questions}
-        search={search}
-        onSearchChange={setSearch}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-        selectedId={selectedIndex}
-        onSelect={handleSelect}
-        onDelete={handleDelete}
-        isBatchMode={isBatchMode}
-        onToggleBatchMode={handleToggleBatchMode}
-        selectedIds={selectedIds}
-        onToggleSelect={handleToggleSelect}
-        onSelectAll={handleSelectAll}
-        onOpenBatchModal={handleOpenBatchModal}
-      />
+      <AdminNav active={section} onChange={handleSectionChange} />
+
+      {section === 'questions' && (
+        <AdminSidebar
+          questions={questions}
+          search={search}
+          onSearchChange={setSearch}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          selectedId={selectedIndex}
+          onSelect={handleSelect}
+          onDelete={handleDelete}
+          isBatchMode={isBatchMode}
+          onToggleBatchMode={handleToggleBatchMode}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+          onSelectAll={handleSelectAll}
+          onOpenBatchModal={handleOpenBatchModal}
+        />
+      )}
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="flex items-center gap-3 px-6 py-4 bg-card border-b border-border">
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleNew}
-            className="px-5 py-2"
-          >
-            + 新增题目
-          </Button>
+          {section === 'questions' && (
+            <>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleNew}
+                className="px-5 py-2"
+              >
+                + 新增题目
+              </Button>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleOpenCourseModal}
-            className="px-5 py-2"
-          >
-            课程管理
-          </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleExport}
+                className="px-5 py-2"
+              >
+                导出 JSON
+              </Button>
 
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleExport}
-            className="px-5 py-2"
-          >
-            导出 JSON
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            className="px-5 py-2"
-          >
-            导入 JSON
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            className="hidden"
-            onChange={handleImport}
-          />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-5 py-2"
+              >
+                导入 JSON
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={handleImport}
+              />
+            </>
+          )}
 
           <div className="flex-1" />
 
@@ -634,116 +644,106 @@ export default function AdminDashboard() {
         )}
 
         {/* Editor */}
-        {isBatchMode
+        {section === 'api-keys'
           ? (
-              <div className="flex-1 flex flex-col items-center justify-center bg-background p-8 text-center">
-                <div className="size-16 bg-primary/10 border border-primary/15 rounded-2xl flex items-center justify-center text-primary mb-4 animate-pulse">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">批量操作模式已启用</h3>
-                <p className="text-muted-foreground text-sm max-w-md mb-6">
-                  在左侧侧边栏中勾选您需要修改的题目。
-                  {selectedIds.size > 0
-                    ? `已选中 ${selectedIds.size} 道题目，点击侧边栏下方的“修改所属课程与分类”即可进行批量修改。`
-                    : '当前尚未选择任何题目。'}
-                </p>
-                {selectedIds.size > 0 && (
-                  <div className="w-full max-w-md bg-card border border-border/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
-                    <div className="text-xs font-bold text-muted-foreground/70 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
-                    <div className="flex flex-col gap-1.5">
-                      {questions
-                        .filter(q => q.id !== undefined && selectedIds.has(q.id))
-                        .map((q, i) => (
-                          <div key={q.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span className="size-5 bg-primary/10 text-primary font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
-                              {i + 1}
-                            </span>
-                            <span className="truncate flex-1 font-medium">{q.text}</span>
-                            <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
-                          </div>
-                        ))}
+              <AdminApiKeys />
+            )
+          : section === 'courses'
+            ? (
+                <div className="flex-1 flex flex-col min-h-0 bg-background">
+                  <div className="flex-1 overflow-y-auto px-6 py-6">
+                    <div className="max-w-3xl mx-auto flex flex-col gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <h2 className="text-xl font-bold text-foreground">课程管理</h2>
+                        <p className="text-sm text-muted-foreground">
+                          增删改课程与其下的 Tab 分类；删除课程会解除其下所有题目的关联。
+                        </p>
+                      </div>
+                      {renderCourseItems()}
                     </div>
                   </div>
-                )}
-              </div>
-            )
-          : displayQuestion
-            ? (
-                <AdminQuestionEditor
-                  key={isNew ? 'new' : String(selectedIndex)}
-                  question={displayQuestion}
-                  index={selectedIndex!}
-                  onSave={handleSave}
-                  isNew={isNew}
-                  courses={courses}
-                />
-              )
-            : (
-                <div className="flex-1 flex items-center justify-center text-muted-foreground/70 text-sm">
-                  请选择或新增一道题目
+                  <div className="px-6 py-4 border-t border-border bg-card flex items-center justify-between pr-20">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setTempCourses(prev => [...prev, { id: undefined as any, name: '新课程', categories: [{ id: undefined as any, name: '基础题', courseId: undefined as any }] }])}
+                      className="px-4 py-2"
+                    >
+                      + 新增课程
+                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setTempCourses(courses)}
+                        className="px-4 py-2 text-muted-foreground hover:text-foreground"
+                      >
+                        重置
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={handleSaveCourses}
+                        className="px-5 py-2"
+                      >
+                        保存并应用
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              )}
+              )
+            : isBatchMode
+              ? (
+                  <div className="flex-1 flex flex-col items-center justify-center bg-background p-8 text-center">
+                    <div className="size-16 bg-primary/10 border border-primary/15 rounded-2xl flex items-center justify-center text-primary mb-4 animate-pulse">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground mb-2">批量操作模式已启用</h3>
+                    <p className="text-muted-foreground text-sm max-w-md mb-6">
+                      在左侧侧边栏中勾选您需要修改的题目。
+                      {selectedIds.size > 0
+                        ? `已选中 ${selectedIds.size} 道题目，点击侧边栏下方的“修改所属课程与分类”即可进行批量修改。`
+                        : '当前尚未选择任何题目。'}
+                    </p>
+                    {selectedIds.size > 0 && (
+                      <div className="w-full max-w-md bg-card border border-border/60 rounded-xl p-4 text-left shadow-sm max-h-[300px] overflow-y-auto">
+                        <div className="text-xs font-bold text-muted-foreground/70 mb-2.5 uppercase tracking-wider">已选题目列表:</div>
+                        <div className="flex flex-col gap-1.5">
+                          {questions
+                            .filter(q => q.id !== undefined && selectedIds.has(q.id))
+                            .map((q, i) => (
+                              <div key={q.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span className="size-5 bg-primary/10 text-primary font-bold rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">
+                                  {i + 1}
+                                </span>
+                                <span className="truncate flex-1 font-medium">{q.text}</span>
+                                <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-md flex-shrink-0 font-semibold">{q.type}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              : displayQuestion
+                ? (
+                    <AdminQuestionEditor
+                      key={isNew ? 'new' : String(selectedIndex)}
+                      question={displayQuestion}
+                      index={selectedIndex!}
+                      onSave={handleSave}
+                      isNew={isNew}
+                      courses={courses}
+                    />
+                  )
+                : (
+                    <div className="flex-1 flex items-center justify-center text-muted-foreground/70 text-sm">
+                      请选择或新增一道题目
+                    </div>
+                  )}
       </div>
-
-      {/* Course Management Modal */}
-      {isCourseModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
-          <div className="w-full max-w-lg bg-card rounded-2xl border border-border shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in fade-in zoom-in duration-200">
-            {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between bg-background">
-              <div>
-                <h3 className="text-lg font-bold text-foreground">课程管理</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">添加、修改或删除课程，删除课程将解除所有关联题目</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsCourseModalOpen(false)}
-                className="size-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground/70 hover:text-muted-foreground/90 transition"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5 max-h-[60vh]">
-              {renderCourseItems()}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-border bg-background flex items-center justify-between">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setTempCourses(prev => [...prev, { id: undefined as any, name: '新课程', categories: [{ id: undefined as any, name: '基础题', courseId: undefined as any }] }])}
-                className="px-4 py-2"
-              >
-                + 新增课程
-              </Button>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsCourseModalOpen(false)}
-                  className="px-4 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  取消
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleSaveCourses}
-                  className="px-5 py-2"
-                >
-                  保存并应用
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Batch Update Modal */}
       {isBatchModalOpen && (
@@ -832,7 +832,7 @@ export default function AdminDashboard() {
                         }
                         return (
                           <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30">
-                            当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
+                            当前选择的课程未配置任何内部分类，请先在左侧「课程管理」中配置分类。
                           </div>
                         )
                       })()

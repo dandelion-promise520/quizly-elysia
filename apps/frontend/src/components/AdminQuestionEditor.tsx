@@ -353,7 +353,7 @@ function AdminQuestionEditor({
               )
             : (
                 <div className="text-xs text-warning bg-warning/10 px-4 py-3 rounded-lg border border-warning/30 inline-block w-full">
-                  当前选择的课程未配置任何内部分类，请先在顶部“课程管理”中配置分类。
+                  当前选择的课程未配置任何内部分类，请先在左侧「课程管理」中配置分类。
                 </div>
               )}
         </div>

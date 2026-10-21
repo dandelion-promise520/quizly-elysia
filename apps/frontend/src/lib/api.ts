@@ -64,6 +64,59 @@ export async function signOut(): Promise<void> {
   clearSession()
 }
 
+/** apikey 表里的一行（不含明文 key，明文只在创建时返回一次） */
+export interface ApiKeyItem {
+  id: string
+  name: string | null
+  start: string | null
+  prefix: string | null
+  enabled: boolean
+  requestCount: number
+  lastRequest: string | number | Date | null
+  expiresAt: string | number | Date | null
+  createdAt: string | number | Date
+}
+
+async function authJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${AUTH_BASE}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+      ...init?.headers,
+    },
+  })
+  ensureOk(res, '接口调用失败')
+  return res.json()
+}
+
+export async function listApiKeys(): Promise<ApiKeyItem[]> {
+  const data = await authJson<{ apiKeys?: ApiKeyItem[] }>('/api-key/list')
+  return data.apiKeys ?? []
+}
+
+/** 创建 API Key，返回值里带明文 key，只此一次 */
+export async function createApiKey(name: string): Promise<{ key: string }> {
+  return authJson<{ key: string }>('/api-key/create', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  })
+}
+
+export async function deleteApiKey(keyId: string): Promise<void> {
+  await authJson('/api-key/delete', {
+    method: 'POST',
+    body: JSON.stringify({ keyId }),
+  })
+}
+
+export async function setApiKeyEnabled(keyId: string, enabled: boolean): Promise<void> {
+  await authJson('/api-key/update', {
+    method: 'POST',
+    body: JSON.stringify({ keyId, enabled }),
+  })
+}
+
 export async function getQuestions(): Promise<Question[]> {
   const res = await fetch(`${API_BASE}/questions`)
   if (!res.ok)
